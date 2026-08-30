@@ -1,16 +1,26 @@
 services:
   db:
-      image: postgres:16-alpine
-      container_name: local_postgres
-      environment:
-        POSTGRES_USER: shaluka
-        POSTGRES_PASSWORD: 1234
-        POSTGRES_DB: smartjourney
-      ports:
-        - "5432:5432"
-      volumes:
-        - db_data:/var/lib/postgresql/data
-      restart: always
+    # PostGIS, not plain postgres - the schema uses geography(Point,4326)
+    # columns (travel_listing.location, traveler_profile.home_location), which
+    # a stock postgres image cannot create. See docs/BACKEND_PLAN.md §3.1.
+    image: postgis/postgis:16-3.4
+    container_name: smartjourney_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      # So dependent services (and `docker compose up --wait`) don't start
+      # talking to the DB before it can actually accept connections.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
 
 volumes:
   db_data:
