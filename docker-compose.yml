@@ -13,12 +13,32 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+      # Only runs on a genuinely empty data volume (Postgres init-script
+      # behavior) - see docs/master_plan/DATA_PLATFORM.md §1's gotcha note.
+      - ./db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       # So dependent services (and `docker compose up --wait`) don't start
       # talking to the DB before it can actually accept connections.
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    # Cache for weather (45 min TTL) and disaster (1 h) lookups - see
+    # ai-backend/app/utils/cache.py, which silently no-ops without it and
+    # re-fetches from OpenWeather on every single request.
+    # Pure cache: no persistence, so a restart just means a cold cache.
+    image: redis:7-alpine
+    container_name: smartjourney_redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
       retries: 10
     restart: unless-stopped
 
