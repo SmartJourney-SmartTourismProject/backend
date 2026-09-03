@@ -110,3 +110,24 @@ Also unchanged and still true: the AI backend has no auth and must stay on a pri
 §6 ("AI backend migration work, Supabase SDK → asyncpg") is **done** — completed 2026-08-30. Its final
 paragraph instructs preserving the mock-data fallbacks; that is now **reversed** by decision D5. Treat
 §6 as historical.
+
+---
+
+## 7. ⚠️ Priority item for whoever builds the admin panel: real listing verification
+
+Found closing out the AI backend's mock-removal (Phase 3, 2026-09-02), worth flagging before this
+gets forgotten. `travel_listing`/`local_event` default `is_verified = false`, and the AI backend
+correctly filters on it — but with the admin panel (§5.7) not built yet, **nothing can ever pass that
+filter**. Left alone, that makes the whole system return "no verified listings" for every single
+destination, regardless of how much real data has been ingested (6,572 listings across all 25
+districts as of this writing).
+
+The AI backend's stopgap — `ai-backend/app/data/verify_all_for_demo.py` — bulk-verifies every
+currently-ingested row so the system is usable *now*. Its own docstring says this loudly: it is not
+real review, must not be added to any scheduler, and must be retired once real verification exists.
+
+**When building §5.7's admin endpoints, treat this as the actual cutover point** — the first time
+`POST /admin/listings/:id/verify` / `/reject` exist and an admin has reviewed at least the listings a
+demo will show, that stopgap script should stop being run, and ideally the bulk `is_verified = true`
+it already applied should be revisited (spot-check, or reset to `false` and re-approve properly)
+rather than silently grandfathered in.
