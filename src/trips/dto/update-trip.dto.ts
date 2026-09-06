@@ -1,4 +1,4 @@
-import { IsIn, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 // Status vocabulary is not yet finalized project-wide (tracked in
 // PROJECT_MASTER_PLAN.md) - "draft"/"upcoming"/"past" are the three tabs the
@@ -21,4 +21,12 @@ export class UpdateTripDto {
   @IsOptional()
   @IsString()
   end_date?: string;
+
+  // Chat-saved trips never get one (TripPlanResponse only returns
+  // estimated_cost, not the budget the traveler asked for) - this is what
+  // lets the Budget Tracker have a real target to track against.
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  budget?: number;
 }

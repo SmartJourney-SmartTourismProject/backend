@@ -106,6 +106,7 @@ export class TripsService {
         ...(dto.status !== undefined && { status: dto.status }),
         ...(dto.start_date !== undefined && { start_date: new Date(dto.start_date) }),
         ...(dto.end_date !== undefined && { end_date: new Date(dto.end_date) }),
+        ...(dto.budget !== undefined && { budget: dto.budget }),
         updated_at: new Date(),
       },
     });

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DEMO_USER_ID } from '../common/demo-user.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { Prisma } from '../generated/prisma/client.js';
 import { AiBackendService } from './ai-backend.service.js';
 import { SendMessageDto } from './dto/send-message.dto.js';
 
@@ -89,6 +90,11 @@ export class ChatService {
         session_id: sessionId,
         role: 'assistant',
         content: aiResponse.final_response ?? '',
+        // Without this, reloading a session (refresh, or switching chats
+        // and back) only had the rendered text to go on - the itinerary
+        // summary card had nothing to rebuild itself from. Only stored
+        // when there's an actual plan, not on a bare clarification reply.
+        plan: aiResponse.itinerary.length > 0 ? (aiResponse as unknown as Prisma.InputJsonValue) : undefined,
       },
     });
 
