@@ -2,7 +2,9 @@
 
 **For:** the NestJS backend (`backend/`), which is the only service that should call the AI backend directly.
 **AI backend repo:** `ai-backend/` (Python / FastAPI)
-**Generated from:** the live FastAPI OpenAPI schema, 2026-08-30. Verify against `GET /docs` (Swagger UI) if anything here looks stale.
+**Generated from:** the live FastAPI OpenAPI schema, 2026-08-30, updated 2026-09-02 for Phase 6/7
+(ReAct agents + graph rewrite, Postgres-backed sessions). Verify against `GET /docs` (Swagger UI)
+if anything here looks stale.
 
 ---
 
@@ -59,14 +61,20 @@ Interactive docs: `http://localhost:8000/docs`
 
 ## `POST /trip-plan`
 
-The primary endpoint. Runs the full multi-agent LangGraph pipeline:
-`validate → policy → slot-fill → location → calendar → weather/disaster → recommend → plan → respond`.
+The primary endpoint. Runs the full multi-agent LangGraph pipeline (rewritten in Phase 6 to real
+ReAct agents, not a linear tool chain — see `ai-backend/docs/master_plan/AGENT_ARCHITECTURE.md`):
+`validate → policy → slot-fill → orchestrate (ReAct) → recommend (ReAct) → plan (ReAct) → verify →
+(repair once | fallback) → respond`. The `orchestrate` step resolves the destination/dates/weather/
+disaster itself, deciding which of its tools to call and in what order — there's no separate
+location/calendar/weather-disaster step anymore. `verify`/`repair`/`fallback` are what make an
+invalid or failed LLM plan degrade into a *complete, valid* deterministic one instead of an error —
+see `plan_source` in the response below.
 
 ### Request
 
 ```json
 {
-  "message": "Plan a 3-day trip to Kandy, budget $300, interested in culture and history",
+  "message": "Plan a 3-day trip to Kandy, budget 60000 LKR, interested in culture and history",
   "language": "en",
   "user_id": "optional-uuid",
   "client_gps": { "lat": 7.29, "lon": 80.63 },
@@ -104,8 +112,11 @@ The primary endpoint. Runs the full multi-agent LangGraph pipeline:
       ]
     }
   ],
-  "estimated_cost": 230.0,
-  "budget_notes": "Estimated cost of $230 stays comfortably within the $300 budget.",
+  "estimated_cost": 46000.0,
+  "currency": "LKR",
+  "budget_notes": "Estimated cost of 46,000 LKR stays comfortably within the 60,000 LKR budget.",
+  "plan_source": "fallback",
+  "data_freshness": "2026-09-01T02:30:00+00:00",
   "weather": {
     "current": { "temp": 24.5, "condition": "Clouds", "humidity": 78 },
     "forecast": [
@@ -114,9 +125,9 @@ The primary endpoint. Runs the full multi-agent LangGraph pipeline:
     ]
   },
   "disaster": { "safe": true, "active_events": [] },
-  "final_response": "Here's your trip plan for Kandy: 3 day(s) planned, estimated cost 230.0.",
+  "final_response": "Here's your trip plan for Kandy: 3 day(s) planned, estimated cost 46000.0.",
   "errors": [],
-  "completed_steps": []
+  "trace": {}
 }
 ```
 
@@ -125,13 +136,16 @@ The primary endpoint. Runs the full multi-agent LangGraph pipeline:
 | `session_id` | string | **Always returned.** Persist it against the user's chat session — it's how follow-up messages work. |
 | `destination` | string \| null | Resolved by the AI from `message`. `null` when it had to ask a clarifying question. |
 | `itinerary` | array | Day-by-day plan. `items[].lat`/`lon` are present on every stop — use them for map pins. Empty array when nothing could be planned. |
-| `estimated_cost` | number \| null | AI's cost estimate. **Currency is implicitly USD** — see *Known gaps*. |
+| `estimated_cost` | number \| null | AI's cost estimate, in `currency`. |
+| `currency` | string | Always `"LKR"` (decision D14 — Sri Lanka only, no other currency). |
 | `budget_notes` | string \| null | The AI's explanation of budget fit — surface this in the UI when present, especially when the budget was exceeded. |
+| `plan_source` | string \| null | `"llm"` (the ReAct planner produced this) or `"fallback"` (the deterministic planner did, because the LLM path failed or its output didn't validate). `null` only when no plan was built at all (e.g. a clarification response). **Both are valid, complete plans** — `"fallback"` is not an error state, see `AGENT_ARCHITECTURE.md §6`. As of 2026-09-02, most responses are currently `"fallback"` — a known, tracked issue (`ai-backend/TODO.md`), not something NestJS needs to work around. |
+| `data_freshness` | string \| null | ISO timestamp of the oldest successful data sync among enabled sources. `null` if unknown or a source has never synced. Informational only. |
 | `weather` | object \| null | `null` when weather couldn't be fetched (no API key, destination not geocodable, API down). The plan still completes. |
 | `disaster` | object \| null | `{safe, active_events[]}`. May also carry `"note": "disaster data unavailable"` when all three sources failed — that's different from a confident "safe". |
 | `final_response` | string \| null | **Chat-display text.** Either a plan summary or a clarification question. This is what you render in the chat bubble. |
 | `errors` | string[] | **Advisory, not necessarily fatal** — see below. |
-| `completed_steps` | string[] | Debug only. Always `[]` unless the AI backend runs with `DEBUG=true`. Ignore in production. |
+| `trace` | object | Debug only. Always `{}` unless the AI backend runs with `DEBUG=true`; otherwise `{"completed_steps": [...], "react_traces": {...}}`. Ignore in production. (Renamed from `completed_steps` in Phase 7.) |
 
 ### Interpreting `errors` — important
 
@@ -160,11 +174,11 @@ The AI backend supports refining an existing plan rather than starting over:
 
 An unrecognized `session_id` is treated as a fresh first turn — it won't error.
 
-**Caveat for NestJS:** session state currently lives in a **local JSON file** inside the AI
-backend container (`app/utils/session_store.py`), not in Postgres. That means it won't survive a
-container rebuild and won't work if you run more than one AI-backend instance behind a load
-balancer. Either keep it to a single instance for now, or plan to move that state into the shared
-database (this is a known open item — see `ai-backend/docs/NEXT_STEPS.md`).
+**Session storage (Phase 7):** session state lives in the shared Postgres database (`ai_session`
+table), not a local file — it survives a container rebuild and works fine behind multiple AI-backend
+instances. Sessions expire after 7 days (`ai_session.expires_at`, cleaned nightly by a scheduled
+job); an expired `session_id` is treated the same as an unrecognized one — a fresh first turn, not
+an error.
 
 ### Errors
 
@@ -233,7 +247,9 @@ Manually trigger the data-ingest jobs (Ticketmaster events; Overpass listings + 
 return immediately (`{"status": "started"}`) and run in the background — the sync itself takes
 several minutes across 25 districts. Check the AI backend's logs for completion.
 
-These also run automatically on a schedule (events weekly, listings monthly) via APScheduler.
+These also run automatically every night at 02:30 via APScheduler — a single "due-only" job that
+skips any connector that hasn't reached its own cadence yet (`osm_listings`/`booking_prices`/
+`foursquare_enrich` are weekly, `ticketmaster_events` is daily), not a fixed weekly/monthly split.
 
 **Wire these to the Admin Panel only**, behind an admin role check in NestJS — they're
 unauthenticated on the AI backend side.
@@ -254,11 +270,13 @@ only keeps enough state to make the *next* follow-up message work.
 
 ## Known gaps to be aware of
 
-- **Currency**: `estimated_cost` has no currency field and the prompts assume USD, while the SRS
-  mockups show LKR. Decide where conversion/labelling happens — probably NestJS or the UI.
+- **`plan_source` is usually `"fallback"`, not `"llm"`, today**: the ReAct recommend/plan agents'
+  structured-output calls fail against the currently-configured free-tier models more often than
+  not (real capability limit, not a wiring bug — see `ai-backend/TODO.md` for the full
+  investigation). The response is still a complete, valid plan either way; NestJS doesn't need to
+  special-case this, but don't be surprised `plan_source` rarely says `"llm"` right now.
 - **Budget adherence**: the AI explains budget overruns in `budget_notes` but doesn't always pick
   the cheapest available option. Surface `budget_notes` prominently rather than trusting
   `estimated_cost` to respect the requested budget.
-- **Session storage**: local file, not shared DB (see *Multi-turn* above).
 - **No rate limiting**: SAD §10.3 specifies queueing beyond ~20 req/sec; not implemented. Fine at
   current scale; NestJS is the natural place to add throttling if it ever matters.

@@ -407,7 +407,7 @@ are folded into §4.1 above. Delete it after Phase 0.
 
 Phases are sequential unless marked parallel. Each ends in something verifiable.
 
-**Phase 0 — Infrastructure**
+**Phase 0 — Infrastructure** ✅ done 2026-09-03
 
 1. `docker-compose.yml` (§3.1): swap to `postgis/postgis:16-3.4`, add the healthcheck, move
    `shaluka`/`1234` into a gitignored `.env` with `POSTGRES_USER`/`POSTGRES_PASSWORD`/`POSTGRES_DB`.
@@ -440,14 +440,46 @@ Phases are sequential unless marked parallel. Each ends in something verifiable.
    `latitude`/`longitude` columns written alongside `location` in application code (§4.2) — and
    update this plan to say so.
 4. Scaffold NestJS (`nest new`), `prisma init`, wire `DATABASE_URL`, enable the
-   `postgresqlExtensions` preview feature.
+   `postgresqlExtensions` preview feature. ✅ **Done 2026-09-03** — see below.
 
 *Done when:* the container is healthy, the probe above returns the right coordinates, and
-`prisma migrate dev` runs cleanly against it.
+~~`prisma migrate dev` runs cleanly against it~~ **`prisma db pull` introspects the live schema
+cleanly** — updated per `docs/BACKEND_ALIGNMENT.md §1` (decision D13): Prisma introspects this
+schema, it does not own/migrate it, so `migrate dev` is never run against these tables at all.
 
-**Phase 1 — Schema + seed**
-Full first migration (§4.1) · seed 25 districts, 3 categories, and 15–20 verified listings across Kandy/Ella/Colombo/Galle (mirroring the AI backend's mock data, so behaviour stays consistent when it switches to the real DB).
-*Done when:* schema matches SAD §9 for in-scope tables; seed runs idempotently.
+**✅ Step 4 done 2026-09-03.** `nest new` (NestJS 12, TypeScript, npm) scaffolded into this directory
+without disturbing `db/`, `docs/`, `.env`, or `docker-compose.yml`. Prisma pinned to **7.10.0**
+(the latest *stable* release — `npm install prisma@latest` resolved to `8.0.0-rc.12`, a release
+candidate, which was deliberately avoided). `prisma init` + `schema.prisma` edited exactly per §4.2
+(`previewFeatures = ["postgresqlExtensions"]`, `extensions = [postgis]`). `npx prisma db pull`
+against the real running `smartjourney_postgres` container introspected **27 models** cleanly, with
+exactly the `Unsupported("geography"/"geometry")` warnings §4.2 predicted and no others —
+`travel_listing.latitude`/`longitude` came through as ordinary readable `Float?` fields via the
+generated `STORED` columns, confirming that design decision against the real schema, not just on
+paper.
+
+**One real friction point §4.2 didn't anticipate** (it was written against an older Prisma): Prisma 7
+requires an explicit driver adapter — `new PrismaClient()` with no arguments throws
+`PrismaClientInitializationError` at runtime. Fixed by installing `@prisma/adapter-pg` + `pg` and
+wiring a `PrismaService`/`PrismaModule` (`src/prisma/`) that constructs the client with
+`new PrismaPg({ connectionString: process.env.DATABASE_URL })`. Every future feature module injects
+`PrismaService`; nothing should construct `PrismaClient` directly.
+
+**Live-verified, not just "builds":** `npm run build` succeeds; `node dist/main.js` starts cleanly and
+logs `PrismaService: Connected to Postgres via Prisma.`; a live query returned real counts matching
+the AI backend's own data — 25 districts, 6,572 listings, same Kandy district UUID seen throughout
+the AI backend's own testing. Same database, both sides reading it correctly.
+
+**Phase 1 — Schema + seed** ✅ superseded by real data, not manual seeding
+The schema (§4.1) and its data both already exist, via a different path than originally planned: the
+AI backend's own Phase 1–3 (`ai-backend/docs/master_plan/PROJECT_MASTER_PLAN.md`) applied the full
+migration set (`backend/db/migrations/0001_core.sql`/`0002_identity_planning.sql`, run by
+`backend/db/migrate.py`) and ingested **real** listings via OSM/Booking/Ticketmaster connectors — 25
+real districts, 6,572 real listings across all of them, not 15–20 mock rows across 4 cities. No
+manual seed script is needed or should be written; `prisma db pull` (Phase 0, above) is what makes
+this real data visible to NestJS.
+*Done when:* ~~schema matches SAD §9 for in-scope tables; seed runs idempotently~~ — verified instead
+via Phase 0's live query (25 districts, 6,572 listings returned through the generated Prisma client).
 
 **Phase 2 — Auth**
 `user`/`traveler_profile`/`admin_profile`/`refresh_token` · bcrypt · JWT access+refresh · Google sign-in · `JwtAuthGuard` + `RolesGuard` · §5.1 and §5.2.

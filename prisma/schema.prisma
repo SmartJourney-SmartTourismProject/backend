@@ -1,0 +1,400 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [postgis, uuid_ossp(map: "uuid-ossp", schema: "public")]
+}
+
+model activity_log {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String?   @db.Uuid
+  action     String
+  detail     Json?
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  app_user   app_user? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id, created_at(sort: Desc)], map: "activity_log_user")
+}
+
+model admin_profile {
+  user_id                                     String    @id @db.Uuid
+  granted_at                                  DateTime  @default(now()) @db.Timestamptz(6)
+  granted_by                                  String?   @db.Uuid
+  app_user_admin_profile_granted_byToapp_user app_user? @relation("admin_profile_granted_byToapp_user", fields: [granted_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  app_user_admin_profile_user_idToapp_user    app_user  @relation("admin_profile_user_idToapp_user", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model ai_session {
+  session_id  String    @id @db.Uuid
+  user_id     String?   @db.Uuid
+  state       Json
+  react_trace Json?
+  turn_count  Int       @default(1)
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime  @default(now()) @db.Timestamptz(6)
+  expires_at  DateTime  @default(dbgenerated("(now() + '7 days'::interval)")) @db.Timestamptz(6)
+  app_user    app_user? @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ai_session_user_fk")
+
+  @@index([expires_at], map: "ai_session_expiry")
+  @@index([user_id], map: "ai_session_user")
+}
+
+model app_user {
+  id                                               String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email                                            String               @unique
+  password_hash                                    String?
+  name                                             String?
+  phone                                            String?
+  google_id                                        String?              @unique
+  email_verified                                   Boolean              @default(false)
+  role                                             String               @default("traveler")
+  is_active                                        Boolean              @default(true)
+  location_enabled                                 Boolean              @default(false)
+  created_at                                       DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at                                       DateTime             @default(now()) @db.Timestamptz(6)
+  activity_log                                     activity_log[]
+  admin_profile_admin_profile_granted_byToapp_user admin_profile[]      @relation("admin_profile_granted_byToapp_user")
+  admin_profile_admin_profile_user_idToapp_user    admin_profile?       @relation("admin_profile_user_idToapp_user")
+  ai_session                                       ai_session[]
+  chat_session                                     chat_session[]
+  google_oauth_tokens                              google_oauth_tokens?
+  itinerary                                        itinerary[]
+  refresh_token                                    refresh_token[]
+  traveler_profile                                 traveler_profile?
+}
+
+model category {
+  id             String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name           String           @unique
+  travel_listing travel_listing[]
+}
+
+model chat_message {
+  id           String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  session_id   String       @db.Uuid
+  role         String
+  content      String
+  created_at   DateTime     @default(now()) @db.Timestamptz(6)
+  plan         Json?
+  chat_session chat_session @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([session_id, created_at], map: "chat_message_session")
+}
+
+model chat_session {
+  id            String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id       String         @db.Uuid
+  ai_session_id String?        @db.Uuid
+  title         String?
+  created_at    DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime       @default(now()) @db.Timestamptz(6)
+  chat_message  chat_message[]
+  app_user      app_user       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id, updated_at(sort: Desc)], map: "chat_session_user")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model cost_reference {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  district_id  String?   @db.Uuid
+  category     String
+  price_level  Int       @db.SmallInt
+  unit         String
+  typical_cost Decimal   @db.Decimal(12, 2)
+  currency     String    @default("LKR") @db.Char(3)
+  source_note  String?
+  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
+  district     district? @relation(fields: [district_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([district_id, category, price_level, unit])
+}
+
+model data_source {
+  name            String            @id
+  display_name    String
+  cadence         String
+  is_enabled      Boolean           @default(true)
+  requires_key    Boolean           @default(false)
+  last_success_at DateTime?         @db.Timestamptz(6)
+  data_source_run data_source_run[]
+}
+
+model data_source_run {
+  id            String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  source        String
+  district_id   String?     @db.Uuid
+  started_at    DateTime    @default(now()) @db.Timestamptz(6)
+  finished_at   DateTime?   @db.Timestamptz(6)
+  status        String      @default("running")
+  rows_fetched  Int         @default(0)
+  rows_upserted Int         @default(0)
+  error         String?
+  district      district?   @relation(fields: [district_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  data_source   data_source @relation(fields: [source], references: [name], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([source, started_at(sort: Desc)], map: "dsr_recent")
+}
+
+model district {
+  id              String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name            String                   @unique
+  province        String
+  osm_relation_id BigInt?                  @unique
+  center          Unsupported("geography")
+  boundary        Unsupported("geometry")?
+  source          String                   @default("osm")
+  updated_at      DateTime                 @default(now()) @db.Timestamptz(6)
+  cost_reference  cost_reference[]
+  data_source_run data_source_run[]
+  geo_resolution  geo_resolution[]
+  itinerary       itinerary[]
+  local_event     local_event[]
+  travel_listing  travel_listing[]
+
+  @@index([boundary], map: "district_boundary_gix", type: Gist)
+  @@index([center], map: "district_center_gix", type: Gist)
+  @@index([name(ops: raw("gin_trgm_ops"))], map: "district_name_trgm", type: Gin)
+}
+
+model expense {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  itinerary_id String    @db.Uuid
+  category     String
+  amount       Decimal   @db.Decimal(12, 2)
+  currency     String    @default("LKR") @db.Char(3)
+  description  String?
+  occurred_at  DateTime  @default(dbgenerated("CURRENT_DATE")) @db.Date
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  itinerary    itinerary @relation(fields: [itinerary_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([itinerary_id], map: "expense_itinerary")
+}
+
+model geo_resolution {
+  query_norm   String                   @id
+  display_name String
+  location     Unsupported("geography")
+  district_id  String?                  @db.Uuid
+  confidence   String
+  provider     String
+  resolved_at  DateTime                 @default(now()) @db.Timestamptz(6)
+  country      String?
+  district     district?                @relation(fields: [district_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model google_oauth_tokens {
+  user_id       String    @id @db.Uuid
+  access_token  String
+  refresh_token String?
+  token_expiry  DateTime? @db.Timestamptz(6)
+  scope         String?
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @db.Timestamptz(6)
+  app_user      app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "google_oauth_tokens_user_fk")
+}
+
+model itinerary {
+  id             String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id        String          @db.Uuid
+  district_id    String?         @db.Uuid
+  title          String?
+  start_date     DateTime?       @db.Date
+  end_date       DateTime?       @db.Date
+  travelers      Int             @default(1)
+  budget         Decimal?        @db.Decimal(12, 2)
+  estimated_cost Decimal?        @db.Decimal(12, 2)
+  currency       String          @default("LKR") @db.Char(3)
+  status         String          @default("draft")
+  created_at     DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime        @default(now()) @db.Timestamptz(6)
+  expense        expense[]
+  district       district?       @relation(fields: [district_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  app_user       app_user        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  itinerary_day  itinerary_day[]
+
+  @@index([user_id, status], map: "itinerary_user")
+}
+
+model itinerary_day {
+  id             String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  itinerary_id   String           @db.Uuid
+  day_number     Int
+  date           DateTime?        @db.Date
+  itinerary      itinerary        @relation(fields: [itinerary_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  itinerary_item itinerary_item[]
+
+  @@index([itinerary_id], map: "itinerary_day_parent")
+}
+
+model itinerary_item {
+  id               String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  itinerary_day_id String          @db.Uuid
+  listing_id       String?         @db.Uuid
+  event_id         String?         @db.Uuid
+  item_type        String
+  name             String
+  latitude         Float?
+  longitude        Float?
+  start_time       DateTime?       @db.Time(6)
+  end_time         DateTime?       @db.Time(6)
+  est_cost         Decimal?        @db.Decimal(12, 2)
+  order_index      Int             @default(0)
+  notes            String?
+  local_event      local_event?    @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itinerary_day    itinerary_day   @relation(fields: [itinerary_day_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  travel_listing   travel_listing? @relation(fields: [listing_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([itinerary_day_id, order_index], map: "itinerary_item_day")
+}
+
+model listing_image {
+  id             String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  listing_id     String         @db.Uuid
+  url            String
+  caption        String?
+  attribution    String?
+  travel_listing travel_listing @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([listing_id, url], map: "listing_image_listing_url_uq")
+  @@index([listing_id], map: "listing_image_listing")
+}
+
+model local_event {
+  id             String                    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  district_id    String                    @db.Uuid
+  name           String
+  description    String?
+  start_datetime DateTime                  @db.Timestamptz(6)
+  end_datetime   DateTime?                 @db.Timestamptz(6)
+  venue_name     String?
+  location       Unsupported("geography")?
+  latitude       Float?                    @default(dbgenerated("st_y((location)::geometry)"))
+  longitude      Float?                    @default(dbgenerated("st_x((location)::geometry)"))
+  tags           String[]                  @default([])
+  price_min      Decimal?                  @db.Decimal(12, 2)
+  price_max      Decimal?                  @db.Decimal(12, 2)
+  currency       String                    @default("LKR") @db.Char(3)
+  source         String
+  external_ref   String
+  is_verified    Boolean                   @default(false)
+  created_at     DateTime                  @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime                  @default(now()) @db.Timestamptz(6)
+  itinerary_item itinerary_item[]
+  district       district                  @relation(fields: [district_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([source, external_ref])
+  @@index([location], map: "event_location", type: Gist)
+  @@index([district_id, start_datetime, end_datetime], map: "event_window")
+}
+
+model refresh_token {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String    @db.Uuid
+  token_hash String    @unique
+  expires_at DateTime  @db.Timestamptz(6)
+  revoked_at DateTime? @db.Timestamptz(6)
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  app_user   app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "refresh_token_user")
+}
+
+model schema_migration {
+  filename   String   @id
+  applied_at DateTime @default(now()) @db.Timestamptz(6)
+  checksum   String
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
+
+model tag_mapping {
+  source         String
+  source_key     String
+  tag            String
+  tag_vocabulary tag_vocabulary @relation(fields: [tag], references: [tag], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([source, source_key, tag])
+}
+
+model tag_vocabulary {
+  tag         String        @id
+  label       String
+  is_outdoor  Boolean       @default(false)
+  tag_mapping tag_mapping[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model travel_listing {
+  id                    String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  district_id           String                   @db.Uuid
+  category_id           String                   @db.Uuid
+  name                  String
+  description           String?
+  location              Unsupported("geography")
+  latitude              Float?                   @default(dbgenerated("st_y((location)::geometry)"))
+  longitude             Float?                   @default(dbgenerated("st_x((location)::geometry)"))
+  tags                  String[]                 @default([])
+  price_level           Int?                     @db.SmallInt
+  price_per_night       Decimal?                 @db.Decimal(12, 2)
+  currency              String                   @default("LKR") @db.Char(3)
+  rating                Decimal?                 @db.Decimal(2, 1)
+  rating_count          Int                      @default(0)
+  opening_hours         Json?
+  photo_url             String?
+  has_public_transit    Boolean                  @default(false)
+  nearest_transit_stop  String?
+  source                String
+  external_ref          String
+  is_verified           Boolean                  @default(false)
+  is_active             Boolean                  @default(true)
+  last_seen_at          DateTime                 @default(now()) @db.Timestamptz(6)
+  created_at            DateTime                 @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime                 @default(now()) @db.Timestamptz(6)
+  foursquare_checked_at DateTime?                @db.Timestamptz(6)
+  itinerary_item        itinerary_item[]
+  listing_image         listing_image[]
+  category              category                 @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  district              district                 @relation(fields: [district_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([source, external_ref])
+  @@index([location], map: "listing_location_gix", type: Gist)
+  @@index([district_id, category_id, is_verified, is_active], map: "listing_lookup")
+  @@index([name(ops: raw("gin_trgm_ops"))], map: "listing_name_trgm", type: Gin)
+  @@index([tags], map: "listing_tags_gin", type: Gin)
+  @@index([foursquare_checked_at], map: "travel_listing_foursquare_checked")
+}
+
+model travel_time {
+  origin_key String
+  dest_key   String
+  mode       String   @default("drive")
+  minutes    Float
+  km         Float
+  provider   String
+  fetched_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@id([origin_key, dest_key, mode])
+}
+
+model traveler_profile {
+  user_id          String                    @id @db.Uuid
+  travel_interests String[]                  @default([])
+  travel_style     String?
+  default_budget   Decimal?                  @db.Decimal(12, 2)
+  currency         String                    @default("LKR") @db.Char(3)
+  home_location    Unsupported("geography")?
+  updated_at       DateTime                  @default(now()) @db.Timestamptz(6)
+  app_user         app_user                  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
