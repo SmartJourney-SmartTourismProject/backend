@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DEMO_USER_ID } from '../common/demo-user.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { AiBackendService } from './ai-backend.service.js';
@@ -12,15 +11,15 @@ export class ChatService {
     private readonly aiBackend: AiBackendService,
   ) {}
 
-  createSession(title?: string) {
+  createSession(userId: string, title?: string) {
     return this.prisma.chat_session.create({
-      data: { user_id: DEMO_USER_ID, title: title ?? null },
+      data: { user_id: userId, title: title ?? null },
     });
   }
 
-  listSessions() {
+  listSessions(userId: string) {
     return this.prisma.chat_session.findMany({
-      where: { user_id: DEMO_USER_ID },
+      where: { user_id: userId },
       orderBy: { updated_at: 'desc' },
     });
   }
@@ -30,9 +29,9 @@ export class ChatService {
    * Forbidden) on a session that exists but belongs to someone else, so a
    * caller can't distinguish "doesn't exist" from "not yours."
    */
-  private async findOwnedSession(id: string) {
+  private async findOwnedSession(userId: string, id: string) {
     const session = await this.prisma.chat_session.findFirst({
-      where: { id, user_id: DEMO_USER_ID },
+      where: { id, user_id: userId },
     });
     if (!session) {
       throw new NotFoundException(`Chat session ${id} not found`);
@@ -40,8 +39,8 @@ export class ChatService {
     return session;
   }
 
-  async getSessionWithMessages(id: string) {
-    const session = await this.findOwnedSession(id);
+  async getSessionWithMessages(userId: string, id: string) {
+    const session = await this.findOwnedSession(userId, id);
     const chat_message = await this.prisma.chat_message.findMany({
       where: { session_id: id },
       orderBy: { created_at: 'asc' },
@@ -49,16 +48,16 @@ export class ChatService {
     return { ...session, chat_message };
   }
 
-  async renameSession(id: string, title: string) {
-    await this.findOwnedSession(id);
+  async renameSession(userId: string, id: string, title: string) {
+    await this.findOwnedSession(userId, id);
     return this.prisma.chat_session.update({
       where: { id },
       data: { title, updated_at: new Date() },
     });
   }
 
-  async deleteSession(id: string) {
-    await this.findOwnedSession(id);
+  async deleteSession(userId: string, id: string) {
+    await this.findOwnedSession(userId, id);
     await this.prisma.chat_session.delete({ where: { id } });
     return { deleted: true };
   }
@@ -69,8 +68,8 @@ export class ChatService {
    * the assistant's reply, and hand back the full plan so the client can
    * render itinerary/map/budget without a second round trip.
    */
-  async sendMessage(sessionId: string, dto: SendMessageDto) {
-    const session = await this.findOwnedSession(sessionId);
+  async sendMessage(userId: string, sessionId: string, dto: SendMessageDto) {
+    const session = await this.findOwnedSession(userId, sessionId);
 
     await this.prisma.chat_message.create({
       data: { session_id: sessionId, role: 'user', content: dto.message },
@@ -78,7 +77,7 @@ export class ChatService {
 
     const aiResponse = await this.aiBackend.planTrip({
       message: dto.message,
-      user_id: DEMO_USER_ID,
+      user_id: userId,
       client_gps: dto.client_gps ?? null,
       // Omit on the first turn so the AI backend starts a fresh
       // conversation rather than treating an unset id as a real one.

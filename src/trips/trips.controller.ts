@@ -9,6 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { CurrentUser } from '../auth/index.js';
 import { SaveTripDto } from './dto/save-trip.dto.js';
 import { TripsQueryDto } from './dto/trips-query.dto.js';
 import { UpdateTripDto } from './dto/update-trip.dto.js';
@@ -19,27 +20,31 @@ export class TripsController {
   constructor(private readonly tripsService: TripsService) {}
 
   @Post()
-  save(@Body() dto: SaveTripDto) {
-    return this.tripsService.saveTrip(dto);
+  save(@CurrentUser('id') userId: string, @Body() dto: SaveTripDto) {
+    return this.tripsService.saveTrip(userId, dto);
   }
 
   @Get()
-  findAll(@Query() query: TripsQueryDto) {
-    return this.tripsService.listTrips(query);
+  findAll(@CurrentUser('id') userId: string, @Query() query: TripsQueryDto) {
+    return this.tripsService.listTrips(userId, query);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.tripsService.getTripById(id);
+  findOne(@CurrentUser('id') userId: string, @Param('id', ParseUUIDPipe) id: string) {
+    return this.tripsService.getTripById(userId, id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateTripDto) {
-    return this.tripsService.updateTrip(id, dto);
+  update(
+    @CurrentUser('id') userId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateTripDto,
+  ) {
+    return this.tripsService.updateTrip(userId, id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.tripsService.deleteTrip(id);
+  remove(@CurrentUser('id') userId: string, @Param('id', ParseUUIDPipe) id: string) {
+    return this.tripsService.deleteTrip(userId, id);
   }
 }
