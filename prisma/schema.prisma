@@ -46,16 +46,15 @@ model ai_session {
 model app_user {
   id                                               String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   email                                            String               @unique
-  password_hash                                    String?
   name                                             String?
   phone                                            String?
-  google_id                                        String?              @unique
   email_verified                                   Boolean              @default(false)
   role                                             String               @default("traveler")
   is_active                                        Boolean              @default(true)
   location_enabled                                 Boolean              @default(false)
   created_at                                       DateTime             @default(now()) @db.Timestamptz(6)
   updated_at                                       DateTime             @default(now()) @db.Timestamptz(6)
+  keycloak_id                                      String?              @unique @db.Uuid
   activity_log                                     activity_log[]
   admin_profile_admin_profile_granted_byToapp_user admin_profile[]      @relation("admin_profile_granted_byToapp_user")
   admin_profile_admin_profile_user_idToapp_user    admin_profile?       @relation("admin_profile_user_idToapp_user")
@@ -63,7 +62,6 @@ model app_user {
   chat_session                                     chat_session[]
   google_oauth_tokens                              google_oauth_tokens?
   itinerary                                        itinerary[]
-  refresh_token                                    refresh_token[]
   traveler_profile                                 traveler_profile?
 }
 
@@ -290,18 +288,6 @@ model local_event {
   @@unique([source, external_ref])
   @@index([location], map: "event_location", type: Gist)
   @@index([district_id, start_datetime, end_datetime], map: "event_window")
-}
-
-model refresh_token {
-  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id    String    @db.Uuid
-  token_hash String    @unique
-  expires_at DateTime  @db.Timestamptz(6)
-  revoked_at DateTime? @db.Timestamptz(6)
-  created_at DateTime  @default(now()) @db.Timestamptz(6)
-  app_user   app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([user_id], map: "refresh_token_user")
 }
 
 model schema_migration {

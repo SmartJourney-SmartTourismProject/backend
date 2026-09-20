@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DEMO_USER_ID } from '../common/demo-user.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateExpenseDto } from './dto/create-expense.dto.js';
 import { UpdateExpenseDto } from './dto/update-expense.dto.js';
@@ -29,9 +28,9 @@ export class BudgetService {
   /** Ownership check shared by every route here - a user may only touch
    * expenses on their own itineraries. NotFoundException (not Forbidden),
    * matching the pattern already used in chat/trips. */
-  private async getOwnedItinerary(tripId: string) {
+  private async getOwnedItinerary(userId: string, tripId: string) {
     const itinerary = await this.prisma.itinerary.findFirst({
-      where: { id: tripId, user_id: DEMO_USER_ID },
+      where: { id: tripId, user_id: userId },
       select: {
         id: true,
         title: true,
@@ -47,9 +46,9 @@ export class BudgetService {
     return itinerary;
   }
 
-  private async getOwnedExpense(expenseId: string) {
+  private async getOwnedExpense(userId: string, expenseId: string) {
     const expense = await this.prisma.expense.findFirst({
-      where: { id: expenseId, itinerary: { user_id: DEMO_USER_ID } },
+      where: { id: expenseId, itinerary: { user_id: userId } },
     });
     if (!expense) {
       throw new NotFoundException(`Expense ${expenseId} not found`);
@@ -57,16 +56,16 @@ export class BudgetService {
     return expense;
   }
 
-  async listExpenses(tripId: string) {
-    await this.getOwnedItinerary(tripId);
+  async listExpenses(userId: string, tripId: string) {
+    await this.getOwnedItinerary(userId, tripId);
     return this.prisma.expense.findMany({
       where: { itinerary_id: tripId },
       orderBy: { occurred_at: 'desc' },
     });
   }
 
-  async addExpense(tripId: string, dto: CreateExpenseDto) {
-    await this.getOwnedItinerary(tripId);
+  async addExpense(userId: string, tripId: string, dto: CreateExpenseDto) {
+    await this.getOwnedItinerary(userId, tripId);
     return this.prisma.expense.create({
       data: {
         itinerary_id: tripId,
@@ -79,8 +78,8 @@ export class BudgetService {
     });
   }
 
-  async updateExpense(expenseId: string, dto: UpdateExpenseDto) {
-    await this.getOwnedExpense(expenseId);
+  async updateExpense(userId: string, expenseId: string, dto: UpdateExpenseDto) {
+    await this.getOwnedExpense(userId, expenseId);
     return this.prisma.expense.update({
       where: { id: expenseId },
       data: {
@@ -93,14 +92,14 @@ export class BudgetService {
     });
   }
 
-  async deleteExpense(expenseId: string) {
-    await this.getOwnedExpense(expenseId);
+  async deleteExpense(userId: string, expenseId: string) {
+    await this.getOwnedExpense(userId, expenseId);
     await this.prisma.expense.delete({ where: { id: expenseId } });
     return { deleted: true };
   }
 
-  async getTripBudget(tripId: string) {
-    const itinerary = await this.getOwnedItinerary(tripId);
+  async getTripBudget(userId: string, tripId: string) {
+    const itinerary = await this.getOwnedItinerary(userId, tripId);
 
     const [spentAgg, byCategory, plannedDays] = await Promise.all([
       this.prisma.expense.aggregate({
@@ -144,9 +143,9 @@ export class BudgetService {
 
   /** Powers the "Budgets by trip" panel - one query for all of the user's
    * trips' spend, not N+1. */
-  async getAllTripsSummary() {
+  async getAllTripsSummary(userId: string) {
     const itineraries = await this.prisma.itinerary.findMany({
-      where: { user_id: DEMO_USER_ID },
+      where: { user_id: userId },
       orderBy: { updated_at: 'desc' },
       select: {
         id: true,

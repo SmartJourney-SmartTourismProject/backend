@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { CurrentUser } from '../auth/index.js';
 import { ChatService } from './chat.service.js';
 import { CreateSessionDto } from './dto/create-session.dto.js';
 import { RenameSessionDto } from './dto/rename-session.dto.js';
@@ -18,32 +19,40 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Post()
-  create(@Body() dto: CreateSessionDto) {
-    return this.chatService.createSession(dto.title);
+  create(@CurrentUser('id') userId: string, @Body() dto: CreateSessionDto) {
+    return this.chatService.createSession(userId, dto.title);
   }
 
   @Get()
-  findAll() {
-    return this.chatService.listSessions();
+  findAll(@CurrentUser('id') userId: string) {
+    return this.chatService.listSessions(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.chatService.getSessionWithMessages(id);
+  findOne(@CurrentUser('id') userId: string, @Param('id', ParseUUIDPipe) id: string) {
+    return this.chatService.getSessionWithMessages(userId, id);
   }
 
   @Post(':id/messages')
-  sendMessage(@Param('id', ParseUUIDPipe) id: string, @Body() dto: SendMessageDto) {
-    return this.chatService.sendMessage(id, dto);
+  sendMessage(
+    @CurrentUser('id') userId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: SendMessageDto,
+  ) {
+    return this.chatService.sendMessage(userId, id, dto);
   }
 
   @Patch(':id')
-  rename(@Param('id', ParseUUIDPipe) id: string, @Body() dto: RenameSessionDto) {
-    return this.chatService.renameSession(id, dto.title);
+  rename(
+    @CurrentUser('id') userId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: RenameSessionDto,
+  ) {
+    return this.chatService.renameSession(userId, id, dto.title);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.chatService.deleteSession(id);
+  remove(@CurrentUser('id') userId: string, @Param('id', ParseUUIDPipe) id: string) {
+    return this.chatService.deleteSession(userId, id);
   }
 }

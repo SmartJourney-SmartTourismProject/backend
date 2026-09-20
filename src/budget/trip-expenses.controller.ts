@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import { CurrentUser } from '../auth/index.js';
 import { BudgetService } from './budget.service.js';
 import { CreateExpenseDto } from './dto/create-expense.dto.js';
 
@@ -11,17 +12,21 @@ export class TripExpensesController {
   constructor(private readonly budgetService: BudgetService) {}
 
   @Get(':tripId/expenses')
-  listExpenses(@Param('tripId', ParseUUIDPipe) tripId: string) {
-    return this.budgetService.listExpenses(tripId);
+  listExpenses(@CurrentUser('id') userId: string, @Param('tripId', ParseUUIDPipe) tripId: string) {
+    return this.budgetService.listExpenses(userId, tripId);
   }
 
   @Post(':tripId/expenses')
-  addExpense(@Param('tripId', ParseUUIDPipe) tripId: string, @Body() dto: CreateExpenseDto) {
-    return this.budgetService.addExpense(tripId, dto);
+  addExpense(
+    @CurrentUser('id') userId: string,
+    @Param('tripId', ParseUUIDPipe) tripId: string,
+    @Body() dto: CreateExpenseDto,
+  ) {
+    return this.budgetService.addExpense(userId, tripId, dto);
   }
 
   @Get(':tripId/budget')
-  getTripBudget(@Param('tripId', ParseUUIDPipe) tripId: string) {
-    return this.budgetService.getTripBudget(tripId);
+  getTripBudget(@CurrentUser('id') userId: string, @Param('tripId', ParseUUIDPipe) tripId: string) {
+    return this.budgetService.getTripBudget(userId, tripId);
   }
 }

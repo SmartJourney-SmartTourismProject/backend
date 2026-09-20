@@ -17,7 +17,7 @@ silently re-litigated later.
 | **AI backend ↔ database** | Direct connection | AI backend's `db_tool.py` / `calendar_tool.py` get rewritten from the Supabase SDK to `asyncpg` against the same `DATABASE_URL`. No network hop inside trip-planning; AI backend stays independently runnable. **Two services share one database** — see §2 for who owns what. |
 | **PostGIS** | Keep it | `postgis/postgis:16-3.4` image, `geography(Point,4326)` columns as SRS/SAD specify. Costs some Prisma friction — mitigated in §4.2. |
 | **Endpoint scope** | Core + admin | Auth, profile, chat/trip planning, saved itineraries, explore, budget tracker, admin (listings CRUD + verification, user management). **Deferred:** subscriptions/payments, FCM + email notifications, analytics dashboard. |
-| **Auth depth** | JWT + Google sign-in | bcrypt + JWT (access + refresh), plus Google OAuth sign-in. **No emailed verification codes or password-reset emails** this round — those need SES/SMTP; endpoints will exist but stubbed with a clear TODO. |
+| **Auth depth** | ~~JWT + Google sign-in~~ **Keycloak (decided 2026-09-20)** | Keycloak 26 in Docker (`backend/keycloak/`) owns accounts, passwords, the SRS §3.1.1 password policy, Google sign-in (as an identity provider) and realm roles `traveler`/`admin`. NestJS issues **no tokens**: it verifies Keycloak's RS256 access tokens against the realm JWKS (`src/auth/`) and mirrors each user into `app_user` on first request (`src/users/`). Web uses next-auth; mobile will use a PKCE public client. **Still no email flows** (forgot-password / verification) — Keycloak has them built in, they just need SMTP configured on the realm. |
 
 ### Deliberate deviations from SRS/SAD, to note in the report
 
@@ -66,8 +66,8 @@ upserts on the ingest side.
 
 ### Two separate Google OAuth flows — do not conflate
 
-1. **Google sign-in (authentication)** — *NestJS owns this.* User proves identity, gets a JWT.
-   Endpoints `GET /auth/google`, `GET /auth/google/callback`.
+1. **Google sign-in (authentication)** — *Keycloak owns this* (identity provider `google` in realm
+   `smartjourney`; the web app sends `kc_idp_hint=google`). NestJS never talks to Google for sign-in.
 2. **Google Calendar consent (authorization)** — *AI backend already owns this.* User grants
    free/busy read access so trip dates can be suggested. Endpoints
    `GET /auth/google/login`, `GET /auth/google/callback` **on the AI backend**.
@@ -139,13 +139,11 @@ for local dev where NestJS runs on the host against the containerised DB.
 
 ```
 DATABASE_URL=postgresql://user:pass@localhost:5432/smartjourney?schema=public
-JWT_ACCESS_SECRET=...
-JWT_REFRESH_SECRET=...
-JWT_ACCESS_TTL=15m
-JWT_REFRESH_TTL=7d
-GOOGLE_CLIENT_ID=...            # sign-in flow (distinct from AI backend's calendar client)
-GOOGLE_CLIENT_SECRET=...
-GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
+KEYCLOAK_ISSUER=http://localhost:8081/realms/smartjourney   # tokens are verified against <issuer>/protocol/openid-connect/certs
+KEYCLOAK_AUDIENCE=smartjourney-api                          # added to tokens by the audience mapper on the smartjourney-web client
+KEYCLOAK_DB_USER / KEYCLOAK_DB_PASSWORD / KEYCLOAK_DB_NAME   # Keycloak's own Postgres (docker-compose)
+GOOGLE_SIGNIN_CLIENT_ID / GOOGLE_SIGNIN_CLIENT_SECRET         # Keycloak's Google identity provider (distinct from the AI backend's calendar client)
+KEYCLOAK_WEB_CLIENT_SECRET                                   # secret of the smartjourney-web client; same value as frontend-web's KEYCLOAK_CLIENT_SECRET
 AI_BACKEND_URL=http://localhost:8000
 AI_BACKEND_TIMEOUT_MS=120000    # trip-plan chains several APIs + 1-2 Gemini calls
 ```
@@ -160,7 +158,7 @@ The AI backend keeps its own `.env`; only `DATABASE_URL` needs to match.
 
 Derived from SAD §9's ER diagram and BUILD_PLAN §3, trimmed to the chosen scope.
 
-**Identity:** `user`, `traveler_profile`, `admin_profile`, `refresh_token`
+**Identity:** `app_user` (with `keycloak_id`; no `password_hash`/`google_id` — migration 0007), `traveler_profile`, `admin_profile`. ~~`refresh_token`~~ dropped: Keycloak issues and rotates refresh tokens.
 **Reference:** `district`, `category`
 **Content:** `travel_listing`, `listing_image`, `local_event`
 **Planning:** `chat_session`, `chat_message`, `itinerary`, `itinerary_day`, `itinerary_item`
@@ -251,22 +249,30 @@ of decision 2.
 Conventions: base path `/api/v1`. 🔓 public · 🔒 authenticated · 🛡️ admin only.
 All list endpoints paginate (`?page=`, `?limit=`).
 
-### 5.1 Auth — `/auth`
+### 5.1 Auth — none in NestJS (Keycloak hosts it)
 
-| | Method | Path | Purpose |
-|---|---|---|---|
-| 🔓 | POST | `/auth/register` | Email + password → create `user` + empty `traveler_profile`, return tokens |
-| 🔓 | POST | `/auth/login` | Email + password → access + refresh tokens |
-| 🔓 | POST | `/auth/refresh` | Refresh token → new access token ("Remember me") |
-| 🔒 | POST | `/auth/logout` | Revoke the refresh token |
-| 🔓 | GET | `/auth/google` | Start Google **sign-in** (not calendar) |
-| 🔓 | GET | `/auth/google/callback` | Google sign-in callback → tokens |
-| 🔒 | GET | `/auth/me` | Current user + profile |
-| 🔓 | POST | `/auth/forgot-password` | **Stub this round** — 501 + TODO (needs SES/SMTP) |
-| 🔓 | POST | `/auth/reset-password` | **Stub this round** — 501 + TODO |
+**There are no `/auth/*` endpoints in NestJS.** Register, login, refresh, logout, Google sign-in,
+forgot-password and change-password are all Keycloak screens/endpoints on realm `smartjourney`
+(`http://localhost:8081/realms/smartjourney`). Clients obtain an access token from Keycloak
+(web: next-auth, confidential client `smartjourney-web`; mobile: PKCE public client, to be added)
+and send it as `Authorization: Bearer <token>` on every NestJS request.
 
-Password rule per SRS §3.1.1: 8–12 chars, ≥1 upper, ≥1 lower, ≥1 digit, ≥1 special. Enforce with a
-`class-validator` rule so web and mobile inherit it automatically.
+What NestJS does (`src/auth/`, `src/users/`):
+
+| Piece | Behaviour |
+|---|---|
+| `JwtStrategy` | RS256 signature against `KEYCLOAK_ISSUER/protocol/openid-connect/certs` (cached JWKS), plus `iss` and `aud = KEYCLOAK_AUDIENCE` checks. No per-request call to Keycloak. |
+| `JwtAuthGuard` | **Global.** Every route requires a token unless marked `@Public()` (health, explore reads). Fails closed. |
+| `RolesGuard` | **Global.** Enforces `@Roles('admin')` from the token's `realm_access.roles`. 403 otherwise. |
+| `UsersService.ensureFromToken` | JIT provisioning: on each authenticated request, upsert `app_user` by `keycloak_id` (= token `sub`), create an empty `traveler_profile` on first sign-in, mirror `email`/`name`/`role`. Result is `request.user` (`@CurrentUser()` / `@CurrentUser('id')`). Short in-memory cache so it isn't a write per call. |
+
+Password rule per SRS §3.1.1 (8–12 chars, ≥1 upper, ≥1 lower, ≥1 digit, ≥1 special) is enforced by
+the realm's **password policy** in Keycloak, so web and mobile inherit it automatically. `/auth/me`
+is replaced by `GET /users/me` (§5.2).
+
+Realm config is reproducible: `backend/keycloak/realm-export.json` is imported on first boot
+(`start-dev --import-realm`); re-export with `keycloak/export-realm.sh` after changing anything in
+the admin console. Secrets in it are `${ENV}` placeholders resolved from `backend/.env`.
 
 ### 5.2 Users & profile — `/users`
 
@@ -481,9 +487,14 @@ this real data visible to NestJS.
 *Done when:* ~~schema matches SAD §9 for in-scope tables; seed runs idempotently~~ — verified instead
 via Phase 0's live query (25 districts, 6,572 listings returned through the generated Prisma client).
 
-**Phase 2 — Auth**
-`user`/`traveler_profile`/`admin_profile`/`refresh_token` · bcrypt · JWT access+refresh · Google sign-in · `JwtAuthGuard` + `RolesGuard` · §5.1 and §5.2.
-*Done when:* register → login → `/auth/me` works, and a non-admin gets 403 from an admin route.
+**Phase 2 — Auth** ✅ done 2026-09-20 (Keycloak, not bcrypt/JWT — see §1, §5.1)
+Keycloak realm + Google IdP + password policy (`backend/keycloak/`) · web login via next-auth · NestJS
+`AuthModule` (JWKS validation, global `JwtAuthGuard` + `RolesGuard`, `@Public()`, `@Roles()`,
+`@CurrentUser()`) · migration `0007_keycloak_identity.sql` · JIT provisioning · `DEMO_USER_ID` shim and
+`db/seeds/001_demo_user.sql` removed — chat/trips/budget now scope every query to `request.user.id`.
+*Verified:* no/invalid token → 401 on protected routes, public routes open; real Keycloak token →
+`app_user` row provisioned and data written under it. Still to do here: `GET/PATCH /users/me`
+(§5.2), and the mobile PKCE client.
 
 **Phase 3 — Explore (§5.5)** — *can run parallel with Phase 4*
 Read-only listing/event/district endpoints with filtering and pagination. Straightforward, and gives the web frontend something real to build against early.

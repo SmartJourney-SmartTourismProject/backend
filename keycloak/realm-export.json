@@ -845,6 +845,22 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "id": "13193558-43dd-40e7-8923-370e9c861f53",
+          "name": "smartjourney-api audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "id.token.claim": "false",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true",
+            "included.custom.audience": "smartjourney-api"
+          }
+        }
+      ],
       "defaultClientScopes": [
         "web-origins",
         "acr",

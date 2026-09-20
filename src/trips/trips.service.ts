@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DEMO_USER_ID } from '../common/demo-user.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { SaveTripDto } from './dto/save-trip.dto.js';
 import { TripsQueryDto } from './dto/trips-query.dto.js';
@@ -34,12 +33,12 @@ export class TripsService {
     return district?.id ?? null;
   }
 
-  async saveTrip(dto: SaveTripDto) {
+  async saveTrip(userId: string, dto: SaveTripDto) {
     const district_id = await this.resolveDistrictId(dto.destination);
 
     return this.prisma.itinerary.create({
       data: {
-        user_id: DEMO_USER_ID,
+        user_id: userId,
         district_id,
         title: dto.title ?? dto.destination ?? null,
         travelers: dto.travelers ?? 1,
@@ -69,10 +68,10 @@ export class TripsService {
     });
   }
 
-  listTrips(query: TripsQueryDto) {
+  listTrips(userId: string, query: TripsQueryDto) {
     return this.prisma.itinerary.findMany({
       where: {
-        user_id: DEMO_USER_ID,
+        user_id: userId,
         ...(query.status && { status: query.status }),
       },
       orderBy: { updated_at: 'desc' },
@@ -80,9 +79,9 @@ export class TripsService {
     });
   }
 
-  async getTripById(id: string) {
+  async getTripById(userId: string, id: string) {
     const trip = await this.prisma.itinerary.findFirst({
-      where: { id, user_id: DEMO_USER_ID },
+      where: { id, user_id: userId },
       include: {
         district: { select: DISTRICT_SUMMARY_SELECT },
         itinerary_day: {
@@ -97,8 +96,8 @@ export class TripsService {
     return trip;
   }
 
-  async updateTrip(id: string, dto: UpdateTripDto) {
-    await this.getTripById(id);
+  async updateTrip(userId: string, id: string, dto: UpdateTripDto) {
+    await this.getTripById(userId, id);
     return this.prisma.itinerary.update({
       where: { id },
       data: {
@@ -112,8 +111,8 @@ export class TripsService {
     });
   }
 
-  async deleteTrip(id: string) {
-    await this.getTripById(id);
+  async deleteTrip(userId: string, id: string) {
+    await this.getTripById(userId, id);
     await this.prisma.itinerary.delete({ where: { id } });
     return { deleted: true };
   }
