@@ -44,7 +44,12 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: smartjourney_keycloak
-    command: start-dev
+    # --import-realm loads ./keycloak/realm-export.json on first boot so every
+    # machine gets the same realm/clients/roles/password policy. If the realm
+    # already exists in keycloak_db the import is skipped, so it never
+    # overwrites changes made in the admin console. Re-export after changing
+    # realm config (see keycloak/README.md).
+    command: start-dev --import-realm
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -52,6 +57,18 @@ services:
       KC_DB_URL: jdbc:postgresql://keycloak_db:5432/${KEYCLOAK_DB_NAME}
       KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      # Google sign-in identity provider. realm-export.json references these
+      # as ${GOOGLE_SIGNIN_CLIENT_ID} / ${GOOGLE_SIGNIN_CLIENT_SECRET} so the
+      # secret never lands in git. Distinct from the AI backend's
+      # GOOGLE_CALENDAR_* client - see docs/BACKEND_PLAN.md §2.
+      GOOGLE_SIGNIN_CLIENT_ID: ${GOOGLE_SIGNIN_CLIENT_ID}
+      GOOGLE_SIGNIN_CLIENT_SECRET: ${GOOGLE_SIGNIN_CLIENT_SECRET}
+      # Secret of the confidential smartjourney-web client (used by next-auth).
+      # Same trick: realm-export.json holds ${KEYCLOAK_WEB_CLIENT_SECRET}. Must
+      # equal KEYCLOAK_CLIENT_SECRET in frontend-web/.env.local.
+      KEYCLOAK_WEB_CLIENT_SECRET: ${KEYCLOAK_WEB_CLIENT_SECRET}
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import:ro
     ports:
       # host 8081 -> container 8080, since something else on this machine
       # already holds host port 8080
