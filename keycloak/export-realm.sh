@@ -22,6 +22,12 @@ realm.pop("users", None)
 for c in realm.get("clients", []):
     if c.get("clientId") == "smartjourney-web":
         c["secret"] = "${KEYCLOAK_WEB_CLIENT_SECRET}"
+realm["smtpServer"] = {
+    "host": "${KC_SMTP_HOST}", "port": "${KC_SMTP_PORT}",
+    "from": "${KC_SMTP_FROM}", "fromDisplayName": "${KC_SMTP_FROM_DISPLAY_NAME}",
+    "auth": "${KC_SMTP_AUTH}", "user": "${KC_SMTP_USER}", "password": "${KC_SMTP_PASSWORD}",
+    "starttls": "${KC_SMTP_STARTTLS}", "ssl": "${KC_SMTP_SSL}",
+}
 for idp in realm.get("identityProviders", []):
     if idp.get("alias") == "google":
         idp["config"]["clientId"] = "${GOOGLE_SIGNIN_CLIENT_ID}"

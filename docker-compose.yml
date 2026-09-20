@@ -87,6 +87,19 @@ services:
       # Same trick: realm-export.json holds ${KEYCLOAK_WEB_CLIENT_SECRET}. Must
       # equal KEYCLOAK_CLIENT_SECRET in frontend-web/.env.local.
       KEYCLOAK_WEB_CLIENT_SECRET: ${KEYCLOAK_WEB_CLIENT_SECRET}
+      # Outgoing mail for "forgot password" and email verification. The realm
+      # export references these as ${KC_SMTP_*}. Local default is the mailpit
+      # service below (no credentials, inbox at http://localhost:8025);
+      # production points them at a real provider (Gmail app password, SES...).
+      KC_SMTP_HOST: ${KC_SMTP_HOST:-mailpit}
+      KC_SMTP_PORT: ${KC_SMTP_PORT:-1025}
+      KC_SMTP_FROM: ${KC_SMTP_FROM:-noreply@smartjourney.local}
+      KC_SMTP_FROM_DISPLAY_NAME: ${KC_SMTP_FROM_DISPLAY_NAME:-SmartJourney}
+      KC_SMTP_AUTH: ${KC_SMTP_AUTH:-false}
+      KC_SMTP_USER: ${KC_SMTP_USER:-}
+      KC_SMTP_PASSWORD: ${KC_SMTP_PASSWORD:-}
+      KC_SMTP_STARTTLS: ${KC_SMTP_STARTTLS:-false}
+      KC_SMTP_SSL: ${KC_SMTP_SSL:-false}
     volumes:
       - ./keycloak:/opt/keycloak/data/import:ro
     ports:
@@ -96,6 +109,20 @@ services:
     depends_on:
       keycloak_db:
         condition: service_healthy
+      mailpit:
+        condition: service_started
+    restart: unless-stopped
+
+  mailpit:
+    # Local SMTP sink so Keycloak's password-reset / verify-email mails can
+    # be tested without a real mail provider. Every message it receives is
+    # viewable at http://localhost:8025 (and via its REST API for tests).
+    # Not for production - swap the KC_SMTP_* vars above instead.
+    image: axllent/mailpit:latest
+    container_name: smartjourney_mailpit
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # web inbox
     restart: unless-stopped
 
 volumes:

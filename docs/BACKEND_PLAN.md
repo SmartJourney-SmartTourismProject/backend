@@ -17,14 +17,15 @@ silently re-litigated later.
 | **AI backend ↔ database** | Direct connection | AI backend's `db_tool.py` / `calendar_tool.py` get rewritten from the Supabase SDK to `asyncpg` against the same `DATABASE_URL`. No network hop inside trip-planning; AI backend stays independently runnable. **Two services share one database** — see §2 for who owns what. |
 | **PostGIS** | Keep it | `postgis/postgis:16-3.4` image, `geography(Point,4326)` columns as SRS/SAD specify. Costs some Prisma friction — mitigated in §4.2. |
 | **Endpoint scope** | Core + admin | Auth, profile, chat/trip planning, saved itineraries, explore, budget tracker, admin (listings CRUD + verification, user management). **Deferred:** subscriptions/payments, FCM + email notifications, analytics dashboard. |
-| **Auth depth** | ~~JWT + Google sign-in~~ **Keycloak (decided 2026-09-20)** | Keycloak 26 in Docker (`backend/keycloak/`) owns accounts, passwords, the SRS §3.1.1 password policy, Google sign-in (as an identity provider) and realm roles `traveler`/`admin`. NestJS issues **no tokens**: it verifies Keycloak's RS256 access tokens against the realm JWKS (`src/auth/`) and mirrors each user into `app_user` on first request (`src/users/`). Web uses next-auth; mobile will use a PKCE public client. **Still no email flows** (forgot-password / verification) — Keycloak has them built in, they just need SMTP configured on the realm. |
+| **Auth depth** | ~~JWT + Google sign-in~~ **Keycloak (decided 2026-09-20)** | Keycloak 26 in Docker (`backend/keycloak/`) owns accounts, passwords, the SRS §3.1.1 password policy, Google sign-in (as an identity provider) and realm roles `traveler`/`admin`. NestJS issues **no tokens**: it verifies Keycloak's RS256 access tokens against the realm JWKS (`src/auth/`) and mirrors each user into `app_user` on first request (`src/users/`). Web uses next-auth; mobile will use a PKCE public client. **Email flows are on** (decided 2026-09-20): realm SMTP is configured from `KC_SMTP_*` env vars — locally the `mailpit` compose service (inbox at http://localhost:8025), in production a real provider — so Keycloak's forgot-password and verify-email screens work. |
 
 ### Deliberate deviations from SRS/SAD, to note in the report
 
-- **Email verification not enforced.** SRS §3.1.1 requires an emailed verification code at
-  registration; §3.1.3 requires password-reset emails. Both deferred pending a mail provider.
-  `User.email_verified` exists in the schema and defaults to `false` so this can be switched on
-  without a migration.
+- ~~**Email verification not enforced.**~~ **Resolved 2026-09-20.** SRS §3.1.1 (verification at
+  registration) and §3.1.3 (password-reset emails) are both handled by Keycloak: `verifyEmail` and
+  `resetPasswordAllowed` are on in the realm, mail goes out through the realm's SMTP settings
+  (`KC_SMTP_*` in `.env`; Mailpit locally). Google sign-ins skip verification (`trustEmail`).
+  One nuance vs. the SRS wording: Keycloak sends a verification *link*, not a numeric *code*.
 - **Subscriptions, notifications, analytics deferred.** SRS §3.1.9/§3.1.10/§3.1.14. Their tables
   are omitted from the first migration rather than created-and-unused; adding them later is
   additive, not a breaking change.
@@ -527,4 +528,4 @@ whatever the web app proves out.
 | **AI session state** | The AI backend stores multi-turn state in a **local JSON file**, not the DB — so it won't survive a container rebuild or work across multiple AI-backend instances. Either run a single instance, or move that state into `chat_session` as a later improvement. |
 | **Committed DB credentials** | `shaluka`/`1234` in `docker-compose.yml`. Move to gitignored `.env` in Phase 0; never reuse in deployment. |
 | **AI backend is unauthenticated** | By design (internal service). Must stay on a private network — never expose it publicly. NestJS is the only permitted caller. |
-| **Email-dependent flows** | Registration verification and password reset are stubbed. Revisit when a mail provider is chosen. |
+| **Email-dependent flows** | ~~Stubbed.~~ Live via Keycloak + realm SMTP. Production still needs real `KC_SMTP_*` credentials (Gmail app password / SES) — Mailpit is dev-only. |
