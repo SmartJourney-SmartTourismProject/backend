@@ -18,6 +18,9 @@ What is deliberately **not** in the file:
   container environment (set in `backend/.env`, see `.env.example`).
 - **`smartjourney-web` client secret** - likewise `${KEYCLOAK_WEB_CLIENT_SECRET}`.
   The same value goes in `frontend-web/.env.local` as `KEYCLOAK_CLIENT_SECRET`.
+- **SMTP settings** (`smtpServer`) - `${KC_SMTP_*}` placeholders. Locally these
+  point at the `mailpit` compose service; every mail Keycloak sends (verify
+  email, reset password, test message) shows up at http://localhost:8025.
 
 ## Changing realm config
 
