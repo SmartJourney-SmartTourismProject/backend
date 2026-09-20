@@ -63,6 +63,7 @@
         "composite": true,
         "composites": {
           "realm": [
+            "traveler",
             "offline_access",
             "uma_authorization"
           ],
@@ -831,6 +832,7 @@
       "protocol": "openid-connect",
       "attributes": {
         "realm_client": "false",
+        "access.token.lifespan": "35",
         "oidc.ciba.grant.enabled": "false",
         "client.secret.creation.time": "1789910345",
         "backchannel.logout.session.required": "true",
