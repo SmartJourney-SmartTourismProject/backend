@@ -27,6 +27,13 @@ export class ExploreService {
     });
   }
 
+  getTags() {
+    return this.prisma.tag_vocabulary.findMany({
+      orderBy: { tag: 'asc' },
+      select: { tag: true, label: true, is_outdoor: true },
+    });
+  }
+
   async searchListings(query: ListingsQueryDto) {
     const page = query.page ?? 1;
 
