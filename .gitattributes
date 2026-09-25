@@ -1,0 +1,11 @@
+# Keep line endings stable across machines.
+#
+# core.autocrlf (on by default on Windows) rewrites LF to CRLF on checkout,
+# which changes a file's bytes without changing its content. For most sources
+# that is harmless, but:
+#   *.sql - db/migrate.py checksums applied migrations; a byte change looked
+#           like an edited migration and aborted the runner.
+#   *.sh  - /bin/sh refuses scripts whose lines end in CR ("bad interpreter").
+# Both are checked out with LF everywhere.
+*.sql text eol=lf
+*.sh  text eol=lf
