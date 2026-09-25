@@ -379,6 +379,26 @@ All 🛡️ — `RolesGuard` on the whole controller.
 `/admin/stats` omits "subscription revenue" from the SRS mockup, since subscriptions are out of
 scope this round.
 
+**Built 2026-09-25** (`src/admin/`), with these decisions worth recording:
+
+- **No `status` column.** pending / approved / rejected are derived from the
+  `(is_verified, is_active)` pair both content tables already carry - rejected is
+  `is_active = false`, added for `local_event` by migration `0008`. The AI backend's ingest jobs
+  re-upsert these rows and never write those two columns, so an admin's decision survives the next
+  sync. Without a way to mark "reviewed and refused", a rejected row would reappear in the queue
+  forever.
+- **Public reads now filter `is_active` too** (`explore.service.ts`), not just `is_verified` -
+  otherwise deactivating an approved listing would leave it visible to travellers.
+- **Reject over delete.** `DELETE` exists but is for genuinely bad rows (duplicates, test data); an
+  ingest job will simply re-create anything deleted on its next run.
+- **User role/status changes go to Keycloak first** (`KeycloakAdminService`, service account
+  `smartjourney-backend`) and are then mirrored into `app_user`. Writing only to `app_user` would be
+  undone within minutes by the JIT sync, which mirrors the token. A user's existing token keeps its
+  old roles until it refreshes (≤5 min) - inherent to stateless JWT auth.
+- **Self-protection:** an admin cannot remove their own admin role or deactivate their own account.
+- Every admin action writes an `activity_log` row (SRS §3.1.13), and an audit-write failure is
+  logged rather than failing the action itself.
+
 ### 5.8 Health
 
 | | Method | Path |
