@@ -59,6 +59,11 @@ function toPreferences(
   };
 }
 
+/** Prisma's "unique constraint failed" - here, two requests provisioning at once. */
+function isUniqueConstraintViolation(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && (error as { code?: string }).code === 'P2002';
+}
+
 /**
  * Just-in-time provisioning. Keycloak is the source of truth for identity;
  * this keeps one `app_user` row per Keycloak user so the NOT NULL user_id
@@ -70,6 +75,11 @@ function toPreferences(
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
   private readonly synced = new Map<string, { user: AuthenticatedUser; at: number }>();
+  // A page load fires several API calls at once, and on a user's very first
+  // request none of them finds a row yet - without this they would all try to
+  // INSERT and all but one would fail on app_user_email_key. Collapsing them
+  // onto one promise also saves the duplicate work on every later sync.
+  private readonly inFlight = new Map<string, Promise<AuthenticatedUser>>();
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -81,9 +91,18 @@ export class UsersService {
       return { ...cached.user, roles };
     }
 
-    const user = await this.upsert(claims, roles);
-    this.synced.set(claims.sub, { user, at: Date.now() });
-    return user;
+    let pending = this.inFlight.get(claims.sub);
+    if (!pending) {
+      pending = this.upsert(claims, roles)
+        .then((user) => {
+          this.synced.set(claims.sub, { user, at: Date.now() });
+          return user;
+        })
+        .finally(() => this.inFlight.delete(claims.sub));
+      this.inFlight.set(claims.sub, pending);
+    }
+    // Roles come from *this* request's token even when another request did the write.
+    return { ...(await pending), roles };
   }
 
   // ---- /users/me -------------------------------------------------------
@@ -200,16 +219,28 @@ export class UsersService {
     }
 
     this.logger.log(`Provisioning app_user for Keycloak user ${claims.sub} (${email})`);
-    const row = await this.prisma.app_user.create({
-      data: {
-        ...profile,
-        keycloak_id: claims.sub,
-        // Empty profile so the AI backend's get_user_profile() finds a row;
-        // the user fills it in later via PATCH /users/me/preferences.
-        traveler_profile: { create: {} },
-      },
-    });
-    return this.toAuthenticated(row, claims.sub, roles);
+    try {
+      const row = await this.prisma.app_user.create({
+        data: {
+          ...profile,
+          keycloak_id: claims.sub,
+          // Empty profile so the AI backend's get_user_profile() finds a row;
+          // the user fills it in later via PATCH /users/me/preferences.
+          traveler_profile: { create: {} },
+        },
+      });
+      return this.toAuthenticated(row, claims.sub, roles);
+    } catch (error) {
+      // Another request (or another instance - inFlight is per-process) won the
+      // race and inserted the row between our lookups and this INSERT. That is
+      // the expected outcome of a tie, not an error: read back what it wrote.
+      if (!isUniqueConstraintViolation(error)) throw error;
+      const existing = await this.prisma.app_user.findFirst({
+        where: { OR: [{ keycloak_id: claims.sub }, { email }] },
+      });
+      if (!existing) throw error;
+      return this.toAuthenticated(existing, claims.sub, roles);
+    }
   }
 
   private toAuthenticated(
