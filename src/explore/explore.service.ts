@@ -39,6 +39,10 @@ export class ExploreService {
 
     const where = {
       is_verified: true,
+      // Rejected/retired rows keep is_verified = false, but an admin can also
+      // deactivate a previously approved one - that must disappear from
+      // public reads too (see admin-content.service.ts).
+      is_active: true,
       ...(query.district && { district_id: query.district }),
       ...(query.category && { category_id: query.category }),
       ...(query.minRating && { rating: { gte: query.minRating } }),
@@ -73,7 +77,7 @@ export class ExploreService {
 
   async getListingById(id: string) {
     const listing = await this.prisma.travel_listing.findFirst({
-      where: { id, is_verified: true },
+      where: { id, is_verified: true, is_active: true },
       include: {
         category: true,
         district: { select: DISTRICT_SUMMARY_SELECT },
@@ -90,6 +94,7 @@ export class ExploreService {
     return this.prisma.local_event.findMany({
       where: {
         is_verified: true,
+        is_active: true,
         ...(query.district && { district_id: query.district }),
         ...(query.from && { start_datetime: { gte: new Date(query.from) } }),
         ...(query.to && { start_datetime: { lte: new Date(query.to) } }),
@@ -101,7 +106,7 @@ export class ExploreService {
 
   async getEventById(id: string) {
     const event = await this.prisma.local_event.findFirst({
-      where: { id, is_verified: true },
+      where: { id, is_verified: true, is_active: true },
       include: { district: { select: DISTRICT_SUMMARY_SELECT } },
     });
     if (!event) {

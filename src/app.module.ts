@@ -8,6 +8,7 @@ import { ExploreModule } from './explore/explore.module.js';
 import { ChatModule } from './chat/chat.module.js';
 import { TripsModule } from './trips/trips.module.js';
 import { BudgetModule } from './budget/budget.module.js';
+import { AdminModule } from './admin/admin.module.js';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { BudgetModule } from './budget/budget.module.js';
     ChatModule,
     TripsModule,
     BudgetModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

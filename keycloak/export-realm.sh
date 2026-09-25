@@ -22,6 +22,8 @@ realm.pop("users", None)
 for c in realm.get("clients", []):
     if c.get("clientId") == "smartjourney-web":
         c["secret"] = "${KEYCLOAK_WEB_CLIENT_SECRET}"
+    if c.get("clientId") == "smartjourney-backend":
+        c["secret"] = "${KEYCLOAK_ADMIN_CLIENT_SECRET}"
 realm["smtpServer"] = {
     "host": "${KC_SMTP_HOST}", "port": "${KC_SMTP_PORT}",
     "from": "${KC_SMTP_FROM}", "fromDisplayName": "${KC_SMTP_FROM_DISPLAY_NAME}",

@@ -58,6 +58,20 @@ def _load_database_url() -> str:
 
 
 def _checksum(path: Path) -> str:
+    """Hash the migration's *content*, with line endings normalised.
+
+    Git's core.autocrlf (on by default on Windows) rewrites LF to CRLF on
+    checkout, which changes the raw bytes of an already-applied migration and
+    made this script abort with a spurious "applied with a different checksum"
+    - the file was never edited, only checked out on a different machine.
+    """
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
+def _legacy_checksum(path: Path) -> str:
+    """Pre-normalisation checksum, for rows written by an older copy of this
+    script. Matching one of these is accepted, and the stored value is then
+    upgraded in place so the comparison is stable from then on."""
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
@@ -94,14 +108,22 @@ def main() -> int:
         for f in files:
             checksum = _checksum(f)
             if f.name in applied:
-                if applied[f.name] != checksum:
-                    sys.exit(
-                        f"ABORT: '{f.name}' was already applied with a different "
-                        f"checksum. A shipped migration must never be edited - add "
-                        f"a new migration file instead. "
-                        f"(applied={applied[f.name][:12]}… now={checksum[:12]}…)"
-                    )
-                continue
+                if applied[f.name] == checksum:
+                    continue
+                if applied[f.name] == _legacy_checksum(f):
+                    with conn, conn.cursor() as cur:
+                        cur.execute(
+                            "UPDATE schema_migration SET checksum = %s WHERE filename = %s",
+                            (checksum, f.name),
+                        )
+                    print(f"Note: re-hashed '{f.name}' (line endings only, content unchanged).")
+                    continue
+                sys.exit(
+                    f"ABORT: '{f.name}' was already applied with a different "
+                    f"checksum. A shipped migration must never be edited - add "
+                    f"a new migration file instead. "
+                    f"(applied={applied[f.name][:12]}… now={checksum[:12]}…)"
+                )
             pending.append((f, checksum))
 
         if args.status:
