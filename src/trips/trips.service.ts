@@ -34,6 +34,19 @@ export class TripsService {
   }
 
   async saveTrip(userId: string, dto: SaveTripDto) {
+    // Idempotent on chat_message_id: the chat's "Save itinerary" button
+    // doesn't track across a page refresh whether it already saved this
+    // card, so a re-click (or the same request replayed) returns the
+    // existing trip rather than tripping the unique constraint or creating
+    // a duplicate.
+    if (dto.chat_message_id) {
+      const existing = await this.prisma.itinerary.findFirst({
+        where: { chat_message_id: dto.chat_message_id, user_id: userId },
+        include: { itinerary_day: { include: { itinerary_item: true } } },
+      });
+      if (existing) return existing;
+    }
+
     const district_id = await this.resolveDistrictId(dto.destination);
 
     return this.prisma.itinerary.create({
@@ -46,6 +59,7 @@ export class TripsService {
         estimated_cost: dto.estimated_cost ?? null,
         currency: dto.currency ?? 'LKR',
         status: 'draft',
+        chat_message_id: dto.chat_message_id ?? null,
         itinerary_day: {
           create: dto.itinerary.map((day) => ({
             day_number: day.day,

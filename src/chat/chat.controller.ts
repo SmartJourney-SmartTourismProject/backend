@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/index.js';
 import { ChatService } from './chat.service.js';
@@ -52,7 +53,11 @@ export class ChatController {
   }
 
   @Delete(':id')
-  remove(@CurrentUser('id') userId: string, @Param('id', ParseUUIDPipe) id: string) {
-    return this.chatService.deleteSession(userId, id);
+  remove(
+    @CurrentUser('id') userId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('deleteSaved') deleteSaved?: string,
+  ) {
+    return this.chatService.deleteSession(userId, id, deleteSaved === 'true');
   }
 }

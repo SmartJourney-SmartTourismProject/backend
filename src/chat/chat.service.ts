@@ -45,7 +45,24 @@ export class ChatService {
       where: { session_id: id },
       orderBy: { created_at: 'asc' },
     });
-    return { ...session, chat_message };
+
+    // A saved trip's chat_message_id is what lets the chat card know it was
+    // already saved (see trips.service.saveTrip) - without reporting it back
+    // here, every reload forgot the card's saved state and let it be
+    // "Save itinerary"'d again into a duplicate.
+    const savedTrips = await this.prisma.itinerary.findMany({
+      where: { chat_message_id: { in: chat_message.map((m) => m.id) } },
+      select: { id: true, chat_message_id: true },
+    });
+    const savedTripByMessageId = new Map(savedTrips.map((t) => [t.chat_message_id, t.id]));
+
+    return {
+      ...session,
+      chat_message: chat_message.map((m) => ({
+        ...m,
+        saved_trip_id: savedTripByMessageId.get(m.id) ?? null,
+      })),
+    };
   }
 
   async renameSession(userId: string, id: string, title: string) {
@@ -56,8 +73,26 @@ export class ChatService {
     });
   }
 
-  async deleteSession(userId: string, id: string) {
+  /**
+   * deleteSavedItineraries opts into also removing any trips saved from this
+   * session's messages. Without it, the chat_message rows just cascade away
+   * and itinerary.chat_message_id is SetNull on the saved trips - they
+   * survive, unlinked, in Saved Itineraries. That's the default (a chat
+   * delete shouldn't silently take saved trips with it) - this is only for
+   * when the user explicitly ticks the "also delete related saved
+   * itineraries" box.
+   */
+  async deleteSession(userId: string, id: string, deleteSavedItineraries = false) {
     await this.findOwnedSession(userId, id);
+    if (deleteSavedItineraries) {
+      const messages = await this.prisma.chat_message.findMany({
+        where: { session_id: id },
+        select: { id: true },
+      });
+      await this.prisma.itinerary.deleteMany({
+        where: { user_id: userId, chat_message_id: { in: messages.map((m) => m.id) } },
+      });
+    }
     await this.prisma.chat_session.delete({ where: { id } });
     return { deleted: true };
   }
@@ -84,7 +119,7 @@ export class ChatService {
       session_id: session.ai_session_id ?? undefined,
     });
 
-    await this.prisma.chat_message.create({
+    const assistantMessage = await this.prisma.chat_message.create({
       data: {
         session_id: sessionId,
         role: 'assistant',
@@ -107,6 +142,9 @@ export class ChatService {
       },
     });
 
-    return aiResponse;
+    // Handed back so the client can tag the itinerary card with the message
+    // it came from - required for the save button to be idempotent (see
+    // trips.service.saveTrip's chat_message_id dedupe).
+    return { ...aiResponse, chat_message_id: assistantMessage.id };
   }
 }
