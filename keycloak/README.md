@@ -22,6 +22,25 @@ What is deliberately **not** in the file:
   point at the `mailpit` compose service; every mail Keycloak sends (verify
   email, reset password, test message) shows up at http://localhost:8025.
 
+## Google sign-in links to an existing account automatically
+
+The `google` identity provider uses the `first broker login auto-link` flow (a
+copy of Keycloak's built-in one) instead of the default. In it, "Confirm link
+existing account" and the account-verification options are DISABLED and
+"Automatically set existing user" (`idp-auto-link`) is REQUIRED.
+
+Why: by default, when Google returns an email that already belongs to a realm
+account, Keycloak stops and demands the user prove ownership - by clicking an
+emailed link or entering that account's password. In local dev the mail goes to
+Mailpit, not a real inbox, so that screen is a dead end; in production it is
+simply a confusing extra step for a user who just clicked "Sign in with Google".
+
+This is safe here specifically because Google verifies the email addresses it
+asserts, which is the same assumption `trustEmail: true` on the provider already
+makes. **Do not reuse this flow for an identity provider that does not verify
+email addresses** - there, auto-linking on a matching address would let anyone
+who can claim that address take over the local account.
+
 ## Changing realm config
 
 Edit in the admin console (http://localhost:8081, realm `smartjourney`), then
