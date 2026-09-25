@@ -41,6 +41,44 @@ makes. **Do not reuse this flow for an identity provider that does not verify
 email addresses** - there, auto-linking on a matching address would let anyone
 who can claim that address take over the local account.
 
+## Sending real password-reset / verification emails
+
+Keycloak already sends these automatically - "forgot password" fires the mail
+the moment the form is submitted. What decides whether it reaches a real inbox
+is the realm's SMTP settings, and locally those point at the **mailpit**
+container, which swallows everything and shows it at http://localhost:8025.
+That is deliberate: no credentials needed, and a test can never email a real
+person by accident.
+
+To switch to a real provider, put its settings in `backend/.env` (`KC_SMTP_*`)
+and run:
+
+```sh
+sh keycloak/apply-smtp.sh
+```
+
+It writes them into the running realm and sends a test message. The script
+exists because the `KC_SMTP_*` variables in `docker-compose.yml` are only read
+when a realm is **imported** - once the realm exists in `keycloak_db`, editing
+`.env` alone changes nothing.
+
+Gmail wants a 16-character **app password** (Google Account -> Security ->
+2-Step Verification -> App passwords), not the account password:
+
+```
+KC_SMTP_HOST=smtp.gmail.com
+KC_SMTP_PORT=587
+KC_SMTP_AUTH=true
+KC_SMTP_STARTTLS=true
+KC_SMTP_SSL=false
+KC_SMTP_USER=you@gmail.com
+KC_SMTP_PASSWORD=xxxxxxxxxxxxxxxx
+KC_SMTP_FROM=you@gmail.com
+```
+
+Re-run `keycloak/export-realm.sh` afterwards: the export keeps
+`${KC_SMTP_*}` placeholders, so the credentials stay out of git.
+
 ## The `smartjourney-backend` service account
 
 The admin endpoints change a user's realm role and enable/disable their
