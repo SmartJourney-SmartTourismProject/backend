@@ -15,6 +15,7 @@ function makePrisma() {
   return {
     app_user: {
       findUnique: vi.fn(),
+      findFirst: vi.fn(),
       update: vi.fn(),
       create: vi.fn(),
     },
@@ -82,5 +83,51 @@ describe('UsersService.ensureFromToken', () => {
     const second = await service.ensureFromToken(claims);
     expect(prisma.app_user.update).toHaveBeenCalledTimes(1);
     expect(second.roles).toEqual(['traveler']);
+  });
+});
+
+describe('UsersService concurrent first sign-in', () => {
+  it('provisions once when several requests arrive together', async () => {
+    const prisma = makePrisma();
+    prisma.app_user.findUnique.mockResolvedValue(null);
+    let created = 0;
+    prisma.app_user.create.mockImplementation(async () => {
+      created += 1;
+      await new Promise((r) => setTimeout(r, 10));
+      return { id: 'db-1', email: claims.email, name: claims.name };
+    });
+    const service = new UsersService(prisma as unknown as PrismaService);
+
+    const users = await Promise.all([
+      service.ensureFromToken(claims),
+      service.ensureFromToken(claims),
+      service.ensureFromToken(claims),
+    ]);
+
+    expect(created).toBe(1);
+    expect(users.map((u) => u.id)).toEqual(['db-1', 'db-1', 'db-1']);
+  });
+
+  it('recovers when another instance wins the insert (P2002)', async () => {
+    const prisma = makePrisma();
+    prisma.app_user.findUnique.mockResolvedValue(null);
+    prisma.app_user.create.mockRejectedValue(Object.assign(new Error('unique'), { code: 'P2002' }));
+    prisma.app_user.findFirst.mockResolvedValue({ id: 'winner-1', email: claims.email, name: claims.name });
+    const service = new UsersService(prisma as unknown as PrismaService);
+
+    const user = await service.ensureFromToken(claims);
+
+    expect(user.id).toBe('winner-1');
+    expect(prisma.app_user.findFirst).toHaveBeenCalled();
+  });
+
+  it('rethrows a P2002 that is not a provisioning race', async () => {
+    const prisma = makePrisma();
+    prisma.app_user.findUnique.mockResolvedValue(null);
+    prisma.app_user.create.mockRejectedValue(Object.assign(new Error('unique'), { code: 'P2002' }));
+    prisma.app_user.findFirst.mockResolvedValue(null);
+    const service = new UsersService(prisma as unknown as PrismaService);
+
+    await expect(service.ensureFromToken(claims)).rejects.toThrow('unique');
   });
 });

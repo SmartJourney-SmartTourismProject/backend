@@ -126,6 +126,11 @@ The AI backend's stopgap — `ai-backend/app/data/verify_all_for_demo.py` — bu
 currently-ingested row so the system is usable *now*. Its own docstring says this loudly: it is not
 real review, must not be added to any scheduler, and must be retired once real verification exists.
 
+> **Cutover reached 2026-09-25.** `POST /admin/listings/:id/verify` and `/reject` now exist
+> (`backend/src/admin/`), with a moderation queue in the web app at `/admin` for holders of the
+> Keycloak realm role `admin`. `verify_all_for_demo.py` should stop being run from now on, and the
+> rows it bulk-verified still want the spot-check described below.
+
 **When building §5.7's admin endpoints, treat this as the actual cutover point** — the first time
 `POST /admin/listings/:id/verify` / `/reject` exist and an admin has reviewed at least the listings a
 demo will show, that stopgap script should stop being run, and ideally the bulk `is_verified = true`

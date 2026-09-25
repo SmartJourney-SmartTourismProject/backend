@@ -41,6 +41,30 @@ makes. **Do not reuse this flow for an identity provider that does not verify
 email addresses** - there, auto-linking on a matching address would let anyone
 who can claim that address take over the local account.
 
+## The `smartjourney-backend` service account
+
+The admin endpoints change a user's realm role and enable/disable their
+account, which only Keycloak can do - so NestJS authenticates as the
+`smartjourney-backend` client (service account, no user login) and calls the
+Admin REST API. It holds three realm-management roles and nothing else:
+`view-users`, `manage-users` and `view-realm` (needed to look the `admin`
+realm role up by name).
+
+**A realm import does not restore this.** The client is in the export, but its
+service-account user's role mappings are not - they live on a user, and the
+export skips users. After a fresh import, run:
+
+```sh
+sh keycloak/grant-service-account-roles.sh
+```
+
+It grants the three roles and prints the client secret; put that in
+`backend/.env` as `KEYCLOAK_ADMIN_CLIENT_SECRET` and restart the API. Without
+it, `PATCH /admin/users/:id` fails with "Keycloak rejected the request (403)"
+while everything else keeps working. Note the API caches its service-account
+token for ~5 minutes, so a role granted just now takes effect on the next
+token - restart the API if you want it immediately.
+
 ## Changing realm config
 
 Edit in the admin console (http://localhost:8081, realm `smartjourney`), then
