@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -15,6 +16,14 @@ export class SaveTripDto {
   @IsOptional()
   @IsString()
   title?: string;
+
+  // The chat message the itinerary card was rendered from. Lets the save be
+  // idempotent (re-clicking "Save itinerary" on the same card, e.g. after a
+  // refresh, returns the existing trip instead of creating a duplicate) - see
+  // itinerary.chat_message_id's unique constraint.
+  @IsOptional()
+  @IsUUID()
+  chat_message_id?: string;
 
   // Free-text place name from the AI backend's `destination` field (e.g.
   // "Kandy") - resolved against `district.name` (e.g. "Kandy District") on
