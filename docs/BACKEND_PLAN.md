@@ -375,6 +375,7 @@ All 🛡️ — `RolesGuard` on the whole controller.
 | GET | `/admin/users/:id` | Detail (**never** return `password_hash`) |
 | PATCH | `/admin/users/:id` | Change role / activate / deactivate |
 | GET | `/admin/users/:id/activity` | `activity_log` entries (SRS §3.1.13) |
+| GET | `/admin/analytics` | 30-day trends + breakdowns behind the charts (SRS §3.1.14) |
 
 `/admin/stats` omits "subscription revenue" from the SRS mockup, since subscriptions are out of
 scope this round.
@@ -398,6 +399,19 @@ scope this round.
 - **Self-protection:** an admin cannot remove their own admin role or deactivate their own account.
 - Every admin action writes an `activity_log` row (SRS §3.1.13), and an audit-write failure is
   logged rather than failing the action itself.
+
+**Coverage against the SRS's four admin requirements** (added 2026-09-25):
+
+| SRS | Where |
+|---|---|
+| §3.1.11 Manage attractions, restaurants, events | Add/Edit forms in the Listings and Events tabs (`ContentFormModal`), incl. image URL, tags, price level and category; delete. **"Travel options" has no table** - the schema has listings and events only, so it is not covered. |
+| §3.1.12 Verify travel listing | The moderation queue: pending/approved/rejected, approve & reject with a reason |
+| §3.1.13 Manage users | List, search, role and status changes, and an **account-activity drawer** reading `activity_log` |
+| §3.1.14 View system analytics | Analytics tab: 30-day trend lines (itineraries, chat sessions, sign-ups), approvals vs rejections per day, and category/district/status/top-planner breakdowns. **Subscription revenue is reported as unavailable**, not zero, since subscriptions are out of scope (§1). |
+
+Chart colours were validated rather than chosen by eye: green/red for approved/rejected fails
+colour-blind separation (ΔE 4.1 for deuteranopes), so the moderation chart uses the diverging
+blue↔red pair (ΔE 23.8). Every chart also offers a table view.
 
 ### 5.8 Health
 

@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { CurrentUser, Roles } from '../auth/index.js';
+import { AdminAnalyticsService } from './admin-analytics.service.js';
 import { AdminContentService } from './admin-content.service.js';
 import { AdminUsersService } from './admin-users.service.js';
 import { CreateEventDto } from './dto/create-event.dto.js';
@@ -25,11 +26,18 @@ export class AdminController {
   constructor(
     private readonly content: AdminContentService,
     private readonly users: AdminUsersService,
+    private readonly analytics: AdminAnalyticsService,
   ) {}
 
   @Get('stats')
   stats() {
     return this.content.getStats();
+  }
+
+  /** SRS §3.1.14 - trends and breakdowns behind the analytics charts. */
+  @Get('analytics')
+  getAnalytics() {
+    return this.analytics.getAnalytics();
   }
 
   // ---- listings --------------------------------------------------------

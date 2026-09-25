@@ -285,7 +285,8 @@ export const ItineraryScalarFieldEnum = {
   currency: 'currency',
   status: 'status',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  chat_message_id: 'chat_message_id'
 } as const
 
 export type ItineraryScalarFieldEnum = (typeof ItineraryScalarFieldEnum)[keyof typeof ItineraryScalarFieldEnum]

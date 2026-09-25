@@ -187,6 +187,7 @@ export type chat_messageWhereInput = {
   created_at?: Prisma.DateTimeFilter<"chat_message"> | Date | string
   plan?: Prisma.JsonNullableFilter<"chat_message">
   chat_session?: Prisma.XOR<Prisma.Chat_sessionScalarRelationFilter, Prisma.chat_sessionWhereInput>
+  itinerary?: Prisma.XOR<Prisma.ItineraryNullableScalarRelationFilter, Prisma.itineraryWhereInput> | null
 }
 
 export type chat_messageOrderByWithRelationInput = {
@@ -197,6 +198,7 @@ export type chat_messageOrderByWithRelationInput = {
   created_at?: Prisma.SortOrder
   plan?: Prisma.SortOrderInput | Prisma.SortOrder
   chat_session?: Prisma.chat_sessionOrderByWithRelationInput
+  itinerary?: Prisma.itineraryOrderByWithRelationInput
 }
 
 export type chat_messageWhereUniqueInput = Prisma.AtLeast<{
@@ -210,6 +212,7 @@ export type chat_messageWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"chat_message"> | Date | string
   plan?: Prisma.JsonNullableFilter<"chat_message">
   chat_session?: Prisma.XOR<Prisma.Chat_sessionScalarRelationFilter, Prisma.chat_sessionWhereInput>
+  itinerary?: Prisma.XOR<Prisma.ItineraryNullableScalarRelationFilter, Prisma.itineraryWhereInput> | null
 }, "id">
 
 export type chat_messageOrderByWithAggregationInput = {
@@ -243,6 +246,7 @@ export type chat_messageCreateInput = {
   created_at?: Date | string
   plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   chat_session: Prisma.chat_sessionCreateNestedOneWithoutChat_messageInput
+  itinerary?: Prisma.itineraryCreateNestedOneWithoutChat_messageInput
 }
 
 export type chat_messageUncheckedCreateInput = {
@@ -252,6 +256,7 @@ export type chat_messageUncheckedCreateInput = {
   content: string
   created_at?: Date | string
   plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  itinerary?: Prisma.itineraryUncheckedCreateNestedOneWithoutChat_messageInput
 }
 
 export type chat_messageUpdateInput = {
@@ -261,6 +266,7 @@ export type chat_messageUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   chat_session?: Prisma.chat_sessionUpdateOneRequiredWithoutChat_messageNestedInput
+  itinerary?: Prisma.itineraryUpdateOneWithoutChat_messageNestedInput
 }
 
 export type chat_messageUncheckedUpdateInput = {
@@ -270,6 +276,7 @@ export type chat_messageUncheckedUpdateInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  itinerary?: Prisma.itineraryUncheckedUpdateOneWithoutChat_messageNestedInput
 }
 
 export type chat_messageCreateManyInput = {
@@ -333,6 +340,11 @@ export type chat_messageOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type Chat_messageNullableScalarRelationFilter = {
+  is?: Prisma.chat_messageWhereInput | null
+  isNot?: Prisma.chat_messageWhereInput | null
+}
+
 export type chat_messageCreateNestedManyWithoutChat_sessionInput = {
   create?: Prisma.XOR<Prisma.chat_messageCreateWithoutChat_sessionInput, Prisma.chat_messageUncheckedCreateWithoutChat_sessionInput> | Prisma.chat_messageCreateWithoutChat_sessionInput[] | Prisma.chat_messageUncheckedCreateWithoutChat_sessionInput[]
   connectOrCreate?: Prisma.chat_messageCreateOrConnectWithoutChat_sessionInput | Prisma.chat_messageCreateOrConnectWithoutChat_sessionInput[]
@@ -375,12 +387,29 @@ export type chat_messageUncheckedUpdateManyWithoutChat_sessionNestedInput = {
   deleteMany?: Prisma.chat_messageScalarWhereInput | Prisma.chat_messageScalarWhereInput[]
 }
 
+export type chat_messageCreateNestedOneWithoutItineraryInput = {
+  create?: Prisma.XOR<Prisma.chat_messageCreateWithoutItineraryInput, Prisma.chat_messageUncheckedCreateWithoutItineraryInput>
+  connectOrCreate?: Prisma.chat_messageCreateOrConnectWithoutItineraryInput
+  connect?: Prisma.chat_messageWhereUniqueInput
+}
+
+export type chat_messageUpdateOneWithoutItineraryNestedInput = {
+  create?: Prisma.XOR<Prisma.chat_messageCreateWithoutItineraryInput, Prisma.chat_messageUncheckedCreateWithoutItineraryInput>
+  connectOrCreate?: Prisma.chat_messageCreateOrConnectWithoutItineraryInput
+  upsert?: Prisma.chat_messageUpsertWithoutItineraryInput
+  disconnect?: Prisma.chat_messageWhereInput | boolean
+  delete?: Prisma.chat_messageWhereInput | boolean
+  connect?: Prisma.chat_messageWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.chat_messageUpdateToOneWithWhereWithoutItineraryInput, Prisma.chat_messageUpdateWithoutItineraryInput>, Prisma.chat_messageUncheckedUpdateWithoutItineraryInput>
+}
+
 export type chat_messageCreateWithoutChat_sessionInput = {
   id?: string
   role: string
   content: string
   created_at?: Date | string
   plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  itinerary?: Prisma.itineraryCreateNestedOneWithoutChat_messageInput
 }
 
 export type chat_messageUncheckedCreateWithoutChat_sessionInput = {
@@ -389,6 +418,7 @@ export type chat_messageUncheckedCreateWithoutChat_sessionInput = {
   content: string
   created_at?: Date | string
   plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  itinerary?: Prisma.itineraryUncheckedCreateNestedOneWithoutChat_messageInput
 }
 
 export type chat_messageCreateOrConnectWithoutChat_sessionInput = {
@@ -429,6 +459,58 @@ export type chat_messageScalarWhereInput = {
   plan?: Prisma.JsonNullableFilter<"chat_message">
 }
 
+export type chat_messageCreateWithoutItineraryInput = {
+  id?: string
+  role: string
+  content: string
+  created_at?: Date | string
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  chat_session: Prisma.chat_sessionCreateNestedOneWithoutChat_messageInput
+}
+
+export type chat_messageUncheckedCreateWithoutItineraryInput = {
+  id?: string
+  session_id: string
+  role: string
+  content: string
+  created_at?: Date | string
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+}
+
+export type chat_messageCreateOrConnectWithoutItineraryInput = {
+  where: Prisma.chat_messageWhereUniqueInput
+  create: Prisma.XOR<Prisma.chat_messageCreateWithoutItineraryInput, Prisma.chat_messageUncheckedCreateWithoutItineraryInput>
+}
+
+export type chat_messageUpsertWithoutItineraryInput = {
+  update: Prisma.XOR<Prisma.chat_messageUpdateWithoutItineraryInput, Prisma.chat_messageUncheckedUpdateWithoutItineraryInput>
+  create: Prisma.XOR<Prisma.chat_messageCreateWithoutItineraryInput, Prisma.chat_messageUncheckedCreateWithoutItineraryInput>
+  where?: Prisma.chat_messageWhereInput
+}
+
+export type chat_messageUpdateToOneWithWhereWithoutItineraryInput = {
+  where?: Prisma.chat_messageWhereInput
+  data: Prisma.XOR<Prisma.chat_messageUpdateWithoutItineraryInput, Prisma.chat_messageUncheckedUpdateWithoutItineraryInput>
+}
+
+export type chat_messageUpdateWithoutItineraryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  chat_session?: Prisma.chat_sessionUpdateOneRequiredWithoutChat_messageNestedInput
+}
+
+export type chat_messageUncheckedUpdateWithoutItineraryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  session_id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+}
+
 export type chat_messageCreateManyChat_sessionInput = {
   id?: string
   role: string
@@ -443,6 +525,7 @@ export type chat_messageUpdateWithoutChat_sessionInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  itinerary?: Prisma.itineraryUpdateOneWithoutChat_messageNestedInput
 }
 
 export type chat_messageUncheckedUpdateWithoutChat_sessionInput = {
@@ -451,6 +534,7 @@ export type chat_messageUncheckedUpdateWithoutChat_sessionInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   plan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  itinerary?: Prisma.itineraryUncheckedUpdateOneWithoutChat_messageNestedInput
 }
 
 export type chat_messageUncheckedUpdateManyWithoutChat_sessionInput = {
@@ -471,6 +555,7 @@ export type chat_messageSelect<ExtArgs extends runtime.Types.Extensions.Internal
   created_at?: boolean
   plan?: boolean
   chat_session?: boolean | Prisma.chat_sessionDefaultArgs<ExtArgs>
+  itinerary?: boolean | Prisma.chat_message$itineraryArgs<ExtArgs>
 }, ExtArgs["result"]["chat_message"]>
 
 export type chat_messageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -505,6 +590,7 @@ export type chat_messageSelectScalar = {
 export type chat_messageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "session_id" | "role" | "content" | "created_at" | "plan", ExtArgs["result"]["chat_message"]>
 export type chat_messageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   chat_session?: boolean | Prisma.chat_sessionDefaultArgs<ExtArgs>
+  itinerary?: boolean | Prisma.chat_message$itineraryArgs<ExtArgs>
 }
 export type chat_messageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   chat_session?: boolean | Prisma.chat_sessionDefaultArgs<ExtArgs>
@@ -517,6 +603,7 @@ export type $chat_messagePayload<ExtArgs extends runtime.Types.Extensions.Intern
   name: "chat_message"
   objects: {
     chat_session: Prisma.$chat_sessionPayload<ExtArgs>
+    itinerary: Prisma.$itineraryPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -920,6 +1007,7 @@ readonly fields: chat_messageFieldRefs;
 export interface Prisma__chat_messageClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   chat_session<T extends Prisma.chat_sessionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.chat_sessionDefaultArgs<ExtArgs>>): Prisma.Prisma__chat_sessionClient<runtime.Types.Result.GetResult<Prisma.$chat_sessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  itinerary<T extends Prisma.chat_message$itineraryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.chat_message$itineraryArgs<ExtArgs>>): Prisma.Prisma__itineraryClient<runtime.Types.Result.GetResult<Prisma.$itineraryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1353,6 +1441,25 @@ export type chat_messageDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many chat_messages to delete.
    */
   limit?: number
+}
+
+/**
+ * chat_message.itinerary
+ */
+export type chat_message$itineraryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the itinerary
+   */
+  select?: Prisma.itinerarySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the itinerary
+   */
+  omit?: Prisma.itineraryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.itineraryInclude<ExtArgs> | null
+  where?: Prisma.itineraryWhereInput
 }
 
 /**

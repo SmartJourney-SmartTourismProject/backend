@@ -64,11 +64,6 @@ function toPreferences(
   };
 }
 
-/** Prisma's "unique constraint failed" - here, two requests provisioning at once. */
-function isUniqueConstraintViolation(error: unknown): boolean {
-  return typeof error === 'object' && error !== null && (error as { code?: string }).code === 'P2002';
-}
-
 /**
  * Just-in-time provisioning. Keycloak is the source of truth for identity;
  * this keeps one `app_user` row per Keycloak user so the NOT NULL user_id
