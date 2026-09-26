@@ -297,9 +297,9 @@ export type itineraryWhereInput = {
   updated_at?: Prisma.DateTimeFilter<"itinerary"> | Date | string
   chat_message_id?: Prisma.UuidNullableFilter<"itinerary"> | string | null
   expense?: Prisma.ExpenseListRelationFilter
+  chat_message?: Prisma.XOR<Prisma.Chat_messageNullableScalarRelationFilter, Prisma.chat_messageWhereInput> | null
   district?: Prisma.XOR<Prisma.DistrictNullableScalarRelationFilter, Prisma.districtWhereInput> | null
   app_user?: Prisma.XOR<Prisma.App_userScalarRelationFilter, Prisma.app_userWhereInput>
-  chat_message?: Prisma.XOR<Prisma.Chat_messageNullableScalarRelationFilter, Prisma.chat_messageWhereInput> | null
   itinerary_day?: Prisma.Itinerary_dayListRelationFilter
 }
 
@@ -319,9 +319,9 @@ export type itineraryOrderByWithRelationInput = {
   updated_at?: Prisma.SortOrder
   chat_message_id?: Prisma.SortOrderInput | Prisma.SortOrder
   expense?: Prisma.expenseOrderByRelationAggregateInput
+  chat_message?: Prisma.chat_messageOrderByWithRelationInput
   district?: Prisma.districtOrderByWithRelationInput
   app_user?: Prisma.app_userOrderByWithRelationInput
-  chat_message?: Prisma.chat_messageOrderByWithRelationInput
   itinerary_day?: Prisma.itinerary_dayOrderByRelationAggregateInput
 }
 
@@ -344,9 +344,9 @@ export type itineraryWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"itinerary"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"itinerary"> | Date | string
   expense?: Prisma.ExpenseListRelationFilter
+  chat_message?: Prisma.XOR<Prisma.Chat_messageNullableScalarRelationFilter, Prisma.chat_messageWhereInput> | null
   district?: Prisma.XOR<Prisma.DistrictNullableScalarRelationFilter, Prisma.districtWhereInput> | null
   app_user?: Prisma.XOR<Prisma.App_userScalarRelationFilter, Prisma.app_userWhereInput>
-  chat_message?: Prisma.XOR<Prisma.Chat_messageNullableScalarRelationFilter, Prisma.chat_messageWhereInput> | null
   itinerary_day?: Prisma.Itinerary_dayListRelationFilter
 }, "id" | "chat_message_id">
 
@@ -405,9 +405,9 @@ export type itineraryCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   expense?: Prisma.expenseCreateNestedManyWithoutItineraryInput
+  chat_message?: Prisma.chat_messageCreateNestedOneWithoutItineraryInput
   district?: Prisma.districtCreateNestedOneWithoutItineraryInput
   app_user: Prisma.app_userCreateNestedOneWithoutItineraryInput
-  chat_message?: Prisma.chat_messageCreateNestedOneWithoutItineraryInput
   itinerary_day?: Prisma.itinerary_dayCreateNestedManyWithoutItineraryInput
 }
 
@@ -443,9 +443,9 @@ export type itineraryUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expense?: Prisma.expenseUpdateManyWithoutItineraryNestedInput
+  chat_message?: Prisma.chat_messageUpdateOneWithoutItineraryNestedInput
   district?: Prisma.districtUpdateOneWithoutItineraryNestedInput
   app_user?: Prisma.app_userUpdateOneRequiredWithoutItineraryNestedInput
-  chat_message?: Prisma.chat_messageUpdateOneWithoutItineraryNestedInput
   itinerary_day?: Prisma.itinerary_dayUpdateManyWithoutItineraryNestedInput
 }
 
@@ -750,8 +750,8 @@ export type itineraryCreateWithoutApp_userInput = {
   created_at?: Date | string
   updated_at?: Date | string
   expense?: Prisma.expenseCreateNestedManyWithoutItineraryInput
-  district?: Prisma.districtCreateNestedOneWithoutItineraryInput
   chat_message?: Prisma.chat_messageCreateNestedOneWithoutItineraryInput
+  district?: Prisma.districtCreateNestedOneWithoutItineraryInput
   itinerary_day?: Prisma.itinerary_dayCreateNestedManyWithoutItineraryInput
 }
 
@@ -920,8 +920,8 @@ export type itineraryCreateWithoutDistrictInput = {
   created_at?: Date | string
   updated_at?: Date | string
   expense?: Prisma.expenseCreateNestedManyWithoutItineraryInput
-  app_user: Prisma.app_userCreateNestedOneWithoutItineraryInput
   chat_message?: Prisma.chat_messageCreateNestedOneWithoutItineraryInput
+  app_user: Prisma.app_userCreateNestedOneWithoutItineraryInput
   itinerary_day?: Prisma.itinerary_dayCreateNestedManyWithoutItineraryInput
 }
 
@@ -981,9 +981,9 @@ export type itineraryCreateWithoutExpenseInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  chat_message?: Prisma.chat_messageCreateNestedOneWithoutItineraryInput
   district?: Prisma.districtCreateNestedOneWithoutItineraryInput
   app_user: Prisma.app_userCreateNestedOneWithoutItineraryInput
-  chat_message?: Prisma.chat_messageCreateNestedOneWithoutItineraryInput
   itinerary_day?: Prisma.itinerary_dayCreateNestedManyWithoutItineraryInput
 }
 
@@ -1033,9 +1033,9 @@ export type itineraryUpdateWithoutExpenseInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  chat_message?: Prisma.chat_messageUpdateOneWithoutItineraryNestedInput
   district?: Prisma.districtUpdateOneWithoutItineraryNestedInput
   app_user?: Prisma.app_userUpdateOneRequiredWithoutItineraryNestedInput
-  chat_message?: Prisma.chat_messageUpdateOneWithoutItineraryNestedInput
   itinerary_day?: Prisma.itinerary_dayUpdateManyWithoutItineraryNestedInput
 }
 
@@ -1070,9 +1070,9 @@ export type itineraryCreateWithoutItinerary_dayInput = {
   created_at?: Date | string
   updated_at?: Date | string
   expense?: Prisma.expenseCreateNestedManyWithoutItineraryInput
+  chat_message?: Prisma.chat_messageCreateNestedOneWithoutItineraryInput
   district?: Prisma.districtCreateNestedOneWithoutItineraryInput
   app_user: Prisma.app_userCreateNestedOneWithoutItineraryInput
-  chat_message?: Prisma.chat_messageCreateNestedOneWithoutItineraryInput
 }
 
 export type itineraryUncheckedCreateWithoutItinerary_dayInput = {
@@ -1122,9 +1122,9 @@ export type itineraryUpdateWithoutItinerary_dayInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expense?: Prisma.expenseUpdateManyWithoutItineraryNestedInput
+  chat_message?: Prisma.chat_messageUpdateOneWithoutItineraryNestedInput
   district?: Prisma.districtUpdateOneWithoutItineraryNestedInput
   app_user?: Prisma.app_userUpdateOneRequiredWithoutItineraryNestedInput
-  chat_message?: Prisma.chat_messageUpdateOneWithoutItineraryNestedInput
 }
 
 export type itineraryUncheckedUpdateWithoutItinerary_dayInput = {
@@ -1174,8 +1174,8 @@ export type itineraryUpdateWithoutApp_userInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expense?: Prisma.expenseUpdateManyWithoutItineraryNestedInput
-  district?: Prisma.districtUpdateOneWithoutItineraryNestedInput
   chat_message?: Prisma.chat_messageUpdateOneWithoutItineraryNestedInput
+  district?: Prisma.districtUpdateOneWithoutItineraryNestedInput
   itinerary_day?: Prisma.itinerary_dayUpdateManyWithoutItineraryNestedInput
 }
 
@@ -1226,8 +1226,8 @@ export type itineraryUpdateWithoutDistrictInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expense?: Prisma.expenseUpdateManyWithoutItineraryNestedInput
-  app_user?: Prisma.app_userUpdateOneRequiredWithoutItineraryNestedInput
   chat_message?: Prisma.chat_messageUpdateOneWithoutItineraryNestedInput
+  app_user?: Prisma.app_userUpdateOneRequiredWithoutItineraryNestedInput
   itinerary_day?: Prisma.itinerary_dayUpdateManyWithoutItineraryNestedInput
 }
 
@@ -1337,9 +1337,9 @@ export type itinerarySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   updated_at?: boolean
   chat_message_id?: boolean
   expense?: boolean | Prisma.itinerary$expenseArgs<ExtArgs>
+  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
   district?: boolean | Prisma.itinerary$districtArgs<ExtArgs>
   app_user?: boolean | Prisma.app_userDefaultArgs<ExtArgs>
-  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
   itinerary_day?: boolean | Prisma.itinerary$itinerary_dayArgs<ExtArgs>
   _count?: boolean | Prisma.ItineraryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["itinerary"]>
@@ -1359,9 +1359,9 @@ export type itinerarySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   created_at?: boolean
   updated_at?: boolean
   chat_message_id?: boolean
+  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
   district?: boolean | Prisma.itinerary$districtArgs<ExtArgs>
   app_user?: boolean | Prisma.app_userDefaultArgs<ExtArgs>
-  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
 }, ExtArgs["result"]["itinerary"]>
 
 export type itinerarySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1379,9 +1379,9 @@ export type itinerarySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   created_at?: boolean
   updated_at?: boolean
   chat_message_id?: boolean
+  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
   district?: boolean | Prisma.itinerary$districtArgs<ExtArgs>
   app_user?: boolean | Prisma.app_userDefaultArgs<ExtArgs>
-  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
 }, ExtArgs["result"]["itinerary"]>
 
 export type itinerarySelectScalar = {
@@ -1404,30 +1404,30 @@ export type itinerarySelectScalar = {
 export type itineraryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "district_id" | "title" | "start_date" | "end_date" | "travelers" | "budget" | "estimated_cost" | "currency" | "status" | "created_at" | "updated_at" | "chat_message_id", ExtArgs["result"]["itinerary"]>
 export type itineraryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   expense?: boolean | Prisma.itinerary$expenseArgs<ExtArgs>
+  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
   district?: boolean | Prisma.itinerary$districtArgs<ExtArgs>
   app_user?: boolean | Prisma.app_userDefaultArgs<ExtArgs>
-  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
   itinerary_day?: boolean | Prisma.itinerary$itinerary_dayArgs<ExtArgs>
   _count?: boolean | Prisma.ItineraryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type itineraryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
   district?: boolean | Prisma.itinerary$districtArgs<ExtArgs>
   app_user?: boolean | Prisma.app_userDefaultArgs<ExtArgs>
-  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
 }
 export type itineraryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
   district?: boolean | Prisma.itinerary$districtArgs<ExtArgs>
   app_user?: boolean | Prisma.app_userDefaultArgs<ExtArgs>
-  chat_message?: boolean | Prisma.itinerary$chat_messageArgs<ExtArgs>
 }
 
 export type $itineraryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "itinerary"
   objects: {
     expense: Prisma.$expensePayload<ExtArgs>[]
+    chat_message: Prisma.$chat_messagePayload<ExtArgs> | null
     district: Prisma.$districtPayload<ExtArgs> | null
     app_user: Prisma.$app_userPayload<ExtArgs>
-    chat_message: Prisma.$chat_messagePayload<ExtArgs> | null
     itinerary_day: Prisma.$itinerary_dayPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1840,9 +1840,9 @@ readonly fields: itineraryFieldRefs;
 export interface Prisma__itineraryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   expense<T extends Prisma.itinerary$expenseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.itinerary$expenseArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$expensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  chat_message<T extends Prisma.itinerary$chat_messageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.itinerary$chat_messageArgs<ExtArgs>>): Prisma.Prisma__chat_messageClient<runtime.Types.Result.GetResult<Prisma.$chat_messagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   district<T extends Prisma.itinerary$districtArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.itinerary$districtArgs<ExtArgs>>): Prisma.Prisma__districtClient<runtime.Types.Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   app_user<T extends Prisma.app_userDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.app_userDefaultArgs<ExtArgs>>): Prisma.Prisma__app_userClient<runtime.Types.Result.GetResult<Prisma.$app_userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  chat_message<T extends Prisma.itinerary$chat_messageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.itinerary$chat_messageArgs<ExtArgs>>): Prisma.Prisma__chat_messageClient<runtime.Types.Result.GetResult<Prisma.$chat_messagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   itinerary_day<T extends Prisma.itinerary$itinerary_dayArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.itinerary$itinerary_dayArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$itinerary_dayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2312,25 +2312,6 @@ export type itinerary$expenseArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
- * itinerary.district
- */
-export type itinerary$districtArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the district
-   */
-  select?: Prisma.districtSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the district
-   */
-  omit?: Prisma.districtOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.districtInclude<ExtArgs> | null
-  where?: Prisma.districtWhereInput
-}
-
-/**
  * itinerary.chat_message
  */
 export type itinerary$chat_messageArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2347,6 +2328,25 @@ export type itinerary$chat_messageArgs<ExtArgs extends runtime.Types.Extensions.
    */
   include?: Prisma.chat_messageInclude<ExtArgs> | null
   where?: Prisma.chat_messageWhereInput
+}
+
+/**
+ * itinerary.district
+ */
+export type itinerary$districtArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the district
+   */
+  select?: Prisma.districtSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the district
+   */
+  omit?: Prisma.districtOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.districtInclude<ExtArgs> | null
+  where?: Prisma.districtWhereInput
 }
 
 /**

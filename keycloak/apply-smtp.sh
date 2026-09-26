@@ -79,7 +79,13 @@ if [ "$TEST" = yes ]; then
     "$B/testSMTPConnection" -d "$smtp")
   if [ "$t" = "204" ]; then
     echo "test email sent OK"
-    [ "$HOST" = "mailpit" ] && echo "  (it is in Mailpit: http://localhost:8025)"
+    # `[ ... ] && echo` as the last statement would make a false test the
+    # script's exit status, so spell the branch out.
+    if [ "$HOST" = "mailpit" ]; then
+      echo "  (it is in Mailpit: http://localhost:8025)"
+    else
+      echo "  sent via $HOST - check the recipient's real inbox (and spam)"
+    fi
   else
     echo "test email FAILED -> HTTP $t" >&2
     echo "  Gmail: use a 16-char app password, port 587, STARTTLS=true, AUTH=true." >&2

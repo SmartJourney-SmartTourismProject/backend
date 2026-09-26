@@ -110,22 +110,27 @@ describe('UsersService concurrent first sign-in', () => {
 
   it('recovers when another instance wins the insert (P2002)', async () => {
     const prisma = makePrisma();
-    prisma.app_user.findUnique.mockResolvedValue(null);
+    // Nothing found before the insert; the insert loses the race; the re-read
+    // inside syncExisting() then finds the row the winner wrote.
+    prisma.app_user.findUnique
+      .mockResolvedValueOnce(null) // by keycloak_id, before insert
+      .mockResolvedValueOnce(null) // by email, before insert
+      .mockResolvedValueOnce({ id: 'winner-1', email: claims.email, name: claims.name }); // re-read
     prisma.app_user.create.mockRejectedValue(Object.assign(new Error('unique'), { code: 'P2002' }));
-    prisma.app_user.findFirst.mockResolvedValue({ id: 'winner-1', email: claims.email, name: claims.name });
+    prisma.app_user.update.mockResolvedValue({ id: 'winner-1', email: claims.email, name: claims.name });
     const service = new UsersService(prisma as unknown as PrismaService);
 
     const user = await service.ensureFromToken(claims);
 
     expect(user.id).toBe('winner-1');
-    expect(prisma.app_user.findFirst).toHaveBeenCalled();
   });
 
   it('rethrows a P2002 that is not a provisioning race', async () => {
     const prisma = makePrisma();
+    // The re-read finds nothing either, so the constraint failure was about
+    // something else and must not be swallowed.
     prisma.app_user.findUnique.mockResolvedValue(null);
     prisma.app_user.create.mockRejectedValue(Object.assign(new Error('unique'), { code: 'P2002' }));
-    prisma.app_user.findFirst.mockResolvedValue(null);
     const service = new UsersService(prisma as unknown as PrismaService);
 
     await expect(service.ensureFromToken(claims)).rejects.toThrow('unique');

@@ -79,9 +79,6 @@ model chat_message {
   created_at   DateTime     @default(now()) @db.Timestamptz(6)
   plan         Json?
   chat_session chat_session @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  // At most one saved itinerary per message - the FK's uniqueness is what
-  // stops the chat's "Save itinerary" button from creating duplicates on a
-  // re-click after refresh (see itinerary.chat_message_id).
   itinerary    itinerary?
 
   @@index([session_id, created_at], map: "chat_message_session")
@@ -214,14 +211,11 @@ model itinerary {
   status          String          @default("draft")
   created_at      DateTime        @default(now()) @db.Timestamptz(6)
   updated_at      DateTime        @default(now()) @db.Timestamptz(6)
-  // Which chat message (if any) this was saved from - unique so the same
-  // chat itinerary card can't be saved twice, and lets a session reload
-  // report back which of its cards are already saved.
   chat_message_id String?         @unique @db.Uuid
   expense         expense[]
+  chat_message    chat_message?   @relation(fields: [chat_message_id], references: [id], onUpdate: NoAction)
   district        district?       @relation(fields: [district_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   app_user        app_user        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  chat_message    chat_message?   @relation(fields: [chat_message_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   itinerary_day   itinerary_day[]
 
   @@index([user_id, status], map: "itinerary_user")
