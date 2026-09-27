@@ -285,14 +285,12 @@ model local_event {
   is_verified    Boolean                   @default(false)
   created_at     DateTime                  @default(now()) @db.Timestamptz(6)
   updated_at     DateTime                  @default(now()) @db.Timestamptz(6)
-  is_active      Boolean                   @default(true)
   itinerary_item itinerary_item[]
   district       district                  @relation(fields: [district_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([source, external_ref])
   @@index([location], map: "event_location", type: Gist)
   @@index([district_id, start_datetime, end_datetime], map: "event_window")
-  @@index([is_verified, is_active, district_id], map: "event_moderation")
 }
 
 model schema_migration {

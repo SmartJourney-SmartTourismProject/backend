@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# No external services here on purpose - unit specs fake Prisma directly
+# (see src/**/*.spec.ts) and the e2e suite fakes both Prisma and the
+# Keycloak-issued JWT (test/app.e2e-spec.ts), so the whole job needs
+# neither Postgres nor a running Keycloak. See
+# Documentation/Testing/MASTER_TEST_PLAN.md for what that trades away.
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npm test
+      - run: npm run test:e2e

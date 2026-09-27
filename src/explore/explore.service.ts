@@ -96,8 +96,15 @@ export class ExploreService {
         is_verified: true,
         is_active: true,
         ...(query.district && { district_id: query.district }),
-        ...(query.from && { start_datetime: { gte: new Date(query.from) } }),
-        ...(query.to && { start_datetime: { lte: new Date(query.to) } }),
+        // A single spread: two separate `start_datetime` spreads here would
+        // have the second silently clobber the first whenever both from and
+        // to are given, dropping one bound instead of applying both.
+        ...((query.from || query.to) && {
+          start_datetime: {
+            ...(query.from && { gte: new Date(query.from) }),
+            ...(query.to && { lte: new Date(query.to) }),
+          },
+        }),
       },
       orderBy: { start_datetime: 'asc' },
       include: { district: { select: DISTRICT_SUMMARY_SELECT } },
