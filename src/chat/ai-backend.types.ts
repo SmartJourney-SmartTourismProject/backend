@@ -43,6 +43,15 @@ export interface AiDisaster {
   note?: string;
 }
 
+export interface AiStartLocation {
+  lat: number;
+  lon: number;
+  /** How the origin was determined; 'text' means the traveler named it. */
+  source: 'gps' | 'ip' | 'text';
+  /** Only present for a named origin ("from Galle"); a GPS/IP fix has none. */
+  name?: string | null;
+}
+
 export interface AiTripPlanResponse {
   session_id: string;
   destination: string | null;
@@ -54,6 +63,12 @@ export interface AiTripPlanResponse {
   data_freshness: string | null;
   weather: AiWeather | null;
   disaster: AiDisaster | null;
+  /**
+   * Where the trip departs from, when known. The itinerary only ever lists
+   * stops at the destination, so this is the one thing that lets a client
+   * draw "Galle to Kandy" rather than just the Kandy stops.
+   */
+  start_location: AiStartLocation | null;
   final_response: string | null;
   errors: string[];
   trace: Record<string, unknown>;
