@@ -1,5 +1,16 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsDateString, IsNumber, IsOptional, IsString, IsUUID, Length, Min } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsDateString,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+  Matches,
+  Min,
+} from 'class-validator';
 
 export class UpdateEventDto {
   @IsOptional()
@@ -26,11 +37,15 @@ export class UpdateEventDto {
 
   @IsOptional()
   @IsString()
+  @Length(0, 200)
   venue_name?: string | null;
 
+  // Bounded for the same reason as the listing's tags - see UpdateListingDto.
   @IsOptional()
   @IsArray()
+  @ArrayMaxSize(20)
   @IsString({ each: true })
+  @Length(1, 40, { each: true })
   tags?: string[];
 
   @IsOptional()
@@ -47,6 +62,6 @@ export class UpdateEventDto {
 
   @IsOptional()
   @IsString()
-  @Length(3, 3)
+  @Matches(/^[A-Z]{3}$/, { message: 'currency must be a 3-letter ISO 4217 code, e.g. LKR' })
   currency?: string;
 }

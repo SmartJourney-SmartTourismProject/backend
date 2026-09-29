@@ -1,4 +1,5 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { CreateEventDto } from './dto/create-event.dto.js';
@@ -10,6 +11,40 @@ import { UpdateListingDto } from './dto/update-listing.dto.js';
 const PAGE_SIZE = 20;
 
 const DISTRICT_SUMMARY_SELECT = { id: true, name: true, province: true } as const;
+
+/**
+ * Both content tables carry @@unique([source, external_ref]). A timestamp is
+ * not unique enough: two rows created in the same millisecond - a double-click
+ * on the form, or two admins working at once - collide, and with no global
+ * Prisma exception filter that surfaces as a 500 rather than anything the
+ * admin can act on. A UUID removes the race instead of narrowing it.
+ */
+function adminExternalRef(): string {
+  return `admin:${randomUUID()}`;
+}
+
+/** end must not precede start; the DTO cannot check one field against another. */
+function assertDateOrder(start?: string, end?: string | null) {
+  if (!start || !end) return;
+  if (new Date(end).getTime() < new Date(start).getTime()) {
+    throw new BadRequestException('end_datetime must not be before start_datetime');
+  }
+}
+
+/**
+ * Same for the price band. The stored columns are Prisma `Decimal`, not number,
+ * so both sides are coerced explicitly rather than left to `<`, which would
+ * compare a Decimal through its string form.
+ */
+function assertPriceOrder(min?: unknown, max?: unknown) {
+  if (min === null || min === undefined || max === null || max === undefined) return;
+  const lo = Number(min);
+  const hi = Number(max);
+  if (Number.isNaN(lo) || Number.isNaN(hi)) return;
+  if (hi < lo) {
+    throw new BadRequestException('price_max must not be less than price_min');
+  }
+}
 
 /**
  * pending / approved / rejected expressed over the (is_verified, is_active)
@@ -121,7 +156,7 @@ export class AdminContentService {
     const { latitude, longitude, ...rest } = dto;
     // `location` is geography(Point,4326) - Unsupported by the Prisma client,
     // so the row is inserted with raw SQL and then read back normally.
-    const externalRef = `admin:${Date.now()}`;
+    const externalRef = adminExternalRef();
     const rows = await this.prisma.$queryRaw<{ id: string }[]>`
       INSERT INTO travel_listing
         (district_id, category_id, name, description, location, tags, price_level,
@@ -222,6 +257,8 @@ export class AdminContentService {
   }
 
   async createEvent(adminId: string, dto: CreateEventDto) {
+    assertDateOrder(dto.start_datetime, dto.end_datetime);
+    assertPriceOrder(dto.price_min, dto.price_max);
     const row = await this.prisma.local_event.create({
       data: {
         district_id: dto.district_id,
@@ -235,7 +272,7 @@ export class AdminContentService {
         price_max: dto.price_max ?? null,
         currency: dto.currency ?? 'LKR',
         source: 'admin',
-        external_ref: `admin:${Date.now()}`,
+        external_ref: adminExternalRef(),
         is_verified: true,
         is_active: true,
       },
@@ -245,7 +282,17 @@ export class AdminContentService {
   }
 
   async updateEvent(adminId: string, id: string, dto: UpdateEventDto) {
-    await this.getEvent(id);
+    const current = await this.getEvent(id);
+    // A patch may supply only one half of a pair, so validate the values the
+    // row will actually end up with, not just the ones in this request.
+    assertDateOrder(
+      dto.start_datetime ?? current.start_datetime?.toISOString(),
+      dto.end_datetime === undefined ? current.end_datetime?.toISOString() : dto.end_datetime,
+    );
+    assertPriceOrder(
+      dto.price_min === undefined ? current.price_min : dto.price_min,
+      dto.price_max === undefined ? current.price_max : dto.price_max,
+    );
     const { start_datetime, end_datetime, ...rest } = dto;
     await this.prisma.local_event.update({
       where: { id },

@@ -1,5 +1,19 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsInt, IsNumber, IsOptional, IsString, IsUUID, Length, Max, Min } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsBoolean,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  IsUUID,
+  Length,
+  Matches,
+  Max,
+  Min,
+} from 'class-validator';
 
 // Only the fields an admin should curate by hand. Deliberately not editable:
 // - source / external_ref: the ingest job's identity for the row (upsert key)
@@ -25,9 +39,13 @@ export class UpdateListingDto {
   @IsUUID()
   category_id?: string;
 
+  // Bounded deliberately: an unbounded string[] lets one request write an
+  // arbitrary amount of data into the row.
   @IsOptional()
   @IsArray()
+  @ArrayMaxSize(20)
   @IsString({ each: true })
+  @Length(1, 40, { each: true })
   tags?: string[];
 
   @IsOptional()
@@ -45,7 +63,7 @@ export class UpdateListingDto {
 
   @IsOptional()
   @IsString()
-  @Length(3, 3)
+  @Matches(/^[A-Z]{3}$/, { message: 'currency must be a 3-letter ISO 4217 code, e.g. LKR' })
   currency?: string;
 
   @IsOptional()
@@ -55,8 +73,11 @@ export class UpdateListingDto {
   @Max(5)
   rating?: number | null;
 
+  // http(s) only. A bare @IsString() would accept `javascript:...` or a
+  // `data:text/html,...` URI, which becomes stored XSS the moment the value is
+  // rendered into an href rather than an <img src>.
   @IsOptional()
-  @IsString()
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true })
   photo_url?: string | null;
 
   @IsOptional()
