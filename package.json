@@ -19,7 +19,9 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
-    "test:e2e": "vitest run --config ./vitest.config.e2e.ts"
+    "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
+    "test:security": "vitest run --config ./vitest.config.e2e.ts test/security.e2e-spec.ts --reporter=verbose",
+    "test:access": "vitest run --config ./vitest.config.e2e.ts test/access-control.e2e-spec.ts --reporter=verbose"
   },
   "dependencies": {
     "@nestjs/axios": "^12.0.0",
