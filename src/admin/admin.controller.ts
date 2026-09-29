@@ -7,6 +7,7 @@ import { CreateEventDto } from './dto/create-event.dto.js';
 import { CreateListingDto } from './dto/create-listing.dto.js';
 import { ModerationQueryDto } from './dto/moderation-query.dto.js';
 import { RejectDto } from './dto/reject.dto.js';
+import { BulkVerifyDto } from './dto/bulk-verify.dto.js';
 import { AdminUpdateUserDto } from './dto/update-user.dto.js';
 import { UpdateEventDto } from './dto/update-event.dto.js';
 import { UpdateListingDto } from './dto/update-listing.dto.js';
@@ -71,6 +72,14 @@ export class AdminController {
     return this.content.verifyListing(adminId, id);
   }
 
+  // Batch form of the route above, for a queue the admin has just reviewed.
+  // Declared before ':id' routes would be ambiguous, so the literal path
+  // segment 'verify-bulk' is used rather than an :id that could swallow it.
+  @Post('listings/verify-bulk')
+  verifyListingsBulk(@CurrentUser('id') adminId: string, @Body() dto: BulkVerifyDto) {
+    return this.content.verifyListingsBulk(adminId, dto.ids);
+  }
+
   @Post('listings/:id/reject')
   rejectListing(
     @CurrentUser('id') adminId: string,
@@ -114,6 +123,11 @@ export class AdminController {
   @Post('events/:id/verify')
   verifyEvent(@CurrentUser('id') adminId: string, @Param('id', ParseUUIDPipe) id: string) {
     return this.content.verifyEvent(adminId, id);
+  }
+
+  @Post('events/verify-bulk')
+  verifyEventsBulk(@CurrentUser('id') adminId: string, @Body() dto: BulkVerifyDto) {
+    return this.content.verifyEventsBulk(adminId, dto.ids);
   }
 
   @Post('events/:id/reject')

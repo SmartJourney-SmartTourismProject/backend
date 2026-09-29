@@ -4,13 +4,21 @@ import type { PrismaService } from '../prisma/prisma.service.js';
 
 function makePrisma() {
   return {
-    travel_listing: { findUnique: vi.fn(), findMany: vi.fn(), count: vi.fn(), update: vi.fn(), delete: vi.fn() },
+    travel_listing: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      count: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+      delete: vi.fn(),
+    },
     local_event: {
       findUnique: vi.fn(),
       findMany: vi.fn(),
       count: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
       delete: vi.fn(),
     },
     activity_log: { create: vi.fn() },
@@ -277,5 +285,56 @@ describe('AdminContentService event create/update guards', () => {
       service.updateEvent('admin-1', 'new-event', { end_datetime: '2026-01-01T00:00:00.000Z' }),
     ).rejects.toBeInstanceOf(BadRequestException);
     expect(prisma.local_event.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('AdminContentService bulk verify', () => {
+  const IDS = ['id-1', 'id-2', 'id-3'];
+
+  it('approves the given rows in a single statement and reports how many changed', async () => {
+    const prisma = makePrisma();
+    prisma.travel_listing.updateMany.mockResolvedValue({ count: 3 });
+    const service = new AdminContentService(prisma as unknown as PrismaService);
+
+    await expect(service.verifyListingsBulk('admin-1', IDS)).resolves.toEqual({ verified: 3 });
+    expect(prisma.travel_listing.updateMany).toHaveBeenCalledTimes(1);
+  });
+
+  it('only touches rows that are still pending, so a concurrent approval is not re-stamped', async () => {
+    const prisma = makePrisma();
+    prisma.travel_listing.updateMany.mockResolvedValue({ count: 2 });
+    const service = new AdminContentService(prisma as unknown as PrismaService);
+
+    await service.verifyListingsBulk('admin-1', IDS);
+
+    const { where, data } = prisma.travel_listing.updateMany.mock.calls[0][0];
+    expect(where).toMatchObject({ id: { in: IDS }, is_verified: false });
+    expect(data).toMatchObject({ is_verified: true, is_active: true });
+  });
+
+  it('writes one audit entry per row, so bulk approval is not an audit blind spot', async () => {
+    const prisma = makePrisma();
+    prisma.travel_listing.updateMany.mockResolvedValue({ count: 3 });
+    const service = new AdminContentService(prisma as unknown as PrismaService);
+
+    await service.verifyListingsBulk('admin-9', IDS);
+
+    expect(prisma.activity_log.create).toHaveBeenCalledTimes(IDS.length);
+    expect(prisma.activity_log.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ user_id: 'admin-9', action: 'listing.verify' }),
+      }),
+    );
+  });
+
+  it('does the same for events', async () => {
+    const prisma = makePrisma();
+    prisma.local_event.updateMany.mockResolvedValue({ count: 1 });
+    const service = new AdminContentService(prisma as unknown as PrismaService);
+
+    await expect(service.verifyEventsBulk('admin-1', ['e-1'])).resolves.toEqual({ verified: 1 });
+    expect(prisma.activity_log.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ action: 'event.verify' }) }),
+    );
   });
 });

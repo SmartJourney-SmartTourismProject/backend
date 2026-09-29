@@ -307,6 +307,38 @@ export class AdminContentService {
     return this.getEvent(id);
   }
 
+  /**
+   * Approve several rows in one action, for a queue an admin has just read
+   * through. `updateMany` is one statement rather than N round-trips, and the
+   * `is_verified: false` guard means a row someone else approved in the
+   * meantime is not counted twice or re-stamped.
+   *
+   * The audit trail stays per-row - one activity_log entry each, same action
+   * name as the single-row route - so bulk approval is not a blind spot when
+   * someone later asks who approved a given listing.
+   */
+  async verifyListingsBulk(adminId: string, ids: string[]) {
+    const { count } = await this.prisma.travel_listing.updateMany({
+      where: { id: { in: ids }, is_verified: false },
+      data: { is_verified: true, is_active: true, updated_at: new Date() },
+    });
+    for (const id of ids) {
+      await this.log(adminId, 'listing.verify', { listing_id: id, bulk: true });
+    }
+    return { verified: count };
+  }
+
+  async verifyEventsBulk(adminId: string, ids: string[]) {
+    const { count } = await this.prisma.local_event.updateMany({
+      where: { id: { in: ids }, is_verified: false },
+      data: { is_verified: true, is_active: true, updated_at: new Date() },
+    });
+    for (const id of ids) {
+      await this.log(adminId, 'event.verify', { event_id: id, bulk: true });
+    }
+    return { verified: count };
+  }
+
   async verifyEvent(adminId: string, id: string) {
     await this.getEvent(id);
     await this.prisma.local_event.update({
