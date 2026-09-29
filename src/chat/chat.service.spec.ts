@@ -6,7 +6,9 @@ import type { AiBackendService } from './ai-backend.service.js';
 function makePrisma() {
   return {
     chat_session: { create: vi.fn(), findMany: vi.fn(), findFirst: vi.fn(), update: vi.fn(), delete: vi.fn() },
-    chat_message: { create: vi.fn(), findMany: vi.fn() },
+    // count backs the "only title from the FIRST plan" rule; 1 means this
+    // turn's own plan is the only one so far.
+    chat_message: { create: vi.fn(), findMany: vi.fn(), count: vi.fn().mockResolvedValue(1) },
     itinerary: { findMany: vi.fn(), deleteMany: vi.fn() },
   };
 }
@@ -115,5 +117,72 @@ describe('ChatService.sendMessage', () => {
 
     const assistantCreateCall = prisma.chat_message.create.mock.calls[1][0];
     expect(assistantCreateCall.data.plan).toBeUndefined();
+  });
+});
+
+describe('ChatService.sendMessage session titles', () => {
+  /**
+   * The sidebar used to show the first 60 characters of whatever the traveler
+   * typed, so two people asking for the same trip in different words got two
+   * unrecognisable rows ("i want to go to galle to kan...") that search could
+   * not tell apart. The title is now built from the plan.
+   */
+  function planResponse(over: Record<string, unknown> = {}) {
+    return {
+      final_response: 'plan',
+      session_id: 'ai-session-1',
+      itinerary: [{ day: 1, items: [] }],
+      destination: 'Kandy District',
+      start_location: null,
+      ...over,
+    };
+  }
+
+  async function titleFrom(aiPlan: Record<string, unknown>, priorPlans = 1) {
+    const prisma = makePrisma();
+    const aiBackend = makeAiBackend();
+    prisma.chat_session.findFirst.mockResolvedValue({ id: 'session-1', ai_session_id: 'ai-session-1' });
+    prisma.chat_message.create.mockResolvedValue({ id: 'assistant-msg-1' });
+    prisma.chat_message.count.mockResolvedValue(priorPlans);
+    aiBackend.planTrip.mockResolvedValue(aiPlan);
+    const service = new ChatService(prisma as unknown as PrismaService, aiBackend as unknown as AiBackendService);
+
+    await service.sendMessage('user-1', 'session-1', { message: 'anything' });
+
+    return prisma.chat_session.update.mock.calls[0][0].data.title;
+  }
+
+  it('names the trip after its destination and length', async () => {
+    expect(await titleFrom(planResponse())).toBe('Kandy · 1 day');
+  });
+
+  it('includes the origin when the traveler named one', async () => {
+    const title = await titleFrom(
+      planResponse({
+        start_location: { lat: 6.03, lon: 80.21, source: 'text', name: 'Galle' },
+        itinerary: [{ day: 1, items: [] }, { day: 2, items: [] }],
+      }),
+    );
+    expect(title).toBe('Galle → Kandy · 2 days');
+  });
+
+  it('drops the "District" suffix, which every row would otherwise carry', async () => {
+    expect(await titleFrom(planResponse({ destination: 'Colombo District' }))).toBe('Colombo · 1 day');
+  });
+
+  it('does not repeat the place when the origin equals the destination', async () => {
+    const title = await titleFrom(
+      planResponse({ start_location: { lat: 7.29, lon: 80.63, source: 'text', name: 'Kandy' } }),
+    );
+    expect(title).toBe('Kandy · 1 day');
+  });
+
+  it('leaves the title alone on a clarification turn with no destination', async () => {
+    // Overwriting a good title with a worse one is the failure to avoid here.
+    expect(await titleFrom(planResponse({ destination: null, itinerary: [] }))).toBeUndefined();
+  });
+
+  it('only titles from the first plan, so a follow-up cannot rename the chat', async () => {
+    expect(await titleFrom(planResponse(), 3)).toBeUndefined();
   });
 });

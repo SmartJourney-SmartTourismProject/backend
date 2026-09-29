@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { AiBackendService } from './ai-backend.service.js';
 import { SendMessageDto } from './dto/send-message.dto.js';
+import type { AiTripPlanResponse } from './ai-backend.types.js';
 
 @Injectable()
 export class ChatService {
@@ -98,6 +99,38 @@ export class ChatService {
   }
 
   /**
+   * A searchable name for the conversation, built from the plan itself.
+   *
+   * The old title was the first message truncated to 60 characters, which
+   * produced a sidebar of near-identical rows ("i want to go to galle to
+   * kan...", twice) that could be neither told apart nor searched: the useful
+   * words were past the cut, and phrasing varies between people asking for
+   * the same trip. A plan already knows where the trip goes, how long it is,
+   * and now where it departs from, so the title is derived from that.
+   *
+   * Returns null when there is nothing better than what the session already
+   * has - a clarification turn with no destination should not overwrite a
+   * good title with a worse one.
+   */
+  private planTitle(aiResponse: AiTripPlanResponse): string | null {
+    const destination = aiResponse.destination?.trim();
+    if (!destination) return null;
+
+    // "District" is on every district name in the catalogue and carries no
+    // information in a sidebar where every row is a district.
+    const shorten = (place: string) => place.replace(/\s+District$/i, '').trim();
+
+    const origin = aiResponse.start_location?.name?.trim();
+    const route =
+      origin && shorten(origin).toLowerCase() !== shorten(destination).toLowerCase()
+        ? `${shorten(origin)} → ${shorten(destination)}`
+        : shorten(destination);
+
+    const days = aiResponse.itinerary.length;
+    return days > 0 ? `${route} · ${days} day${days === 1 ? '' : 's'}` : route;
+  }
+
+  /**
    * The core integration (AI_BACKEND_ENDPOINTS.md §"What NestJS should
    * persist"): persist the user's message, proxy to the AI backend, persist
    * the assistant's reply, and hand back the full plan so the client can
@@ -132,12 +165,22 @@ export class ChatService {
       },
     });
 
+    // Named from the FIRST plan only. Re-titling on every turn would make a
+    // follow-up ("make it cheaper") rewrite the name of a conversation the
+    // user may since have renamed by hand, and a session's identity in the
+    // sidebar should not keep moving underneath them.
+    const priorPlans = await this.prisma.chat_message.count({
+      where: { session_id: sessionId, role: 'assistant', plan: { not: Prisma.DbNull } },
+    });
+    const derivedTitle = priorPlans <= 1 ? this.planTitle(aiResponse) : null;
+
     await this.prisma.chat_session.update({
       where: { id: sessionId },
       data: {
         // Only the first turn sets this - later turns keep reusing the
         // same ai_session_id so follow-ups stay in the same AI conversation.
         ai_session_id: session.ai_session_id ?? aiResponse.session_id,
+        ...(derivedTitle ? { title: derivedTitle } : {}),
         updated_at: new Date(),
       },
     });
