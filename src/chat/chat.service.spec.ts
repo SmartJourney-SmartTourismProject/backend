@@ -252,3 +252,57 @@ describe('ChatService.sendMessage persists sources-only responses', () => {
     expect(assistantCreateCall.data.plan).toBeUndefined();
   });
 });
+
+describe('ChatService.sendMessage itinerary photos', () => {
+  function setup(listingsResult: unknown) {
+    const prisma = makePrisma() as ReturnType<typeof makePrisma> & { travel_listing: { findMany: ReturnType<typeof vi.fn> } };
+    prisma.travel_listing = { findMany: vi.fn() };
+    if (listingsResult instanceof Error) prisma.travel_listing.findMany.mockRejectedValue(listingsResult);
+    else prisma.travel_listing.findMany.mockResolvedValue(listingsResult);
+    const aiBackend = makeAiBackend();
+    prisma.chat_session.findFirst.mockResolvedValue({ id: 'session-1', ai_session_id: 'ai-session-1' });
+    prisma.chat_message.create.mockResolvedValue({ id: 'assistant-msg-1' });
+    aiBackend.planTrip.mockResolvedValue({
+      final_response: 'plan',
+      session_id: 'ai-session-1',
+      destination: 'Kandy',
+      start_location: null,
+      itinerary: [
+        {
+          day: 1,
+          items: [
+            { type: 'hotel', name: 'Forest Villa', lat: 7.3, lon: 80.6, listing_id: 'l-hotel' },
+            { type: 'restaurant', name: 'Cafe', lat: 7.3, lon: 80.6, listing_id: 'l-cafe' },
+          ],
+        },
+      ],
+    });
+    const service = new ChatService(prisma as unknown as PrismaService, aiBackend as unknown as AiBackendService);
+    return { prisma, service };
+  }
+
+  it('attaches each stop\'s photo (and credit) before storing the reply', async () => {
+    const { prisma, service } = setup([
+      { id: 'l-hotel', photo_url: 'https://img/h.jpg', listing_image: [{ url: 'https://img/h.jpg', attribution: 'CC BY-SA' }] },
+      { id: 'l-cafe', photo_url: null, listing_image: [] },
+    ]);
+
+    const result = await service.sendMessage('user-1', 'session-1', { message: 'plan kandy' });
+
+    const [hotel, cafe] = result.itinerary[0].items;
+    expect(hotel.photo_url).toBe('https://img/h.jpg');
+    expect(hotel.photo_attribution).toBe('CC BY-SA');
+    expect(cafe.photo_url).toBeUndefined();
+    // Stored with the message, so a reloaded chat still has them.
+    const stored = prisma.chat_message.create.mock.calls[1][0].data.plan as { itinerary: { items: { photo_url?: string }[] }[] };
+    expect(stored.itinerary[0].items[0].photo_url).toBe('https://img/h.jpg');
+    expect(prisma.travel_listing.findMany).toHaveBeenCalledTimes(1);
+  });
+
+  it('a failed photo lookup never fails the reply', async () => {
+    const { service } = setup(new Error('db down'));
+    const result = await service.sendMessage('user-1', 'session-1', { message: 'plan kandy' });
+    expect(result.final_response).toBe('plan');
+    expect(result.itinerary[0].items[0].photo_url).toBeUndefined();
+  });
+});

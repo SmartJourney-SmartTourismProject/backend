@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { TripsService } from './trips.service.js';
+import { TripsService, effectiveStatus, todayInSriLanka } from './trips.service.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
 
 function makePrisma() {
@@ -12,6 +12,8 @@ function makePrisma() {
       update: vi.fn(),
       delete: vi.fn(),
     },
+    itinerary_day: { update: vi.fn() },
+    $transaction: vi.fn(),
   };
 }
 
@@ -97,16 +99,122 @@ describe('TripsService.saveTrip', () => {
 });
 
 describe('TripsService.listTrips', () => {
-  it('scopes the query to the caller and applies an optional status filter', () => {
+  const TODAY = todayInSriLanka();
+  const YESTERDAY = new Date(TODAY.getTime() - 24 * 60 * 60 * 1000);
+
+  it('scopes Drafts/Upcoming to the caller and to trips that have not ended', async () => {
     const prisma = makePrisma();
-    prisma.itinerary.findMany.mockReturnValue([]);
+    prisma.itinerary.findMany.mockResolvedValue([]);
     const service = new TripsService(prisma as unknown as PrismaService);
 
-    service.listTrips('user-1', { status: 'upcoming' });
+    await service.listTrips('user-1', { status: 'upcoming' });
 
     expect(prisma.itinerary.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { user_id: 'user-1', status: 'upcoming' } }),
+      expect.objectContaining({
+        where: {
+          user_id: 'user-1',
+          status: 'upcoming',
+          OR: [{ end_date: null }, { end_date: { gte: TODAY } }],
+        },
+      }),
     );
+  });
+
+  it('Past includes trips whose last day is over, whatever their stored status', async () => {
+    const prisma = makePrisma();
+    prisma.itinerary.findMany.mockResolvedValue([{ id: 't1', status: 'upcoming', end_date: YESTERDAY }]);
+    const service = new TripsService(prisma as unknown as PrismaService);
+
+    const trips = await service.listTrips('user-1', { status: 'past' });
+
+    expect(prisma.itinerary.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { user_id: 'user-1', OR: [{ status: 'past' }, { end_date: { lt: TODAY } }] },
+      }),
+    );
+    expect(trips[0].status).toBe('past');
+  });
+
+  it('a trip ending today is not past yet', () => {
+    expect(effectiveStatus({ status: 'upcoming', end_date: TODAY }).status).toBe('upcoming');
+    expect(effectiveStatus({ status: 'draft', end_date: YESTERDAY }).status).toBe('past');
+    expect(effectiveStatus({ status: 'draft', end_date: null }).status).toBe('draft');
+  });
+});
+
+describe('TripsService dates', () => {
+  it('saveTrip sets the trip dates from its first and last day', async () => {
+    const prisma = makePrisma();
+    prisma.itinerary.findFirst.mockResolvedValue(null);
+    prisma.district.findFirst.mockResolvedValue(null);
+    prisma.itinerary.create.mockResolvedValue({ id: 'trip-1', status: 'draft', end_date: null });
+    const service = new TripsService(prisma as unknown as PrismaService);
+
+    await service.saveTrip('user-1', {
+      destination: 'Kandy',
+      itinerary: [
+        { day: 2, date: '2026-12-02', items: [] },
+        { day: 1, date: '2026-12-01', items: [] },
+      ],
+    } as Parameters<TripsService['saveTrip']>[1]);
+
+    const data = prisma.itinerary.create.mock.calls[0][0].data;
+    expect(data.start_date).toEqual(new Date('2026-12-01T00:00:00.000Z'));
+    expect(data.end_date).toEqual(new Date('2026-12-02T00:00:00.000Z'));
+    expect(data.status).toBe('draft');
+  });
+
+  function tripWithDays(status = 'draft') {
+    return {
+      id: 'trip-1', status, end_date: null,
+      itinerary_day: [
+        { id: 'd1', day_number: 1 },
+        { id: 'd2', day_number: 2 },
+        { id: 'd3', day_number: 3 },
+      ],
+    };
+  }
+
+  it('picking a start date re-dates every day, sets the end date and makes a draft upcoming', async () => {
+    const prisma = makePrisma();
+    prisma.itinerary.findFirst.mockResolvedValue(tripWithDays('draft'));
+    prisma.itinerary.update.mockReturnValue('trip-update');
+    prisma.itinerary_day.update.mockImplementation((args) => args);
+    prisma.$transaction.mockResolvedValue([{ id: 'trip-1', status: 'upcoming', end_date: null }]);
+    const service = new TripsService(prisma as unknown as PrismaService);
+
+    await service.updateTrip('user-1', 'trip-1', { start_date: '2026-12-10' });
+
+    const tripData = prisma.itinerary.update.mock.calls[0][0].data;
+    expect(tripData.start_date).toEqual(new Date('2026-12-10T00:00:00.000Z'));
+    expect(tripData.end_date).toEqual(new Date('2026-12-12T00:00:00.000Z'));
+    expect(tripData.status).toBe('upcoming');
+    const dayDates = prisma.itinerary_day.update.mock.calls.map((c) => c[0].data.date.toISOString().slice(0, 10));
+    expect(dayDates).toEqual(['2026-12-10', '2026-12-11', '2026-12-12']);
+  });
+
+  it('an explicit status wins over the automatic draft -> upcoming', async () => {
+    const prisma = makePrisma();
+    prisma.itinerary.findFirst.mockResolvedValue(tripWithDays('draft'));
+    prisma.itinerary_day.update.mockImplementation((args) => args);
+    prisma.$transaction.mockResolvedValue([{ id: 'trip-1', status: 'draft', end_date: null }]);
+    const service = new TripsService(prisma as unknown as PrismaService);
+
+    await service.updateTrip('user-1', 'trip-1', { start_date: '2026-12-10', status: 'draft' });
+
+    expect(prisma.itinerary.update.mock.calls[0][0].data.status).toBe('draft');
+  });
+
+  it('a date change leaves an already-upcoming trip upcoming', async () => {
+    const prisma = makePrisma();
+    prisma.itinerary.findFirst.mockResolvedValue(tripWithDays('upcoming'));
+    prisma.itinerary_day.update.mockImplementation((args) => args);
+    prisma.$transaction.mockResolvedValue([{ id: 'trip-1', status: 'upcoming', end_date: null }]);
+    const service = new TripsService(prisma as unknown as PrismaService);
+
+    await service.updateTrip('user-1', 'trip-1', { start_date: '2026-12-10' });
+
+    expect(prisma.itinerary.update.mock.calls[0][0].data.status).toBeUndefined();
   });
 });
 

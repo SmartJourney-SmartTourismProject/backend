@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { AiBackendService } from './ai-backend.service.js';
@@ -7,10 +7,42 @@ import type { AiTripPlanResponse } from './ai-backend.types.js';
 
 @Injectable()
 export class ChatService {
+  private readonly logger = new Logger(ChatService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly aiBackend: AiBackendService,
   ) {}
+
+  /**
+   * Puts each itinerary stop's photo on the item (`photo_url`, plus the
+   * Wikimedia credit when there is one) so the chat card can show a photo
+   * strip. One query for the whole plan, done before the message is stored
+   * so the photos come back on reload. Photos are decoration: a failed
+   * lookup is logged and the reply goes out without them.
+   */
+  private async attachPhotos(aiResponse: AiTripPlanResponse): Promise<void> {
+    const items = (aiResponse.itinerary ?? []).flatMap((day) => day.items ?? []);
+    const ids = [...new Set(items.map((i) => i.listing_id).filter((id): id is string => !!id))];
+    if (ids.length === 0) return;
+    try {
+      const listings = await this.prisma.travel_listing.findMany({
+        where: { id: { in: ids } },
+        select: { id: true, photo_url: true, listing_image: { select: { url: true, attribution: true } } },
+      });
+      const byId = new Map(listings.map((l) => [l.id, l]));
+      for (const item of items) {
+        const listing = item.listing_id ? byId.get(item.listing_id) : undefined;
+        const url = listing?.photo_url ?? listing?.listing_image[0]?.url;
+        if (!listing || !url) continue;
+        item.photo_url = url;
+        const credit = listing.listing_image.find((img) => img.url === url)?.attribution;
+        if (credit) item.photo_attribution = credit;
+      }
+    } catch (error) {
+      this.logger.warn(`Could not attach itinerary photos: ${String(error)}`);
+    }
+  }
 
   createSession(userId: string, title?: string) {
     return this.prisma.chat_session.create({
@@ -151,6 +183,7 @@ export class ChatService {
       // conversation rather than treating an unset id as a real one.
       session_id: session.ai_session_id ?? undefined,
     });
+    await this.attachPhotos(aiResponse);
 
     const assistantMessage = await this.prisma.chat_message.create({
       data: {

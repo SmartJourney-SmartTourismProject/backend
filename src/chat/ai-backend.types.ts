@@ -18,6 +18,10 @@ export interface AiItineraryItem {
   notes?: string | null;
   lat: number;
   lon: number;
+  listing_id?: string | null;
+  /** Added by ChatService.attachPhotos from travel_listing - not sent by the AI backend. */
+  photo_url?: string | null;
+  photo_attribution?: string | null;
 }
 
 export interface AiItineraryDay {
