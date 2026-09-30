@@ -79,6 +79,28 @@ KC_SMTP_FROM=you@gmail.com
 Re-run `keycloak/export-realm.sh` afterwards: the export keeps
 `${KC_SMTP_*}` placeholders, so the credentials stay out of git.
 
+## Login theme
+
+Keycloak's sign-in, register, forgot-password, verify-email and
+update-password pages use the `smartjourney` theme in
+`keycloak/themes/smartjourney/login/`, styled to match the web app's sign-in
+card. It builds on the built-in `keycloak.v2` theme and only adds
+`resources/css/smartjourney.css` (styles), `resources/img/` (the mountain
+background) and `messages/messages_en.properties` (wording such as "Welcome
+Back"). There are no template copies, so it survives Keycloak upgrades.
+
+`docker-compose.yml` mounts the folder into the container. For an existing
+realm, switch it on once:
+
+```sh
+docker compose up -d keycloak    # recreate with the theme mount
+sh keycloak/apply-theme.sh
+```
+
+A fresh import picks it up by itself (`"loginTheme": "smartjourney"` in
+`realm-export.json`). `start-dev` doesn't cache themes, so after editing the
+CSS or messages a browser refresh is enough.
+
 ## The `smartjourney-backend` service account
 
 The admin endpoints change a user's realm role and enable/disable their

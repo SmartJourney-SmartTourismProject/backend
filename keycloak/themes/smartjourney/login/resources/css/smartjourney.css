@@ -1,0 +1,403 @@
+/*
+ * SmartJourney skin for Keycloak's keycloak.v2 (PatternFly 5) login pages.
+ * Mirrors frontend-web/src/components/auth/AuthCard.tsx: mountain photo,
+ * frosted-glass card, brand logo row, pink-to-purple gradient button.
+ * Colours are copied from frontend-web/tailwind.config.js.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,600&display=swap');
+
+:root {
+  --sj-brand-600: #412874;
+  --sj-brand-700: #391f66;
+  --sj-brand-200: #c9b3e2;
+  --sj-accent-500: #d552a3;
+  --sj-accent-600: #c23e8f;
+  --sj-gradient: linear-gradient(171deg, #d552a3 0%, #412874 100%);
+  --sj-text: #111827;
+  --sj-text-muted: #4b5563;
+  --sj-border: #d1d5db;
+}
+
+/* ---- Page background ---------------------------------------------------- */
+
+.login-pf body,
+body#keycloak-bg {
+  background: #221240 url('../img/hero-mountains.png') no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Alexandria', system-ui, sans-serif;
+  min-height: 100%;
+}
+
+/* Same light scrim as AuthCard's bg-black/10 */
+body#keycloak-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+
+.pf-v5-c-login {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: none;
+}
+
+/* ---- The card -----------------------------------------------------------
+ * The whole container (logo header + form) becomes the one glass card, so
+ * the logo sits inside it like on the app's card. The page is forced light
+ * even when the OS is in dark mode (keycloak.v2's template adds
+ * pf-v5-theme-dark): PatternFly's colours are custom properties, and
+ * redefining them here - closer than the dark theme's :root values - wins.
+ */
+.pf-v5-c-login__container {
+  --pf-v5-global--Color--100: var(--sj-text);
+  --pf-v5-global--Color--200: var(--sj-text-muted);
+  --pf-v5-global--BackgroundColor--100: #ffffff;
+  --pf-v5-global--BackgroundColor--200: #f9fafb;
+  --pf-v5-global--BorderColor--100: var(--sj-border);
+  --pf-v5-global--link--Color: var(--sj-accent-600);
+  --pf-v5-global--link--Color--hover: var(--sj-accent-500);
+  --pf-v5-global--FontFamily--text: 'Alexandria', system-ui, sans-serif;
+  --pf-v5-global--FontFamily--heading: 'Alexandria', system-ui, sans-serif;
+
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: min(28rem, 100%);
+  margin: 0 auto;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  color: var(--sj-text);
+  font-family: 'Alexandria', system-ui, sans-serif;
+}
+
+.pf-v5-c-login__main {
+  background: transparent;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pf-v5-c-login__main-header,
+.pf-v5-c-login__main-body,
+.pf-v5-c-login__main-footer {
+  padding: 0;
+}
+
+.pf-v5-c-login__main-body {
+  margin-top: 1.5rem;
+}
+
+/* ---- Logo row ------------------------------------------------------------ */
+
+.pf-v5-c-login__header {
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+
+#kc-header-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.2;
+  color: var(--sj-brand-600) !important;
+}
+
+/* The purple tile with the plane, same as the app's logo mark */
+#kc-header-wrapper::before {
+  content: '';
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='rotate(45 12 12)'%3E%3Cpath d='M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z'/%3E%3C/g%3E%3C/svg%3E")
+      center / 1.5rem no-repeat,
+    var(--sj-gradient);
+}
+
+/* ---- Title --------------------------------------------------------------- */
+
+.pf-v5-c-login__main-header {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+#kc-page-title {
+  text-align: center;
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--sj-text);
+}
+
+/* ---- Fields -------------------------------------------------------------- */
+
+.pf-v5-c-form__label-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.pf-v5-c-form-control {
+  --pf-v5-c-form-control--BorderRadius: 0.75rem;
+  border-radius: 0.75rem;
+  background: #ffffff;
+}
+
+.pf-v5-c-form-control::before,
+.pf-v5-c-form-control::after {
+  border-radius: 0.75rem;
+}
+
+.pf-v5-c-form-control > input,
+.pf-v5-c-form-control > select,
+.pf-v5-c-form-control > textarea {
+  padding: 0.625rem 0.875rem;
+  color: var(--sj-text);
+}
+
+/* PatternFly draws the border with ::before (all sides) and ::after (a
+   thicker bottom line); soften both and use the brand ring on focus. */
+.pf-v5-c-form-control::before {
+  border-color: var(--sj-border);
+}
+
+.pf-v5-c-form-control::after {
+  border-bottom-width: 1px;
+  border-color: transparent;
+}
+
+.pf-v5-c-form-control > input:focus,
+.pf-v5-c-form-control > select:focus,
+.pf-v5-c-form-control > textarea:focus {
+  outline: none;
+}
+
+.pf-v5-c-form-control:focus-within::before {
+  border-color: var(--sj-brand-600);
+}
+
+.pf-v5-c-form-control:focus-within {
+  box-shadow: 0 0 0 3px rgba(201, 179, 226, 0.6);
+}
+
+/* The show-password eye sits in the input's rounded right edge */
+.pf-v5-c-input-group__item.pf-m-fill .pf-v5-c-form-control,
+.pf-v5-c-input-group__item.pf-m-fill .pf-v5-c-form-control::before,
+.pf-v5-c-input-group__item.pf-m-fill .pf-v5-c-form-control::after {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.pf-v5-c-input-group .pf-v5-c-button.pf-m-control {
+  border-radius: 0 0.75rem 0.75rem 0;
+  background: #ffffff;
+  color: var(--sj-text-muted);
+}
+
+.pf-v5-c-input-group .pf-v5-c-button.pf-m-control::after {
+  border-radius: 0 0.75rem 0.75rem 0;
+  border-color: var(--sj-border);
+}
+
+/* ---- Buttons ------------------------------------------------------------- */
+
+.pf-v5-c-button.pf-m-primary {
+  --pf-v5-c-button--m-primary--BackgroundColor: transparent;
+  --pf-v5-c-button--m-primary--hover--BackgroundColor: transparent;
+  --pf-v5-c-button--m-primary--focus--BackgroundColor: transparent;
+  --pf-v5-c-button--m-primary--active--BackgroundColor: transparent;
+  --pf-v5-c-button--m-primary--Color: #ffffff;
+  --pf-v5-c-button--m-primary--hover--Color: #ffffff;
+  background: var(--sj-gradient);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.15s ease;
+}
+
+.pf-v5-c-button.pf-m-primary:hover,
+.pf-v5-c-button.pf-m-primary:focus {
+  opacity: 0.9;
+}
+
+.pf-v5-c-button.pf-m-primary::after {
+  border-radius: 0.75rem;
+}
+
+/* Secondary actions (e.g. "Cancel" on update-password) */
+.pf-v5-c-button.pf-m-secondary,
+.pf-v5-c-button.pf-m-link {
+  border-radius: 0.75rem;
+  color: var(--sj-brand-600);
+}
+
+.pf-v5-c-button.pf-m-secondary::after {
+  border-color: var(--sj-brand-200);
+  border-radius: 0.75rem;
+}
+
+/* ---- Links, checkbox, alerts --------------------------------------------- */
+
+.pf-v5-c-login a,
+#kc-registration a,
+.pf-v5-c-helper-text a {
+  color: var(--sj-accent-600);
+  font-weight: 500;
+}
+
+.pf-v5-c-login a:hover {
+  color: var(--sj-accent-500);
+  text-decoration: underline;
+}
+
+.pf-v5-c-check__input {
+  appearance: auto;
+  -webkit-appearance: checkbox;
+  width: 1rem;
+  height: 1rem;
+  background: #ffffff;
+  accent-color: var(--sj-brand-600);
+  color-scheme: light;
+}
+
+.pf-v5-c-check__label {
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.pf-v5-c-alert {
+  border-radius: 0.75rem;
+}
+
+/* ---- "New user? Register" ------------------------------------------------ */
+
+#kc-info,
+#kc-registration-container,
+.pf-v5-c-login__main-footer-band {
+  background: transparent;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+#kc-info {
+  margin-top: 1rem;
+}
+
+#kc-registration {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--sj-text-muted);
+}
+
+/* ---- "or continue with" divider + Google button -------------------------- */
+
+.pf-v5-c-login__main-footer {
+  display: block;
+}
+
+.pf-v5-c-login__main-footer > .pf-v5-c-login__main-footer-band {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  border: 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.pf-v5-c-login__main-footer > .pf-v5-c-login__main-footer-band::before,
+.pf-v5-c-login__main-footer > .pf-v5-c-login__main-footer-band::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--sj-border);
+}
+
+.pf-v5-c-login__main-footer-band-item {
+  margin: 0;
+}
+
+#kc-social-providers {
+  margin-top: 1.25rem;
+}
+
+#kc-social-providers .pf-v5-c-login__main-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+}
+
+#kc-social-providers .pf-v5-c-login__main-footer-links-item {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#kc-social-providers .pf-v5-c-login__main-footer-links-item-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid var(--sj-border);
+  border-radius: 0.75rem;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+#kc-social-providers .pf-v5-c-login__main-footer-links-item-link:hover {
+  background: #f9fafb;
+  color: #374151;
+  text-decoration: none;
+}
+
+#kc-social-providers .pf-v5-c-login__main-footer-links-item-link svg {
+  width: 1rem;
+  height: 1rem;
+  fill: #4285f4;
+}
+
+/* The provider link is icon-only; spell the name out like the app does */
+#social-google::after {
+  content: 'Google';
+}
+
+/* ---- Phones -------------------------------------------------------------- */
+
+@media (max-width: 480px) {
+  .pf-v5-c-login__container {
+    padding: 1.5rem 1.25rem;
+  }
+
+  #kc-page-title {
+    font-size: 1.5rem;
+  }
+}

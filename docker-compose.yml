@@ -108,6 +108,10 @@ services:
       KC_SMTP_SSL: ${KC_SMTP_SSL:-false}
     volumes:
       - ./keycloak:/opt/keycloak/data/import:ro
+      # SmartJourney login theme (keycloak/themes/smartjourney). start-dev
+      # doesn't cache themes, so CSS edits show on a browser refresh. An
+      # existing realm is switched to it by keycloak/apply-theme.sh.
+      - ./keycloak/themes/smartjourney:/opt/keycloak/themes/smartjourney:ro
     ports:
       # host 8081 -> container 8080, since something else on this machine
       # already holds host port 8080
