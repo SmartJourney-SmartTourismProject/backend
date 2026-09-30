@@ -2,9 +2,11 @@ import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query
 import { CurrentUser, Roles } from '../auth/index.js';
 import { AdminAnalyticsService } from './admin-analytics.service.js';
 import { AdminContentService } from './admin-content.service.js';
+import { AdminEntryFeesService } from './admin-entry-fees.service.js';
 import { AdminUsersService } from './admin-users.service.js';
 import { CreateEventDto } from './dto/create-event.dto.js';
 import { CreateListingDto } from './dto/create-listing.dto.js';
+import { EntryFeeQueryDto, RelinkEntryFeeDto } from './dto/entry-fee-query.dto.js';
 import { ModerationQueryDto } from './dto/moderation-query.dto.js';
 import { RejectDto } from './dto/reject.dto.js';
 import { BulkVerifyDto } from './dto/bulk-verify.dto.js';
@@ -28,6 +30,7 @@ export class AdminController {
     private readonly content: AdminContentService,
     private readonly users: AdminUsersService,
     private readonly analytics: AdminAnalyticsService,
+    private readonly entryFees: AdminEntryFeesService,
   ) {}
 
   @Get('stats')
@@ -142,6 +145,39 @@ export class AdminController {
   @Delete('events/:id')
   deleteEvent(@CurrentUser('id') adminId: string, @Param('id', ParseUUIDPipe) id: string) {
     return this.content.deleteEvent(adminId, id);
+  }
+
+  // ---- entry fees --------------------------------------------------------
+  // Review queue for scraped heritage-site ticket prices (0012). A separate
+  // status column, not is_verified/is_active - see AdminEntryFeesService.
+
+  @Get('entry-fees')
+  listEntryFees(@Query() query: EntryFeeQueryDto) {
+    return this.entryFees.list(query);
+  }
+
+  @Get('entry-fees/:id')
+  getEntryFee(@Param('id', ParseUUIDPipe) id: string) {
+    return this.entryFees.get(id);
+  }
+
+  @Post('entry-fees/:id/approve')
+  approveEntryFee(@CurrentUser('id') adminId: string, @Param('id', ParseUUIDPipe) id: string) {
+    return this.entryFees.approve(adminId, id);
+  }
+
+  @Post('entry-fees/:id/reject')
+  rejectEntryFee(@CurrentUser('id') adminId: string, @Param('id', ParseUUIDPipe) id: string) {
+    return this.entryFees.reject(adminId, id);
+  }
+
+  @Patch('entry-fees/:id/listing')
+  relinkEntryFee(
+    @CurrentUser('id') adminId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: RelinkEntryFeeDto,
+  ) {
+    return this.entryFees.relink(adminId, id, dto.listing_id);
   }
 
   // ---- users -----------------------------------------------------------

@@ -59,6 +59,7 @@ export type Local_eventMinAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   is_active: boolean | null
+  source_url: string | null
 }
 
 export type Local_eventMaxAggregateOutputType = {
@@ -80,6 +81,7 @@ export type Local_eventMaxAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   is_active: boolean | null
+  source_url: string | null
 }
 
 export type Local_eventCountAggregateOutputType = {
@@ -102,6 +104,7 @@ export type Local_eventCountAggregateOutputType = {
   created_at: number
   updated_at: number
   is_active: number
+  source_url: number
   _all: number
 }
 
@@ -139,6 +142,7 @@ export type Local_eventMinAggregateInputType = {
   created_at?: true
   updated_at?: true
   is_active?: true
+  source_url?: true
 }
 
 export type Local_eventMaxAggregateInputType = {
@@ -160,6 +164,7 @@ export type Local_eventMaxAggregateInputType = {
   created_at?: true
   updated_at?: true
   is_active?: true
+  source_url?: true
 }
 
 export type Local_eventCountAggregateInputType = {
@@ -182,6 +187,7 @@ export type Local_eventCountAggregateInputType = {
   created_at?: true
   updated_at?: true
   is_active?: true
+  source_url?: true
   _all?: true
 }
 
@@ -291,6 +297,7 @@ export type Local_eventGroupByOutputType = {
   created_at: Date
   updated_at: Date
   is_active: boolean
+  source_url: string | null
   _count: Local_eventCountAggregateOutputType | null
   _avg: Local_eventAvgAggregateOutputType | null
   _sum: Local_eventSumAggregateOutputType | null
@@ -336,6 +343,7 @@ export type local_eventWhereInput = {
   created_at?: Prisma.DateTimeFilter<"local_event"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"local_event"> | Date | string
   is_active?: Prisma.BoolFilter<"local_event"> | boolean
+  source_url?: Prisma.StringNullableFilter<"local_event"> | string | null
   itinerary_item?: Prisma.Itinerary_itemListRelationFilter
   district?: Prisma.XOR<Prisma.DistrictScalarRelationFilter, Prisma.districtWhereInput>
 }
@@ -360,6 +368,7 @@ export type local_eventOrderByWithRelationInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  source_url?: Prisma.SortOrderInput | Prisma.SortOrder
   itinerary_item?: Prisma.itinerary_itemOrderByRelationAggregateInput
   district?: Prisma.districtOrderByWithRelationInput
 }
@@ -388,6 +397,7 @@ export type local_eventWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"local_event"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"local_event"> | Date | string
   is_active?: Prisma.BoolFilter<"local_event"> | boolean
+  source_url?: Prisma.StringNullableFilter<"local_event"> | string | null
   itinerary_item?: Prisma.Itinerary_itemListRelationFilter
   district?: Prisma.XOR<Prisma.DistrictScalarRelationFilter, Prisma.districtWhereInput>
 }, "id" | "source_external_ref">
@@ -412,6 +422,7 @@ export type local_eventOrderByWithAggregationInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  source_url?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.local_eventCountOrderByAggregateInput
   _avg?: Prisma.local_eventAvgOrderByAggregateInput
   _max?: Prisma.local_eventMaxOrderByAggregateInput
@@ -442,6 +453,7 @@ export type local_eventScalarWhereWithAggregatesInput = {
   created_at?: Prisma.DateTimeWithAggregatesFilter<"local_event"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"local_event"> | Date | string
   is_active?: Prisma.BoolWithAggregatesFilter<"local_event"> | boolean
+  source_url?: Prisma.StringNullableWithAggregatesFilter<"local_event"> | string | null
 }
 
 export type local_eventCreateInput = {
@@ -463,6 +475,7 @@ export type local_eventCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   is_active?: boolean
+  source_url?: string | null
   itinerary_item?: Prisma.itinerary_itemCreateNestedManyWithoutLocal_eventInput
   district: Prisma.districtCreateNestedOneWithoutLocal_eventInput
 }
@@ -487,6 +500,7 @@ export type local_eventUncheckedCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   is_active?: boolean
+  source_url?: string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedCreateNestedManyWithoutLocal_eventInput
 }
 
@@ -509,6 +523,7 @@ export type local_eventUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   itinerary_item?: Prisma.itinerary_itemUpdateManyWithoutLocal_eventNestedInput
   district?: Prisma.districtUpdateOneRequiredWithoutLocal_eventNestedInput
 }
@@ -533,6 +548,7 @@ export type local_eventUncheckedUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedUpdateManyWithoutLocal_eventNestedInput
 }
 
@@ -556,6 +572,7 @@ export type local_eventCreateManyInput = {
   created_at?: Date | string
   updated_at?: Date | string
   is_active?: boolean
+  source_url?: string | null
 }
 
 export type local_eventUpdateManyMutationInput = {
@@ -577,6 +594,7 @@ export type local_eventUpdateManyMutationInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type local_eventUncheckedUpdateManyInput = {
@@ -599,6 +617,7 @@ export type local_eventUncheckedUpdateManyInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type Local_eventListRelationFilter = {
@@ -649,6 +668,7 @@ export type local_eventCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  source_url?: Prisma.SortOrder
 }
 
 export type local_eventAvgOrderByAggregateInput = {
@@ -677,6 +697,7 @@ export type local_eventMaxOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  source_url?: Prisma.SortOrder
 }
 
 export type local_eventMinOrderByAggregateInput = {
@@ -698,6 +719,7 @@ export type local_eventMinOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  source_url?: Prisma.SortOrder
 }
 
 export type local_eventSumOrderByAggregateInput = {
@@ -779,6 +801,7 @@ export type local_eventCreateWithoutDistrictInput = {
   created_at?: Date | string
   updated_at?: Date | string
   is_active?: boolean
+  source_url?: string | null
   itinerary_item?: Prisma.itinerary_itemCreateNestedManyWithoutLocal_eventInput
 }
 
@@ -801,6 +824,7 @@ export type local_eventUncheckedCreateWithoutDistrictInput = {
   created_at?: Date | string
   updated_at?: Date | string
   is_active?: boolean
+  source_url?: string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedCreateNestedManyWithoutLocal_eventInput
 }
 
@@ -853,6 +877,7 @@ export type local_eventScalarWhereInput = {
   created_at?: Prisma.DateTimeFilter<"local_event"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"local_event"> | Date | string
   is_active?: Prisma.BoolFilter<"local_event"> | boolean
+  source_url?: Prisma.StringNullableFilter<"local_event"> | string | null
 }
 
 export type local_eventCreateWithoutItinerary_itemInput = {
@@ -874,6 +899,7 @@ export type local_eventCreateWithoutItinerary_itemInput = {
   created_at?: Date | string
   updated_at?: Date | string
   is_active?: boolean
+  source_url?: string | null
   district: Prisma.districtCreateNestedOneWithoutLocal_eventInput
 }
 
@@ -897,6 +923,7 @@ export type local_eventUncheckedCreateWithoutItinerary_itemInput = {
   created_at?: Date | string
   updated_at?: Date | string
   is_active?: boolean
+  source_url?: string | null
 }
 
 export type local_eventCreateOrConnectWithoutItinerary_itemInput = {
@@ -934,6 +961,7 @@ export type local_eventUpdateWithoutItinerary_itemInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   district?: Prisma.districtUpdateOneRequiredWithoutLocal_eventNestedInput
 }
 
@@ -957,6 +985,7 @@ export type local_eventUncheckedUpdateWithoutItinerary_itemInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type local_eventUpdateWithoutDistrictInput = {
@@ -978,6 +1007,7 @@ export type local_eventUpdateWithoutDistrictInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   itinerary_item?: Prisma.itinerary_itemUpdateManyWithoutLocal_eventNestedInput
 }
 
@@ -1000,6 +1030,7 @@ export type local_eventUncheckedUpdateWithoutDistrictInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedUpdateManyWithoutLocal_eventNestedInput
 }
 
@@ -1022,6 +1053,7 @@ export type local_eventCreateManyDistrictInput = {
   created_at?: Date | string
   updated_at?: Date | string
   is_active?: boolean
+  source_url?: string | null
 }
 
 export type local_eventUncheckedUpdateManyWithoutDistrictInput = {
@@ -1043,6 +1075,7 @@ export type local_eventUncheckedUpdateManyWithoutDistrictInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1096,6 +1129,7 @@ export type local_eventSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   created_at?: boolean
   updated_at?: boolean
   is_active?: boolean
+  source_url?: boolean
   itinerary_item?: boolean | Prisma.local_event$itinerary_itemArgs<ExtArgs>
   district?: boolean | Prisma.districtDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.Local_eventCountOutputTypeDefaultArgs<ExtArgs>
@@ -1121,6 +1155,7 @@ export type local_eventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   created_at?: boolean
   updated_at?: boolean
   is_active?: boolean
+  source_url?: boolean
   district?: boolean | Prisma.districtDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["local_event"]>
 
@@ -1144,6 +1179,7 @@ export type local_eventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   created_at?: boolean
   updated_at?: boolean
   is_active?: boolean
+  source_url?: boolean
   district?: boolean | Prisma.districtDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["local_event"]>
 
@@ -1167,9 +1203,10 @@ export type local_eventSelectScalar = {
   created_at?: boolean
   updated_at?: boolean
   is_active?: boolean
+  source_url?: boolean
 }
 
-export type local_eventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "district_id" | "name" | "description" | "start_datetime" | "end_datetime" | "venue_name" | "latitude" | "longitude" | "tags" | "price_min" | "price_max" | "currency" | "source" | "external_ref" | "is_verified" | "created_at" | "updated_at" | "is_active", ExtArgs["result"]["local_event"]>
+export type local_eventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "district_id" | "name" | "description" | "start_datetime" | "end_datetime" | "venue_name" | "latitude" | "longitude" | "tags" | "price_min" | "price_max" | "currency" | "source" | "external_ref" | "is_verified" | "created_at" | "updated_at" | "is_active" | "source_url", ExtArgs["result"]["local_event"]>
 export type local_eventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   itinerary_item?: boolean | Prisma.local_event$itinerary_itemArgs<ExtArgs>
   district?: boolean | Prisma.districtDefaultArgs<ExtArgs>
@@ -1208,6 +1245,7 @@ export type $local_eventPayload<ExtArgs extends runtime.Types.Extensions.Interna
     created_at: Date
     updated_at: Date
     is_active: boolean
+    source_url: string | null
   }, ExtArgs["result"]["local_event"]>
   composites: {}
 }
@@ -1652,6 +1690,7 @@ export interface local_eventFieldRefs {
   readonly created_at: Prisma.FieldRef<"local_event", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"local_event", 'DateTime'>
   readonly is_active: Prisma.FieldRef<"local_event", 'Boolean'>
+  readonly source_url: Prisma.FieldRef<"local_event", 'String'>
 }
     
 

@@ -415,6 +415,7 @@ export const ModelName = {
   itinerary_day: 'itinerary_day',
   itinerary_item: 'itinerary_item',
   listing_image: 'listing_image',
+  listing_entry_fee: 'listing_entry_fee',
   local_event: 'local_event',
   schema_migration: 'schema_migration',
   spatial_ref_sys: 'spatial_ref_sys',
@@ -438,7 +439,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "activity_log" | "admin_profile" | "ai_session" | "app_user" | "category" | "chat_message" | "chat_session" | "cost_reference" | "data_source" | "data_source_run" | "district" | "expense" | "geo_resolution" | "google_oauth_tokens" | "itinerary" | "itinerary_day" | "itinerary_item" | "listing_image" | "local_event" | "schema_migration" | "spatial_ref_sys" | "tag_mapping" | "tag_vocabulary" | "travel_listing" | "travel_time" | "traveler_profile"
+    modelProps: "activity_log" | "admin_profile" | "ai_session" | "app_user" | "category" | "chat_message" | "chat_session" | "cost_reference" | "data_source" | "data_source_run" | "district" | "expense" | "geo_resolution" | "google_oauth_tokens" | "itinerary" | "itinerary_day" | "itinerary_item" | "listing_image" | "listing_entry_fee" | "local_event" | "schema_migration" | "spatial_ref_sys" | "tag_mapping" | "tag_vocabulary" | "travel_listing" | "travel_time" | "traveler_profile"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1742,6 +1743,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    listing_entry_fee: {
+      payload: Prisma.$listing_entry_feePayload<ExtArgs>
+      fields: Prisma.listing_entry_feeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.listing_entry_feeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$listing_entry_feePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.listing_entry_feeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$listing_entry_feePayload>
+        }
+        findFirst: {
+          args: Prisma.listing_entry_feeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$listing_entry_feePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.listing_entry_feeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$listing_entry_feePayload>
+        }
+        findMany: {
+          args: Prisma.listing_entry_feeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$listing_entry_feePayload>[]
+        }
+        create: {
+          args: Prisma.listing_entry_feeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$listing_entry_feePayload>
+        }
+        createMany: {
+          args: Prisma.listing_entry_feeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.listing_entry_feeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$listing_entry_feePayload>[]
+        }
+        delete: {
+          args: Prisma.listing_entry_feeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$listing_entry_feePayload>
+        }
+        update: {
+          args: Prisma.listing_entry_feeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$listing_entry_feePayload>
+        }
+        deleteMany: {
+          args: Prisma.listing_entry_feeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.listing_entry_feeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.listing_entry_feeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$listing_entry_feePayload>[]
+        }
+        upsert: {
+          args: Prisma.listing_entry_feeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$listing_entry_feePayload>
+        }
+        aggregate: {
+          args: Prisma.Listing_entry_feeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateListing_entry_fee>
+        }
+        groupBy: {
+          args: Prisma.listing_entry_feeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Listing_entry_feeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.listing_entry_feeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Listing_entry_feeCountAggregateOutputType> | number
+        }
+      }
+    }
     local_event: {
       payload: Prisma.$local_eventPayload<ExtArgs>
       fields: Prisma.local_eventFieldRefs
@@ -2594,6 +2669,26 @@ export const Listing_imageScalarFieldEnum = {
 export type Listing_imageScalarFieldEnum = (typeof Listing_imageScalarFieldEnum)[keyof typeof Listing_imageScalarFieldEnum]
 
 
+export const Listing_entry_feeScalarFieldEnum = {
+  id: 'id',
+  listing_id: 'listing_id',
+  site_name: 'site_name',
+  foreign_adult: 'foreign_adult',
+  foreign_child: 'foreign_child',
+  local_adult: 'local_adult',
+  currency: 'currency',
+  source: 'source',
+  source_url: 'source_url',
+  external_ref: 'external_ref',
+  status: 'status',
+  fetched_at: 'fetched_at',
+  reviewed_at: 'reviewed_at',
+  reviewed_by: 'reviewed_by'
+} as const
+
+export type Listing_entry_feeScalarFieldEnum = (typeof Listing_entry_feeScalarFieldEnum)[keyof typeof Listing_entry_feeScalarFieldEnum]
+
+
 export const Local_eventScalarFieldEnum = {
   id: 'id',
   district_id: 'district_id',
@@ -2613,7 +2708,8 @@ export const Local_eventScalarFieldEnum = {
   is_verified: 'is_verified',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  is_active: 'is_active'
+  is_active: 'is_active',
+  source_url: 'source_url'
 } as const
 
 export type Local_eventScalarFieldEnum = (typeof Local_eventScalarFieldEnum)[keyof typeof Local_eventScalarFieldEnum]
@@ -3043,6 +3139,7 @@ export type GlobalOmitConfig = {
   itinerary_day?: Prisma.itinerary_dayOmit
   itinerary_item?: Prisma.itinerary_itemOmit
   listing_image?: Prisma.listing_imageOmit
+  listing_entry_fee?: Prisma.listing_entry_feeOmit
   local_event?: Prisma.local_eventOmit
   schema_migration?: Prisma.schema_migrationOmit
   spatial_ref_sys?: Prisma.spatial_ref_sysOmit

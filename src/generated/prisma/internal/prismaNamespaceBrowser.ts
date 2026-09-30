@@ -69,6 +69,7 @@ export const ModelName = {
   itinerary_day: 'itinerary_day',
   itinerary_item: 'itinerary_item',
   listing_image: 'listing_image',
+  listing_entry_fee: 'listing_entry_fee',
   local_event: 'local_event',
   schema_migration: 'schema_migration',
   spatial_ref_sys: 'spatial_ref_sys',
@@ -332,6 +333,26 @@ export const Listing_imageScalarFieldEnum = {
 export type Listing_imageScalarFieldEnum = (typeof Listing_imageScalarFieldEnum)[keyof typeof Listing_imageScalarFieldEnum]
 
 
+export const Listing_entry_feeScalarFieldEnum = {
+  id: 'id',
+  listing_id: 'listing_id',
+  site_name: 'site_name',
+  foreign_adult: 'foreign_adult',
+  foreign_child: 'foreign_child',
+  local_adult: 'local_adult',
+  currency: 'currency',
+  source: 'source',
+  source_url: 'source_url',
+  external_ref: 'external_ref',
+  status: 'status',
+  fetched_at: 'fetched_at',
+  reviewed_at: 'reviewed_at',
+  reviewed_by: 'reviewed_by'
+} as const
+
+export type Listing_entry_feeScalarFieldEnum = (typeof Listing_entry_feeScalarFieldEnum)[keyof typeof Listing_entry_feeScalarFieldEnum]
+
+
 export const Local_eventScalarFieldEnum = {
   id: 'id',
   district_id: 'district_id',
@@ -351,7 +372,8 @@ export const Local_eventScalarFieldEnum = {
   is_verified: 'is_verified',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  is_active: 'is_active'
+  is_active: 'is_active',
+  source_url: 'source_url'
 } as const
 
 export type Local_eventScalarFieldEnum = (typeof Local_eventScalarFieldEnum)[keyof typeof Local_eventScalarFieldEnum]

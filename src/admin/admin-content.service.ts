@@ -79,17 +79,20 @@ export class AdminContentService {
   // ---- dashboard -------------------------------------------------------
 
   async getStats() {
-    const [travelers, admins, itineraries, chatSessions, listingsPending, listingsApproved, eventsPending, eventsApproved] =
-      await Promise.all([
-        this.prisma.app_user.count({ where: { role: 'traveler' } }),
-        this.prisma.app_user.count({ where: { role: 'admin' } }),
-        this.prisma.itinerary.count(),
-        this.prisma.chat_session.count(),
-        this.prisma.travel_listing.count({ where: stateFilter('pending') }),
-        this.prisma.travel_listing.count({ where: stateFilter('approved') }),
-        this.prisma.local_event.count({ where: stateFilter('pending') }),
-        this.prisma.local_event.count({ where: stateFilter('approved') }),
-      ]);
+    const [
+      travelers, admins, itineraries, chatSessions,
+      listingsPending, listingsApproved, eventsPending, eventsApproved, entryFeesPending,
+    ] = await Promise.all([
+      this.prisma.app_user.count({ where: { role: 'traveler' } }),
+      this.prisma.app_user.count({ where: { role: 'admin' } }),
+      this.prisma.itinerary.count(),
+      this.prisma.chat_session.count(),
+      this.prisma.travel_listing.count({ where: stateFilter('pending') }),
+      this.prisma.travel_listing.count({ where: stateFilter('approved') }),
+      this.prisma.local_event.count({ where: stateFilter('pending') }),
+      this.prisma.local_event.count({ where: stateFilter('approved') }),
+      this.prisma.listing_entry_fee.count({ where: { status: 'pending' } }),
+    ]);
 
     return {
       users: { travelers, admins, total: travelers + admins },
@@ -97,8 +100,9 @@ export class AdminContentService {
       chat_sessions: chatSessions,
       listings: { pending: listingsPending, approved: listingsApproved },
       events: { pending: eventsPending, approved: eventsApproved },
+      entry_fees: { pending: entryFeesPending },
       // What the dashboard's "needs attention" card counts.
-      pending_verifications: listingsPending + eventsPending,
+      pending_verifications: listingsPending + eventsPending + entryFeesPending,
     };
   }
 

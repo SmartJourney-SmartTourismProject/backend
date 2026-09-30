@@ -108,6 +108,12 @@ export type itinerary_item = Prisma.itinerary_itemModel
  */
 export type listing_image = Prisma.listing_imageModel
 /**
+ * Model listing_entry_fee
+ * Scraped entry fees awaiting / after admin review (db/migrations/0012).
+ * Only status = 'approved' rows reach the AI backend's budget.
+ */
+export type listing_entry_fee = Prisma.listing_entry_feeModel
+/**
  * Model local_event
  * 
  */
