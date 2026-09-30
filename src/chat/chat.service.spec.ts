@@ -3,6 +3,9 @@ import { ChatService } from './chat.service.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
 import type { AiBackendService } from './ai-backend.service.js';
 
+// A day with one stop - an itinerary of empty days is not a plan (see hasStops).
+const STOP = { name: 'Stop', type: 'attraction', lat: 7.29, lon: 80.63 };
+
 function makePrisma() {
   return {
     chat_session: { create: vi.fn(), findMany: vi.fn(), findFirst: vi.fn(), update: vi.fn(), delete: vi.fn() },
@@ -13,7 +16,7 @@ function makePrisma() {
     // own plan is the only one so far".
     chat_message: {
       create: vi.fn(),
-      findMany: vi.fn().mockResolvedValue([{ plan: { itinerary: [{ day: 1, items: [] }] } }]),
+      findMany: vi.fn().mockResolvedValue([{ plan: { itinerary: [{ day: 1, items: [STOP] }] } }]),
     },
     itinerary: { findMany: vi.fn(), deleteMany: vi.fn() },
   };
@@ -137,7 +140,7 @@ describe('ChatService.sendMessage session titles', () => {
     return {
       final_response: 'plan',
       session_id: 'ai-session-1',
-      itinerary: [{ day: 1, items: [] }],
+      itinerary: [{ day: 1, items: [STOP] }],
       destination: 'Kandy District',
       start_location: null,
       ...over,
@@ -152,7 +155,7 @@ describe('ChatService.sendMessage session titles', () => {
     // `priorPlans` real-plan rows (a non-empty itinerary each) - what
     // ChatService's JS filter counts, not a raw row count.
     prisma.chat_message.findMany.mockResolvedValue(
-      Array.from({ length: priorPlans }, () => ({ plan: { itinerary: [{ day: 1, items: [] }] } })),
+      Array.from({ length: priorPlans }, () => ({ plan: { itinerary: [{ day: 1, items: [STOP] }] } })),
     );
     aiBackend.planTrip.mockResolvedValue(aiPlan);
     const service = new ChatService(prisma as unknown as PrismaService, aiBackend as unknown as AiBackendService);
@@ -170,7 +173,7 @@ describe('ChatService.sendMessage session titles', () => {
     const title = await titleFrom(
       planResponse({
         start_location: { lat: 6.03, lon: 80.21, source: 'text', name: 'Galle' },
-        itinerary: [{ day: 1, items: [] }, { day: 2, items: [] }],
+        itinerary: [{ day: 1, items: [STOP] }, { day: 2, items: [STOP] }],
       }),
     );
     expect(title).toBe('Galle → Kandy · 2 days');
@@ -247,6 +250,28 @@ describe('ChatService.sendMessage persists sources-only responses', () => {
     const service = new ChatService(prisma as unknown as PrismaService, aiBackend as unknown as AiBackendService);
 
     await service.sendMessage('user-1', 'session-1', { message: 'plan a trip' });
+
+    const assistantCreateCall = prisma.chat_message.create.mock.calls[1][0];
+    expect(assistantCreateCall.data.plan).toBeUndefined();
+  });
+
+  it('omits `plan` for an itinerary of days with no stops (a failed plan)', async () => {
+    const prisma = makePrisma();
+    const aiBackend = makeAiBackend();
+    prisma.chat_session.findFirst.mockResolvedValue({ id: 'session-1', ai_session_id: 'ai-session-1' });
+    prisma.chat_message.create.mockResolvedValue({ id: 'assistant-msg-1' });
+    aiBackend.planTrip.mockResolvedValue({
+      final_response: 'Sorry, I ran into an issue',
+      destination: 'galle and matara',
+      itinerary: [
+        { day: 1, items: [] },
+        { day: 2, items: [] },
+      ],
+      session_id: 'ai-session-1',
+    });
+    const service = new ChatService(prisma as unknown as PrismaService, aiBackend as unknown as AiBackendService);
+
+    await service.sendMessage('user-1', 'session-1', { message: 'plan galle and matara' });
 
     const assistantCreateCall = prisma.chat_message.create.mock.calls[1][0];
     expect(assistantCreateCall.data.plan).toBeUndefined();

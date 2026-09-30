@@ -5,6 +5,14 @@ import { AiBackendService } from './ai-backend.service.js';
 import { SendMessageDto } from './dto/send-message.dto.js';
 import type { AiTripPlanResponse } from './ai-backend.types.js';
 
+/** At least one day with at least one stop - an itinerary of empty days is no plan. */
+function hasStops(itinerary: unknown): boolean {
+  return (
+    Array.isArray(itinerary) &&
+    itinerary.some((day) => Array.isArray((day as { items?: unknown })?.items) && (day as { items: unknown[] }).items.length > 0)
+  );
+}
+
 @Injectable()
 export class ChatService {
   private readonly logger = new Logger(ChatService.name);
@@ -198,8 +206,11 @@ export class ChatService {
         // checked too (not just `itinerary`), or a pure-question turn's
         // citations would vanish on reload even though the plan check
         // alone looked like the right guard for "was anything produced".
+        // "A real plan" means at least one stop: an itinerary of empty days
+        // (a failed plan) was stored and shown as a card of 0 LKR days with
+        // a Save button.
         plan:
-          aiResponse.itinerary.length > 0 || (aiResponse.sources?.length ?? 0) > 0
+          hasStops(aiResponse.itinerary) || (aiResponse.sources?.length ?? 0) > 0
             ? (aiResponse as unknown as Prisma.InputJsonValue)
             : undefined,
       },
@@ -223,10 +234,9 @@ export class ChatService {
       where: { session_id: sessionId, role: 'assistant', plan: { not: Prisma.DbNull } },
       select: { plan: true },
     });
-    const priorPlans = priorPlanMessages.filter((m) => {
-      const itinerary = (m.plan as { itinerary?: unknown[] } | null)?.itinerary;
-      return Array.isArray(itinerary) && itinerary.length > 0;
-    }).length;
+    const priorPlans = priorPlanMessages.filter((m) =>
+      hasStops((m.plan as { itinerary?: unknown } | null)?.itinerary),
+    ).length;
     const derivedTitle = priorPlans <= 1 ? this.planTitle(aiResponse) : null;
 
     await this.prisma.chat_session.update({
