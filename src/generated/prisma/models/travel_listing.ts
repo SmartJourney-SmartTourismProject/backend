@@ -15,6 +15,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 /**
  * Model travel_listing
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.
  */
 export type travel_listingModel = runtime.Types.Result.DefaultSelection<Prisma.$travel_listingPayload>
 
@@ -33,6 +34,7 @@ export type Travel_listingAvgAggregateOutputType = {
   price_per_night: runtime.Decimal | null
   rating: runtime.Decimal | null
   rating_count: number | null
+  popularity: number | null
 }
 
 export type Travel_listingSumAggregateOutputType = {
@@ -42,6 +44,7 @@ export type Travel_listingSumAggregateOutputType = {
   price_per_night: runtime.Decimal | null
   rating: runtime.Decimal | null
   rating_count: number | null
+  popularity: number | null
 }
 
 export type Travel_listingMinAggregateOutputType = {
@@ -68,6 +71,9 @@ export type Travel_listingMinAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   foursquare_checked_at: Date | null
+  wikipedia_title: string | null
+  popularity: number | null
+  popularity_checked_at: Date | null
 }
 
 export type Travel_listingMaxAggregateOutputType = {
@@ -94,6 +100,9 @@ export type Travel_listingMaxAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   foursquare_checked_at: Date | null
+  wikipedia_title: string | null
+  popularity: number | null
+  popularity_checked_at: Date | null
 }
 
 export type Travel_listingCountAggregateOutputType = {
@@ -122,6 +131,9 @@ export type Travel_listingCountAggregateOutputType = {
   created_at: number
   updated_at: number
   foursquare_checked_at: number
+  wikipedia_title: number
+  popularity: number
+  popularity_checked_at: number
   _all: number
 }
 
@@ -133,6 +145,7 @@ export type Travel_listingAvgAggregateInputType = {
   price_per_night?: true
   rating?: true
   rating_count?: true
+  popularity?: true
 }
 
 export type Travel_listingSumAggregateInputType = {
@@ -142,6 +155,7 @@ export type Travel_listingSumAggregateInputType = {
   price_per_night?: true
   rating?: true
   rating_count?: true
+  popularity?: true
 }
 
 export type Travel_listingMinAggregateInputType = {
@@ -168,6 +182,9 @@ export type Travel_listingMinAggregateInputType = {
   created_at?: true
   updated_at?: true
   foursquare_checked_at?: true
+  wikipedia_title?: true
+  popularity?: true
+  popularity_checked_at?: true
 }
 
 export type Travel_listingMaxAggregateInputType = {
@@ -194,6 +211,9 @@ export type Travel_listingMaxAggregateInputType = {
   created_at?: true
   updated_at?: true
   foursquare_checked_at?: true
+  wikipedia_title?: true
+  popularity?: true
+  popularity_checked_at?: true
 }
 
 export type Travel_listingCountAggregateInputType = {
@@ -222,6 +242,9 @@ export type Travel_listingCountAggregateInputType = {
   created_at?: true
   updated_at?: true
   foursquare_checked_at?: true
+  wikipedia_title?: true
+  popularity?: true
+  popularity_checked_at?: true
   _all?: true
 }
 
@@ -337,6 +360,9 @@ export type Travel_listingGroupByOutputType = {
   created_at: Date
   updated_at: Date
   foursquare_checked_at: Date | null
+  wikipedia_title: string | null
+  popularity: number | null
+  popularity_checked_at: Date | null
   _count: Travel_listingCountAggregateOutputType | null
   _avg: Travel_listingAvgAggregateOutputType | null
   _sum: Travel_listingSumAggregateOutputType | null
@@ -388,6 +414,9 @@ export type travel_listingWhereInput = {
   created_at?: Prisma.DateTimeFilter<"travel_listing"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"travel_listing"> | Date | string
   foursquare_checked_at?: Prisma.DateTimeNullableFilter<"travel_listing"> | Date | string | null
+  wikipedia_title?: Prisma.StringNullableFilter<"travel_listing"> | string | null
+  popularity?: Prisma.IntNullableFilter<"travel_listing"> | number | null
+  popularity_checked_at?: Prisma.DateTimeNullableFilter<"travel_listing"> | Date | string | null
   itinerary_item?: Prisma.Itinerary_itemListRelationFilter
   listing_image?: Prisma.Listing_imageListRelationFilter
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.categoryWhereInput>
@@ -420,6 +449,9 @@ export type travel_listingOrderByWithRelationInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   foursquare_checked_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  wikipedia_title?: Prisma.SortOrderInput | Prisma.SortOrder
+  popularity?: Prisma.SortOrderInput | Prisma.SortOrder
+  popularity_checked_at?: Prisma.SortOrderInput | Prisma.SortOrder
   itinerary_item?: Prisma.itinerary_itemOrderByRelationAggregateInput
   listing_image?: Prisma.listing_imageOrderByRelationAggregateInput
   category?: Prisma.categoryOrderByWithRelationInput
@@ -456,6 +488,9 @@ export type travel_listingWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"travel_listing"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"travel_listing"> | Date | string
   foursquare_checked_at?: Prisma.DateTimeNullableFilter<"travel_listing"> | Date | string | null
+  wikipedia_title?: Prisma.StringNullableFilter<"travel_listing"> | string | null
+  popularity?: Prisma.IntNullableFilter<"travel_listing"> | number | null
+  popularity_checked_at?: Prisma.DateTimeNullableFilter<"travel_listing"> | Date | string | null
   itinerary_item?: Prisma.Itinerary_itemListRelationFilter
   listing_image?: Prisma.Listing_imageListRelationFilter
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.categoryWhereInput>
@@ -488,6 +523,9 @@ export type travel_listingOrderByWithAggregationInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   foursquare_checked_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  wikipedia_title?: Prisma.SortOrderInput | Prisma.SortOrder
+  popularity?: Prisma.SortOrderInput | Prisma.SortOrder
+  popularity_checked_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.travel_listingCountOrderByAggregateInput
   _avg?: Prisma.travel_listingAvgOrderByAggregateInput
   _max?: Prisma.travel_listingMaxOrderByAggregateInput
@@ -524,6 +562,9 @@ export type travel_listingScalarWhereWithAggregatesInput = {
   created_at?: Prisma.DateTimeWithAggregatesFilter<"travel_listing"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"travel_listing"> | Date | string
   foursquare_checked_at?: Prisma.DateTimeNullableWithAggregatesFilter<"travel_listing"> | Date | string | null
+  wikipedia_title?: Prisma.StringNullableWithAggregatesFilter<"travel_listing"> | string | null
+  popularity?: Prisma.IntNullableWithAggregatesFilter<"travel_listing"> | number | null
+  popularity_checked_at?: Prisma.DateTimeNullableWithAggregatesFilter<"travel_listing"> | Date | string | null
 }
 
 export type travel_listingUpdateInput = {
@@ -550,6 +591,9 @@ export type travel_listingUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUpdateManyWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUpdateManyWithoutTravel_listingNestedInput
   category?: Prisma.categoryUpdateOneRequiredWithoutTravel_listingNestedInput
@@ -582,6 +626,9 @@ export type travel_listingUncheckedUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedUpdateManyWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUncheckedUpdateManyWithoutTravel_listingNestedInput
 }
@@ -610,6 +657,9 @@ export type travel_listingUpdateManyMutationInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type travel_listingUncheckedUpdateManyInput = {
@@ -638,6 +688,9 @@ export type travel_listingUncheckedUpdateManyInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type Travel_listingListRelationFilter = {
@@ -691,6 +744,9 @@ export type travel_listingCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   foursquare_checked_at?: Prisma.SortOrder
+  wikipedia_title?: Prisma.SortOrder
+  popularity?: Prisma.SortOrder
+  popularity_checked_at?: Prisma.SortOrder
 }
 
 export type travel_listingAvgOrderByAggregateInput = {
@@ -700,6 +756,7 @@ export type travel_listingAvgOrderByAggregateInput = {
   price_per_night?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   rating_count?: Prisma.SortOrder
+  popularity?: Prisma.SortOrder
 }
 
 export type travel_listingMaxOrderByAggregateInput = {
@@ -726,6 +783,9 @@ export type travel_listingMaxOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   foursquare_checked_at?: Prisma.SortOrder
+  wikipedia_title?: Prisma.SortOrder
+  popularity?: Prisma.SortOrder
+  popularity_checked_at?: Prisma.SortOrder
 }
 
 export type travel_listingMinOrderByAggregateInput = {
@@ -752,6 +812,9 @@ export type travel_listingMinOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   foursquare_checked_at?: Prisma.SortOrder
+  wikipedia_title?: Prisma.SortOrder
+  popularity?: Prisma.SortOrder
+  popularity_checked_at?: Prisma.SortOrder
 }
 
 export type travel_listingSumOrderByAggregateInput = {
@@ -761,6 +824,7 @@ export type travel_listingSumOrderByAggregateInput = {
   price_per_night?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   rating_count?: Prisma.SortOrder
+  popularity?: Prisma.SortOrder
 }
 
 export type travel_listingCreateNestedManyWithoutCategoryInput = {
@@ -875,6 +939,9 @@ export type travel_listingScalarWhereInput = {
   created_at?: Prisma.DateTimeFilter<"travel_listing"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"travel_listing"> | Date | string
   foursquare_checked_at?: Prisma.DateTimeNullableFilter<"travel_listing"> | Date | string | null
+  wikipedia_title?: Prisma.StringNullableFilter<"travel_listing"> | string | null
+  popularity?: Prisma.IntNullableFilter<"travel_listing"> | number | null
+  popularity_checked_at?: Prisma.DateTimeNullableFilter<"travel_listing"> | Date | string | null
 }
 
 export type travel_listingUpdateWithWhereUniqueWithoutDistrictInput = {
@@ -916,6 +983,9 @@ export type travel_listingUpdateWithoutItinerary_itemInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   listing_image?: Prisma.listing_imageUpdateManyWithoutTravel_listingNestedInput
   category?: Prisma.categoryUpdateOneRequiredWithoutTravel_listingNestedInput
   district?: Prisma.districtUpdateOneRequiredWithoutTravel_listingNestedInput
@@ -947,6 +1017,9 @@ export type travel_listingUncheckedUpdateWithoutItinerary_itemInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   listing_image?: Prisma.listing_imageUncheckedUpdateManyWithoutTravel_listingNestedInput
 }
 
@@ -979,6 +1052,9 @@ export type travel_listingUpdateWithoutListing_imageInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUpdateManyWithoutTravel_listingNestedInput
   category?: Prisma.categoryUpdateOneRequiredWithoutTravel_listingNestedInput
   district?: Prisma.districtUpdateOneRequiredWithoutTravel_listingNestedInput
@@ -1010,6 +1086,9 @@ export type travel_listingUncheckedUpdateWithoutListing_imageInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedUpdateManyWithoutTravel_listingNestedInput
 }
 
@@ -1037,6 +1116,9 @@ export type travel_listingUpdateWithoutCategoryInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUpdateManyWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUpdateManyWithoutTravel_listingNestedInput
   district?: Prisma.districtUpdateOneRequiredWithoutTravel_listingNestedInput
@@ -1067,6 +1149,9 @@ export type travel_listingUncheckedUpdateWithoutCategoryInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedUpdateManyWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUncheckedUpdateManyWithoutTravel_listingNestedInput
 }
@@ -1096,6 +1181,9 @@ export type travel_listingUncheckedUpdateManyWithoutCategoryInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type travel_listingUpdateWithoutDistrictInput = {
@@ -1122,6 +1210,9 @@ export type travel_listingUpdateWithoutDistrictInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUpdateManyWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUpdateManyWithoutTravel_listingNestedInput
   category?: Prisma.categoryUpdateOneRequiredWithoutTravel_listingNestedInput
@@ -1152,6 +1243,9 @@ export type travel_listingUncheckedUpdateWithoutDistrictInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedUpdateManyWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUncheckedUpdateManyWithoutTravel_listingNestedInput
 }
@@ -1181,6 +1275,9 @@ export type travel_listingUncheckedUpdateManyWithoutDistrictInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foursquare_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -1249,6 +1346,9 @@ export type travel_listingSelect<ExtArgs extends runtime.Types.Extensions.Intern
   created_at?: boolean
   updated_at?: boolean
   foursquare_checked_at?: boolean
+  wikipedia_title?: boolean
+  popularity?: boolean
+  popularity_checked_at?: boolean
   itinerary_item?: boolean | Prisma.travel_listing$itinerary_itemArgs<ExtArgs>
   listing_image?: boolean | Prisma.travel_listing$listing_imageArgs<ExtArgs>
   category?: boolean | Prisma.categoryDefaultArgs<ExtArgs>
@@ -1283,6 +1383,9 @@ export type travel_listingSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   created_at?: boolean
   updated_at?: boolean
   foursquare_checked_at?: boolean
+  wikipedia_title?: boolean
+  popularity?: boolean
+  popularity_checked_at?: boolean
   category?: boolean | Prisma.categoryDefaultArgs<ExtArgs>
   district?: boolean | Prisma.districtDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["travel_listing"]>
@@ -1313,9 +1416,12 @@ export type travel_listingSelectScalar = {
   created_at?: boolean
   updated_at?: boolean
   foursquare_checked_at?: boolean
+  wikipedia_title?: boolean
+  popularity?: boolean
+  popularity_checked_at?: boolean
 }
 
-export type travel_listingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "district_id" | "category_id" | "name" | "description" | "latitude" | "longitude" | "tags" | "price_level" | "price_per_night" | "currency" | "rating" | "rating_count" | "opening_hours" | "photo_url" | "has_public_transit" | "nearest_transit_stop" | "source" | "external_ref" | "is_verified" | "is_active" | "last_seen_at" | "created_at" | "updated_at" | "foursquare_checked_at", ExtArgs["result"]["travel_listing"]>
+export type travel_listingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "district_id" | "category_id" | "name" | "description" | "latitude" | "longitude" | "tags" | "price_level" | "price_per_night" | "currency" | "rating" | "rating_count" | "opening_hours" | "photo_url" | "has_public_transit" | "nearest_transit_stop" | "source" | "external_ref" | "is_verified" | "is_active" | "last_seen_at" | "created_at" | "updated_at" | "foursquare_checked_at" | "wikipedia_title" | "popularity" | "popularity_checked_at", ExtArgs["result"]["travel_listing"]>
 export type travel_listingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   itinerary_item?: boolean | Prisma.travel_listing$itinerary_itemArgs<ExtArgs>
   listing_image?: boolean | Prisma.travel_listing$listing_imageArgs<ExtArgs>
@@ -1362,6 +1468,9 @@ export type $travel_listingPayload<ExtArgs extends runtime.Types.Extensions.Inte
     created_at: Date
     updated_at: Date
     foursquare_checked_at: Date | null
+    wikipedia_title: string | null
+    popularity: number | null
+    popularity_checked_at: Date | null
   }, ExtArgs["result"]["travel_listing"]>
   composites: {}
 }
@@ -1743,6 +1852,9 @@ export interface travel_listingFieldRefs {
   readonly created_at: Prisma.FieldRef<"travel_listing", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"travel_listing", 'DateTime'>
   readonly foursquare_checked_at: Prisma.FieldRef<"travel_listing", 'DateTime'>
+  readonly wikipedia_title: Prisma.FieldRef<"travel_listing", 'String'>
+  readonly popularity: Prisma.FieldRef<"travel_listing", 'Int'>
+  readonly popularity_checked_at: Prisma.FieldRef<"travel_listing", 'DateTime'>
 }
     
 

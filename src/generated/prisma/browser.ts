@@ -135,6 +135,7 @@ export type tag_vocabulary = Prisma.tag_vocabularyModel
 /**
  * Model travel_listing
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.
  */
 export type travel_listing = Prisma.travel_listingModel
 /**

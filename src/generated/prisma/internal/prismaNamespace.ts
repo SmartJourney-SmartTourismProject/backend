@@ -2682,7 +2682,10 @@ export const Travel_listingScalarFieldEnum = {
   last_seen_at: 'last_seen_at',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  foursquare_checked_at: 'foursquare_checked_at'
+  foursquare_checked_at: 'foursquare_checked_at',
+  wikipedia_title: 'wikipedia_title',
+  popularity: 'popularity',
+  popularity_checked_at: 'popularity_checked_at'
 } as const
 
 export type Travel_listingScalarFieldEnum = (typeof Travel_listingScalarFieldEnum)[keyof typeof Travel_listingScalarFieldEnum]

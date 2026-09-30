@@ -54,7 +54,20 @@ export class ExploreService {
     const [items, total] = await Promise.all([
       this.prisma.travel_listing.findMany({
         where,
-        orderBy: { rating: 'desc' },
+        // Best-known first. Ordering on rating alone put the 665 hotels that
+        // carry a Booking.com score ahead of everything else, so a landmark
+        // like Galle Fort Ramparts (57,637 Wikipedia views, no star rating)
+        // sat below anonymous guesthouses. popularity is the only signal most
+        // attractions have - see migration 0010 and
+        // ai-backend/app/data/connectors/wikipedia_popularity.py.
+        //
+        // nulls: 'last' on both, or Postgres sorts NULLs FIRST on DESC and
+        // every unmeasured row would lead the page.
+        orderBy: [
+          { popularity: { sort: 'desc', nulls: 'last' } },
+          { rating: { sort: 'desc', nulls: 'last' } },
+          { rating_count: 'desc' },
+        ],
         skip: (page - 1) * PAGE_SIZE,
         take: PAGE_SIZE,
         include: {
