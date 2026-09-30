@@ -418,7 +418,7 @@ export type travel_listingWhereInput = {
   popularity?: Prisma.IntNullableFilter<"travel_listing"> | number | null
   popularity_checked_at?: Prisma.DateTimeNullableFilter<"travel_listing"> | Date | string | null
   itinerary_item?: Prisma.Itinerary_itemListRelationFilter
-  listing_entry_fee?: Prisma.Listing_entry_feeListRelationFilter
+  listing_entry_fee?: Prisma.XOR<Prisma.Listing_entry_feeNullableScalarRelationFilter, Prisma.listing_entry_feeWhereInput> | null
   listing_image?: Prisma.Listing_imageListRelationFilter
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.categoryWhereInput>
   district?: Prisma.XOR<Prisma.DistrictScalarRelationFilter, Prisma.districtWhereInput>
@@ -454,7 +454,7 @@ export type travel_listingOrderByWithRelationInput = {
   popularity?: Prisma.SortOrderInput | Prisma.SortOrder
   popularity_checked_at?: Prisma.SortOrderInput | Prisma.SortOrder
   itinerary_item?: Prisma.itinerary_itemOrderByRelationAggregateInput
-  listing_entry_fee?: Prisma.listing_entry_feeOrderByRelationAggregateInput
+  listing_entry_fee?: Prisma.listing_entry_feeOrderByWithRelationInput
   listing_image?: Prisma.listing_imageOrderByRelationAggregateInput
   category?: Prisma.categoryOrderByWithRelationInput
   district?: Prisma.districtOrderByWithRelationInput
@@ -494,7 +494,7 @@ export type travel_listingWhereUniqueInput = Prisma.AtLeast<{
   popularity?: Prisma.IntNullableFilter<"travel_listing"> | number | null
   popularity_checked_at?: Prisma.DateTimeNullableFilter<"travel_listing"> | Date | string | null
   itinerary_item?: Prisma.Itinerary_itemListRelationFilter
-  listing_entry_fee?: Prisma.Listing_entry_feeListRelationFilter
+  listing_entry_fee?: Prisma.XOR<Prisma.Listing_entry_feeNullableScalarRelationFilter, Prisma.listing_entry_feeWhereInput> | null
   listing_image?: Prisma.Listing_imageListRelationFilter
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.categoryWhereInput>
   district?: Prisma.XOR<Prisma.DistrictScalarRelationFilter, Prisma.districtWhereInput>
@@ -598,7 +598,7 @@ export type travel_listingUpdateInput = {
   popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUpdateManyWithoutTravel_listingNestedInput
-  listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutTravel_listingNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUpdateOneWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUpdateManyWithoutTravel_listingNestedInput
   category?: Prisma.categoryUpdateOneRequiredWithoutTravel_listingNestedInput
   district?: Prisma.districtUpdateOneRequiredWithoutTravel_listingNestedInput
@@ -634,7 +634,7 @@ export type travel_listingUncheckedUpdateInput = {
   popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedUpdateManyWithoutTravel_listingNestedInput
-  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutTravel_listingNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateOneWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUncheckedUpdateManyWithoutTravel_listingNestedInput
 }
 
@@ -1002,7 +1002,7 @@ export type travel_listingUpdateWithoutItinerary_itemInput = {
   wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutTravel_listingNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUpdateOneWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUpdateManyWithoutTravel_listingNestedInput
   category?: Prisma.categoryUpdateOneRequiredWithoutTravel_listingNestedInput
   district?: Prisma.districtUpdateOneRequiredWithoutTravel_listingNestedInput
@@ -1037,7 +1037,7 @@ export type travel_listingUncheckedUpdateWithoutItinerary_itemInput = {
   wikipedia_title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutTravel_listingNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateOneWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUncheckedUpdateManyWithoutTravel_listingNestedInput
 }
 
@@ -1074,7 +1074,7 @@ export type travel_listingUpdateWithoutListing_imageInput = {
   popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUpdateManyWithoutTravel_listingNestedInput
-  listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutTravel_listingNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUpdateOneWithoutTravel_listingNestedInput
   category?: Prisma.categoryUpdateOneRequiredWithoutTravel_listingNestedInput
   district?: Prisma.districtUpdateOneRequiredWithoutTravel_listingNestedInput
 }
@@ -1109,7 +1109,7 @@ export type travel_listingUncheckedUpdateWithoutListing_imageInput = {
   popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedUpdateManyWithoutTravel_listingNestedInput
-  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutTravel_listingNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateOneWithoutTravel_listingNestedInput
 }
 
 export type travel_listingUpdateToOneWithWhereWithoutListing_entry_feeInput = {
@@ -1211,7 +1211,7 @@ export type travel_listingUpdateWithoutCategoryInput = {
   popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUpdateManyWithoutTravel_listingNestedInput
-  listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutTravel_listingNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUpdateOneWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUpdateManyWithoutTravel_listingNestedInput
   district?: Prisma.districtUpdateOneRequiredWithoutTravel_listingNestedInput
 }
@@ -1245,7 +1245,7 @@ export type travel_listingUncheckedUpdateWithoutCategoryInput = {
   popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedUpdateManyWithoutTravel_listingNestedInput
-  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutTravel_listingNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateOneWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUncheckedUpdateManyWithoutTravel_listingNestedInput
 }
 
@@ -1307,7 +1307,7 @@ export type travel_listingUpdateWithoutDistrictInput = {
   popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUpdateManyWithoutTravel_listingNestedInput
-  listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutTravel_listingNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUpdateOneWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUpdateManyWithoutTravel_listingNestedInput
   category?: Prisma.categoryUpdateOneRequiredWithoutTravel_listingNestedInput
 }
@@ -1341,7 +1341,7 @@ export type travel_listingUncheckedUpdateWithoutDistrictInput = {
   popularity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   popularity_checked_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   itinerary_item?: Prisma.itinerary_itemUncheckedUpdateManyWithoutTravel_listingNestedInput
-  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutTravel_listingNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateOneWithoutTravel_listingNestedInput
   listing_image?: Prisma.listing_imageUncheckedUpdateManyWithoutTravel_listingNestedInput
 }
 
@@ -1382,13 +1382,11 @@ export type travel_listingUncheckedUpdateManyWithoutDistrictInput = {
 
 export type Travel_listingCountOutputType = {
   itinerary_item: number
-  listing_entry_fee: number
   listing_image: number
 }
 
 export type Travel_listingCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   itinerary_item?: boolean | Travel_listingCountOutputTypeCountItinerary_itemArgs
-  listing_entry_fee?: boolean | Travel_listingCountOutputTypeCountListing_entry_feeArgs
   listing_image?: boolean | Travel_listingCountOutputTypeCountListing_imageArgs
 }
 
@@ -1407,13 +1405,6 @@ export type Travel_listingCountOutputTypeDefaultArgs<ExtArgs extends runtime.Typ
  */
 export type Travel_listingCountOutputTypeCountItinerary_itemArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.itinerary_itemWhereInput
-}
-
-/**
- * Travel_listingCountOutputType without action
- */
-export type Travel_listingCountOutputTypeCountListing_entry_feeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.listing_entry_feeWhereInput
 }
 
 /**
@@ -1544,7 +1535,7 @@ export type $travel_listingPayload<ExtArgs extends runtime.Types.Extensions.Inte
   name: "travel_listing"
   objects: {
     itinerary_item: Prisma.$itinerary_itemPayload<ExtArgs>[]
-    listing_entry_fee: Prisma.$listing_entry_feePayload<ExtArgs>[]
+    listing_entry_fee: Prisma.$listing_entry_feePayload<ExtArgs> | null
     listing_image: Prisma.$listing_imagePayload<ExtArgs>[]
     category: Prisma.$categoryPayload<ExtArgs>
     district: Prisma.$districtPayload<ExtArgs>
@@ -1902,7 +1893,7 @@ readonly fields: travel_listingFieldRefs;
 export interface Prisma__travel_listingClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   itinerary_item<T extends Prisma.travel_listing$itinerary_itemArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.travel_listing$itinerary_itemArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$itinerary_itemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  listing_entry_fee<T extends Prisma.travel_listing$listing_entry_feeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.travel_listing$listing_entry_feeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$listing_entry_feePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  listing_entry_fee<T extends Prisma.travel_listing$listing_entry_feeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.travel_listing$listing_entry_feeArgs<ExtArgs>>): Prisma.Prisma__listing_entry_feeClient<runtime.Types.Result.GetResult<Prisma.$listing_entry_feePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   listing_image<T extends Prisma.travel_listing$listing_imageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.travel_listing$listing_imageArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$listing_imagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   category<T extends Prisma.categoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.categoryDefaultArgs<ExtArgs>>): Prisma.Prisma__categoryClient<runtime.Types.Result.GetResult<Prisma.$categoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   district<T extends Prisma.districtDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.districtDefaultArgs<ExtArgs>>): Prisma.Prisma__districtClient<runtime.Types.Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
@@ -2318,11 +2309,6 @@ export type travel_listing$listing_entry_feeArgs<ExtArgs extends runtime.Types.E
    */
   include?: Prisma.listing_entry_feeInclude<ExtArgs> | null
   where?: Prisma.listing_entry_feeWhereInput
-  orderBy?: Prisma.listing_entry_feeOrderByWithRelationInput | Prisma.listing_entry_feeOrderByWithRelationInput[]
-  cursor?: Prisma.listing_entry_feeWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.Listing_entry_feeScalarFieldEnum | Prisma.Listing_entry_feeScalarFieldEnum[]
 }
 
 /**

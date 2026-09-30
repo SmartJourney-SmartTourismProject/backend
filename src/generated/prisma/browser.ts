@@ -55,6 +55,7 @@ export type chat_session = Prisma.chat_sessionModel
 /**
  * Model cost_reference
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
  */
 export type cost_reference = Prisma.cost_referenceModel
 /**
@@ -154,3 +155,13 @@ export type travel_time = Prisma.travel_timeModel
  * 
  */
 export type traveler_profile = Prisma.traveler_profileModel
+/**
+ * Model knowledge_chunk
+ * 
+ */
+export type knowledge_chunk = Prisma.knowledge_chunkModel
+/**
+ * Model knowledge_document
+ * 
+ */
+export type knowledge_document = Prisma.knowledge_documentModel

@@ -77,7 +77,9 @@ export const ModelName = {
   tag_vocabulary: 'tag_vocabulary',
   travel_listing: 'travel_listing',
   travel_time: 'travel_time',
-  traveler_profile: 'traveler_profile'
+  traveler_profile: 'traveler_profile',
+  knowledge_chunk: 'knowledge_chunk',
+  knowledge_document: 'knowledge_document'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -188,7 +190,8 @@ export const Cost_referenceScalarFieldEnum = {
   typical_cost: 'typical_cost',
   currency: 'currency',
   source_note: 'source_note',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  is_assumed_default: 'is_assumed_default'
 } as const
 
 export type Cost_referenceScalarFieldEnum = (typeof Cost_referenceScalarFieldEnum)[keyof typeof Cost_referenceScalarFieldEnum]
@@ -474,6 +477,36 @@ export const Traveler_profileScalarFieldEnum = {
 } as const
 
 export type Traveler_profileScalarFieldEnum = (typeof Traveler_profileScalarFieldEnum)[keyof typeof Traveler_profileScalarFieldEnum]
+
+
+export const Knowledge_chunkScalarFieldEnum = {
+  id: 'id',
+  document_id: 'document_id',
+  chunk_index: 'chunk_index',
+  section: 'section',
+  content: 'content',
+  district_id: 'district_id',
+  embedding_model: 'embedding_model'
+} as const
+
+export type Knowledge_chunkScalarFieldEnum = (typeof Knowledge_chunkScalarFieldEnum)[keyof typeof Knowledge_chunkScalarFieldEnum]
+
+
+export const Knowledge_documentScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  source_ref: 'source_ref',
+  title: 'title',
+  url: 'url',
+  license: 'license',
+  district_id: 'district_id',
+  content_hash: 'content_hash',
+  last_verified: 'last_verified',
+  fetched_at: 'fetched_at',
+  is_active: 'is_active'
+} as const
+
+export type Knowledge_documentScalarFieldEnum = (typeof Knowledge_documentScalarFieldEnum)[keyof typeof Knowledge_documentScalarFieldEnum]
 
 
 export const SortOrder = {

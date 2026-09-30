@@ -228,6 +228,8 @@ export type districtWhereInput = {
   data_source_run?: Prisma.Data_source_runListRelationFilter
   geo_resolution?: Prisma.Geo_resolutionListRelationFilter
   itinerary?: Prisma.ItineraryListRelationFilter
+  knowledge_chunk?: Prisma.Knowledge_chunkListRelationFilter
+  knowledge_document?: Prisma.Knowledge_documentListRelationFilter
   local_event?: Prisma.Local_eventListRelationFilter
   travel_listing?: Prisma.Travel_listingListRelationFilter
 }
@@ -243,6 +245,8 @@ export type districtOrderByWithRelationInput = {
   data_source_run?: Prisma.data_source_runOrderByRelationAggregateInput
   geo_resolution?: Prisma.geo_resolutionOrderByRelationAggregateInput
   itinerary?: Prisma.itineraryOrderByRelationAggregateInput
+  knowledge_chunk?: Prisma.knowledge_chunkOrderByRelationAggregateInput
+  knowledge_document?: Prisma.knowledge_documentOrderByRelationAggregateInput
   local_event?: Prisma.local_eventOrderByRelationAggregateInput
   travel_listing?: Prisma.travel_listingOrderByRelationAggregateInput
 }
@@ -261,6 +265,8 @@ export type districtWhereUniqueInput = Prisma.AtLeast<{
   data_source_run?: Prisma.Data_source_runListRelationFilter
   geo_resolution?: Prisma.Geo_resolutionListRelationFilter
   itinerary?: Prisma.ItineraryListRelationFilter
+  knowledge_chunk?: Prisma.Knowledge_chunkListRelationFilter
+  knowledge_document?: Prisma.Knowledge_documentListRelationFilter
   local_event?: Prisma.Local_eventListRelationFilter
   travel_listing?: Prisma.Travel_listingListRelationFilter
 }, "id" | "name" | "osm_relation_id">
@@ -302,6 +308,8 @@ export type districtUpdateInput = {
   data_source_run?: Prisma.data_source_runUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUpdateManyWithoutDistrictNestedInput
 }
@@ -317,6 +325,8 @@ export type districtUncheckedUpdateInput = {
   data_source_run?: Prisma.data_source_runUncheckedUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUncheckedUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUncheckedUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUncheckedUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUncheckedUpdateManyWithoutDistrictNestedInput
 }
@@ -446,6 +456,28 @@ export type districtUpdateOneRequiredWithoutTravel_listingNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.districtUpdateToOneWithWhereWithoutTravel_listingInput, Prisma.districtUpdateWithoutTravel_listingInput>, Prisma.districtUncheckedUpdateWithoutTravel_listingInput>
 }
 
+export type districtCreateNestedOneWithoutKnowledge_chunkInput = {
+  connect?: Prisma.districtWhereUniqueInput
+}
+
+export type districtUpdateOneWithoutKnowledge_chunkNestedInput = {
+  disconnect?: Prisma.districtWhereInput | boolean
+  delete?: Prisma.districtWhereInput | boolean
+  connect?: Prisma.districtWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.districtUpdateToOneWithWhereWithoutKnowledge_chunkInput, Prisma.districtUpdateWithoutKnowledge_chunkInput>, Prisma.districtUncheckedUpdateWithoutKnowledge_chunkInput>
+}
+
+export type districtCreateNestedOneWithoutKnowledge_documentInput = {
+  connect?: Prisma.districtWhereUniqueInput
+}
+
+export type districtUpdateOneWithoutKnowledge_documentNestedInput = {
+  disconnect?: Prisma.districtWhereInput | boolean
+  delete?: Prisma.districtWhereInput | boolean
+  connect?: Prisma.districtWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.districtUpdateToOneWithWhereWithoutKnowledge_documentInput, Prisma.districtUpdateWithoutKnowledge_documentInput>, Prisma.districtUncheckedUpdateWithoutKnowledge_documentInput>
+}
+
 export type districtUpdateToOneWithWhereWithoutCost_referenceInput = {
   where?: Prisma.districtWhereInput
   data: Prisma.XOR<Prisma.districtUpdateWithoutCost_referenceInput, Prisma.districtUncheckedUpdateWithoutCost_referenceInput>
@@ -461,6 +493,8 @@ export type districtUpdateWithoutCost_referenceInput = {
   data_source_run?: Prisma.data_source_runUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUpdateManyWithoutDistrictNestedInput
 }
@@ -475,6 +509,8 @@ export type districtUncheckedUpdateWithoutCost_referenceInput = {
   data_source_run?: Prisma.data_source_runUncheckedUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUncheckedUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUncheckedUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUncheckedUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUncheckedUpdateManyWithoutDistrictNestedInput
 }
@@ -494,6 +530,8 @@ export type districtUpdateWithoutData_source_runInput = {
   cost_reference?: Prisma.cost_referenceUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUpdateManyWithoutDistrictNestedInput
 }
@@ -508,6 +546,8 @@ export type districtUncheckedUpdateWithoutData_source_runInput = {
   cost_reference?: Prisma.cost_referenceUncheckedUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUncheckedUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUncheckedUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUncheckedUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUncheckedUpdateManyWithoutDistrictNestedInput
 }
@@ -527,6 +567,8 @@ export type districtUpdateWithoutGeo_resolutionInput = {
   cost_reference?: Prisma.cost_referenceUpdateManyWithoutDistrictNestedInput
   data_source_run?: Prisma.data_source_runUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUpdateManyWithoutDistrictNestedInput
 }
@@ -541,6 +583,8 @@ export type districtUncheckedUpdateWithoutGeo_resolutionInput = {
   cost_reference?: Prisma.cost_referenceUncheckedUpdateManyWithoutDistrictNestedInput
   data_source_run?: Prisma.data_source_runUncheckedUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUncheckedUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUncheckedUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUncheckedUpdateManyWithoutDistrictNestedInput
 }
@@ -560,6 +604,8 @@ export type districtUpdateWithoutItineraryInput = {
   cost_reference?: Prisma.cost_referenceUpdateManyWithoutDistrictNestedInput
   data_source_run?: Prisma.data_source_runUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUpdateManyWithoutDistrictNestedInput
 }
@@ -574,6 +620,8 @@ export type districtUncheckedUpdateWithoutItineraryInput = {
   cost_reference?: Prisma.cost_referenceUncheckedUpdateManyWithoutDistrictNestedInput
   data_source_run?: Prisma.data_source_runUncheckedUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUncheckedUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUncheckedUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUncheckedUpdateManyWithoutDistrictNestedInput
 }
@@ -594,6 +642,8 @@ export type districtUpdateWithoutLocal_eventInput = {
   data_source_run?: Prisma.data_source_runUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUpdateManyWithoutDistrictNestedInput
 }
 
@@ -608,6 +658,8 @@ export type districtUncheckedUpdateWithoutLocal_eventInput = {
   data_source_run?: Prisma.data_source_runUncheckedUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUncheckedUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUncheckedUpdateManyWithoutDistrictNestedInput
   travel_listing?: Prisma.travel_listingUncheckedUpdateManyWithoutDistrictNestedInput
 }
 
@@ -627,6 +679,8 @@ export type districtUpdateWithoutTravel_listingInput = {
   data_source_run?: Prisma.data_source_runUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUpdateManyWithoutDistrictNestedInput
 }
 
@@ -641,7 +695,83 @@ export type districtUncheckedUpdateWithoutTravel_listingInput = {
   data_source_run?: Prisma.data_source_runUncheckedUpdateManyWithoutDistrictNestedInput
   geo_resolution?: Prisma.geo_resolutionUncheckedUpdateManyWithoutDistrictNestedInput
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUncheckedUpdateManyWithoutDistrictNestedInput
   local_event?: Prisma.local_eventUncheckedUpdateManyWithoutDistrictNestedInput
+}
+
+export type districtUpdateToOneWithWhereWithoutKnowledge_chunkInput = {
+  where?: Prisma.districtWhereInput
+  data: Prisma.XOR<Prisma.districtUpdateWithoutKnowledge_chunkInput, Prisma.districtUncheckedUpdateWithoutKnowledge_chunkInput>
+}
+
+export type districtUpdateWithoutKnowledge_chunkInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
+  osm_relation_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cost_reference?: Prisma.cost_referenceUpdateManyWithoutDistrictNestedInput
+  data_source_run?: Prisma.data_source_runUpdateManyWithoutDistrictNestedInput
+  geo_resolution?: Prisma.geo_resolutionUpdateManyWithoutDistrictNestedInput
+  itinerary?: Prisma.itineraryUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUpdateManyWithoutDistrictNestedInput
+  local_event?: Prisma.local_eventUpdateManyWithoutDistrictNestedInput
+  travel_listing?: Prisma.travel_listingUpdateManyWithoutDistrictNestedInput
+}
+
+export type districtUncheckedUpdateWithoutKnowledge_chunkInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
+  osm_relation_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cost_reference?: Prisma.cost_referenceUncheckedUpdateManyWithoutDistrictNestedInput
+  data_source_run?: Prisma.data_source_runUncheckedUpdateManyWithoutDistrictNestedInput
+  geo_resolution?: Prisma.geo_resolutionUncheckedUpdateManyWithoutDistrictNestedInput
+  itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_document?: Prisma.knowledge_documentUncheckedUpdateManyWithoutDistrictNestedInput
+  local_event?: Prisma.local_eventUncheckedUpdateManyWithoutDistrictNestedInput
+  travel_listing?: Prisma.travel_listingUncheckedUpdateManyWithoutDistrictNestedInput
+}
+
+export type districtUpdateToOneWithWhereWithoutKnowledge_documentInput = {
+  where?: Prisma.districtWhereInput
+  data: Prisma.XOR<Prisma.districtUpdateWithoutKnowledge_documentInput, Prisma.districtUncheckedUpdateWithoutKnowledge_documentInput>
+}
+
+export type districtUpdateWithoutKnowledge_documentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
+  osm_relation_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cost_reference?: Prisma.cost_referenceUpdateManyWithoutDistrictNestedInput
+  data_source_run?: Prisma.data_source_runUpdateManyWithoutDistrictNestedInput
+  geo_resolution?: Prisma.geo_resolutionUpdateManyWithoutDistrictNestedInput
+  itinerary?: Prisma.itineraryUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUpdateManyWithoutDistrictNestedInput
+  local_event?: Prisma.local_eventUpdateManyWithoutDistrictNestedInput
+  travel_listing?: Prisma.travel_listingUpdateManyWithoutDistrictNestedInput
+}
+
+export type districtUncheckedUpdateWithoutKnowledge_documentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  province?: Prisma.StringFieldUpdateOperationsInput | string
+  osm_relation_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cost_reference?: Prisma.cost_referenceUncheckedUpdateManyWithoutDistrictNestedInput
+  data_source_run?: Prisma.data_source_runUncheckedUpdateManyWithoutDistrictNestedInput
+  geo_resolution?: Prisma.geo_resolutionUncheckedUpdateManyWithoutDistrictNestedInput
+  itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutDistrictNestedInput
+  knowledge_chunk?: Prisma.knowledge_chunkUncheckedUpdateManyWithoutDistrictNestedInput
+  local_event?: Prisma.local_eventUncheckedUpdateManyWithoutDistrictNestedInput
+  travel_listing?: Prisma.travel_listingUncheckedUpdateManyWithoutDistrictNestedInput
 }
 
 
@@ -654,6 +784,8 @@ export type DistrictCountOutputType = {
   data_source_run: number
   geo_resolution: number
   itinerary: number
+  knowledge_chunk: number
+  knowledge_document: number
   local_event: number
   travel_listing: number
 }
@@ -663,6 +795,8 @@ export type DistrictCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   data_source_run?: boolean | DistrictCountOutputTypeCountData_source_runArgs
   geo_resolution?: boolean | DistrictCountOutputTypeCountGeo_resolutionArgs
   itinerary?: boolean | DistrictCountOutputTypeCountItineraryArgs
+  knowledge_chunk?: boolean | DistrictCountOutputTypeCountKnowledge_chunkArgs
+  knowledge_document?: boolean | DistrictCountOutputTypeCountKnowledge_documentArgs
   local_event?: boolean | DistrictCountOutputTypeCountLocal_eventArgs
   travel_listing?: boolean | DistrictCountOutputTypeCountTravel_listingArgs
 }
@@ -708,6 +842,20 @@ export type DistrictCountOutputTypeCountItineraryArgs<ExtArgs extends runtime.Ty
 /**
  * DistrictCountOutputType without action
  */
+export type DistrictCountOutputTypeCountKnowledge_chunkArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.knowledge_chunkWhereInput
+}
+
+/**
+ * DistrictCountOutputType without action
+ */
+export type DistrictCountOutputTypeCountKnowledge_documentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.knowledge_documentWhereInput
+}
+
+/**
+ * DistrictCountOutputType without action
+ */
 export type DistrictCountOutputTypeCountLocal_eventArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.local_eventWhereInput
 }
@@ -731,6 +879,8 @@ export type districtSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   data_source_run?: boolean | Prisma.district$data_source_runArgs<ExtArgs>
   geo_resolution?: boolean | Prisma.district$geo_resolutionArgs<ExtArgs>
   itinerary?: boolean | Prisma.district$itineraryArgs<ExtArgs>
+  knowledge_chunk?: boolean | Prisma.district$knowledge_chunkArgs<ExtArgs>
+  knowledge_document?: boolean | Prisma.district$knowledge_documentArgs<ExtArgs>
   local_event?: boolean | Prisma.district$local_eventArgs<ExtArgs>
   travel_listing?: boolean | Prisma.district$travel_listingArgs<ExtArgs>
   _count?: boolean | Prisma.DistrictCountOutputTypeDefaultArgs<ExtArgs>
@@ -761,6 +911,8 @@ export type districtInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   data_source_run?: boolean | Prisma.district$data_source_runArgs<ExtArgs>
   geo_resolution?: boolean | Prisma.district$geo_resolutionArgs<ExtArgs>
   itinerary?: boolean | Prisma.district$itineraryArgs<ExtArgs>
+  knowledge_chunk?: boolean | Prisma.district$knowledge_chunkArgs<ExtArgs>
+  knowledge_document?: boolean | Prisma.district$knowledge_documentArgs<ExtArgs>
   local_event?: boolean | Prisma.district$local_eventArgs<ExtArgs>
   travel_listing?: boolean | Prisma.district$travel_listingArgs<ExtArgs>
   _count?: boolean | Prisma.DistrictCountOutputTypeDefaultArgs<ExtArgs>
@@ -774,6 +926,8 @@ export type $districtPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     data_source_run: Prisma.$data_source_runPayload<ExtArgs>[]
     geo_resolution: Prisma.$geo_resolutionPayload<ExtArgs>[]
     itinerary: Prisma.$itineraryPayload<ExtArgs>[]
+    knowledge_chunk: Prisma.$knowledge_chunkPayload<ExtArgs>[]
+    knowledge_document: Prisma.$knowledge_documentPayload<ExtArgs>[]
     local_event: Prisma.$local_eventPayload<ExtArgs>[]
     travel_listing: Prisma.$travel_listingPayload<ExtArgs>[]
   }
@@ -1111,6 +1265,8 @@ export interface Prisma__districtClient<T, Null = never, ExtArgs extends runtime
   data_source_run<T extends Prisma.district$data_source_runArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.district$data_source_runArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$data_source_runPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   geo_resolution<T extends Prisma.district$geo_resolutionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.district$geo_resolutionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$geo_resolutionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   itinerary<T extends Prisma.district$itineraryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.district$itineraryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$itineraryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  knowledge_chunk<T extends Prisma.district$knowledge_chunkArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.district$knowledge_chunkArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$knowledge_chunkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  knowledge_document<T extends Prisma.district$knowledge_documentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.district$knowledge_documentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$knowledge_documentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   local_event<T extends Prisma.district$local_eventArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.district$local_eventArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$local_eventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   travel_listing<T extends Prisma.district$travel_listingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.district$travel_listingArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$travel_listingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1552,6 +1708,54 @@ export type district$itineraryArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.ItineraryScalarFieldEnum | Prisma.ItineraryScalarFieldEnum[]
+}
+
+/**
+ * district.knowledge_chunk
+ */
+export type district$knowledge_chunkArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the knowledge_chunk
+   */
+  select?: Prisma.knowledge_chunkSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the knowledge_chunk
+   */
+  omit?: Prisma.knowledge_chunkOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.knowledge_chunkInclude<ExtArgs> | null
+  where?: Prisma.knowledge_chunkWhereInput
+  orderBy?: Prisma.knowledge_chunkOrderByWithRelationInput | Prisma.knowledge_chunkOrderByWithRelationInput[]
+  cursor?: Prisma.knowledge_chunkWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Knowledge_chunkScalarFieldEnum | Prisma.Knowledge_chunkScalarFieldEnum[]
+}
+
+/**
+ * district.knowledge_document
+ */
+export type district$knowledge_documentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the knowledge_document
+   */
+  select?: Prisma.knowledge_documentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the knowledge_document
+   */
+  omit?: Prisma.knowledge_documentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.knowledge_documentInclude<ExtArgs> | null
+  where?: Prisma.knowledge_documentWhereInput
+  orderBy?: Prisma.knowledge_documentOrderByWithRelationInput | Prisma.knowledge_documentOrderByWithRelationInput[]
+  cursor?: Prisma.knowledge_documentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Knowledge_documentScalarFieldEnum | Prisma.Knowledge_documentScalarFieldEnum[]
 }
 
 /**

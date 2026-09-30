@@ -423,7 +423,9 @@ export const ModelName = {
   tag_vocabulary: 'tag_vocabulary',
   travel_listing: 'travel_listing',
   travel_time: 'travel_time',
-  traveler_profile: 'traveler_profile'
+  traveler_profile: 'traveler_profile',
+  knowledge_chunk: 'knowledge_chunk',
+  knowledge_document: 'knowledge_document'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -439,7 +441,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "activity_log" | "admin_profile" | "ai_session" | "app_user" | "category" | "chat_message" | "chat_session" | "cost_reference" | "data_source" | "data_source_run" | "district" | "expense" | "geo_resolution" | "google_oauth_tokens" | "itinerary" | "itinerary_day" | "itinerary_item" | "listing_image" | "listing_entry_fee" | "local_event" | "schema_migration" | "spatial_ref_sys" | "tag_mapping" | "tag_vocabulary" | "travel_listing" | "travel_time" | "traveler_profile"
+    modelProps: "activity_log" | "admin_profile" | "ai_session" | "app_user" | "category" | "chat_message" | "chat_session" | "cost_reference" | "data_source" | "data_source_run" | "district" | "expense" | "geo_resolution" | "google_oauth_tokens" | "itinerary" | "itinerary_day" | "itinerary_item" | "listing_image" | "listing_entry_fee" | "local_event" | "schema_migration" | "spatial_ref_sys" | "tag_mapping" | "tag_vocabulary" | "travel_listing" | "travel_time" | "traveler_profile" | "knowledge_chunk" | "knowledge_document"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2393,6 +2395,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    knowledge_chunk: {
+      payload: Prisma.$knowledge_chunkPayload<ExtArgs>
+      fields: Prisma.knowledge_chunkFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.knowledge_chunkFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_chunkPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.knowledge_chunkFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_chunkPayload>
+        }
+        findFirst: {
+          args: Prisma.knowledge_chunkFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_chunkPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.knowledge_chunkFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_chunkPayload>
+        }
+        findMany: {
+          args: Prisma.knowledge_chunkFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_chunkPayload>[]
+        }
+        create: {
+          args: Prisma.knowledge_chunkCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_chunkPayload>
+        }
+        createMany: {
+          args: Prisma.knowledge_chunkCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.knowledge_chunkCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_chunkPayload>[]
+        }
+        delete: {
+          args: Prisma.knowledge_chunkDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_chunkPayload>
+        }
+        update: {
+          args: Prisma.knowledge_chunkUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_chunkPayload>
+        }
+        deleteMany: {
+          args: Prisma.knowledge_chunkDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.knowledge_chunkUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.knowledge_chunkUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_chunkPayload>[]
+        }
+        upsert: {
+          args: Prisma.knowledge_chunkUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_chunkPayload>
+        }
+        aggregate: {
+          args: Prisma.Knowledge_chunkAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateKnowledge_chunk>
+        }
+        groupBy: {
+          args: Prisma.knowledge_chunkGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Knowledge_chunkGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.knowledge_chunkCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Knowledge_chunkCountAggregateOutputType> | number
+        }
+      }
+    }
+    knowledge_document: {
+      payload: Prisma.$knowledge_documentPayload<ExtArgs>
+      fields: Prisma.knowledge_documentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.knowledge_documentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_documentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.knowledge_documentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_documentPayload>
+        }
+        findFirst: {
+          args: Prisma.knowledge_documentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_documentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.knowledge_documentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_documentPayload>
+        }
+        findMany: {
+          args: Prisma.knowledge_documentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_documentPayload>[]
+        }
+        create: {
+          args: Prisma.knowledge_documentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_documentPayload>
+        }
+        createMany: {
+          args: Prisma.knowledge_documentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.knowledge_documentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_documentPayload>[]
+        }
+        delete: {
+          args: Prisma.knowledge_documentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_documentPayload>
+        }
+        update: {
+          args: Prisma.knowledge_documentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_documentPayload>
+        }
+        deleteMany: {
+          args: Prisma.knowledge_documentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.knowledge_documentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.knowledge_documentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_documentPayload>[]
+        }
+        upsert: {
+          args: Prisma.knowledge_documentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$knowledge_documentPayload>
+        }
+        aggregate: {
+          args: Prisma.Knowledge_documentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateKnowledge_document>
+        }
+        groupBy: {
+          args: Prisma.knowledge_documentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Knowledge_documentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.knowledge_documentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Knowledge_documentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2524,7 +2674,8 @@ export const Cost_referenceScalarFieldEnum = {
   typical_cost: 'typical_cost',
   currency: 'currency',
   source_note: 'source_note',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  is_assumed_default: 'is_assumed_default'
 } as const
 
 export type Cost_referenceScalarFieldEnum = (typeof Cost_referenceScalarFieldEnum)[keyof typeof Cost_referenceScalarFieldEnum]
@@ -2810,6 +2961,36 @@ export const Traveler_profileScalarFieldEnum = {
 } as const
 
 export type Traveler_profileScalarFieldEnum = (typeof Traveler_profileScalarFieldEnum)[keyof typeof Traveler_profileScalarFieldEnum]
+
+
+export const Knowledge_chunkScalarFieldEnum = {
+  id: 'id',
+  document_id: 'document_id',
+  chunk_index: 'chunk_index',
+  section: 'section',
+  content: 'content',
+  district_id: 'district_id',
+  embedding_model: 'embedding_model'
+} as const
+
+export type Knowledge_chunkScalarFieldEnum = (typeof Knowledge_chunkScalarFieldEnum)[keyof typeof Knowledge_chunkScalarFieldEnum]
+
+
+export const Knowledge_documentScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  source_ref: 'source_ref',
+  title: 'title',
+  url: 'url',
+  license: 'license',
+  district_id: 'district_id',
+  content_hash: 'content_hash',
+  last_verified: 'last_verified',
+  fetched_at: 'fetched_at',
+  is_active: 'is_active'
+} as const
+
+export type Knowledge_documentScalarFieldEnum = (typeof Knowledge_documentScalarFieldEnum)[keyof typeof Knowledge_documentScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -3148,6 +3329,8 @@ export type GlobalOmitConfig = {
   travel_listing?: Prisma.travel_listingOmit
   travel_time?: Prisma.travel_timeOmit
   traveler_profile?: Prisma.traveler_profileOmit
+  knowledge_chunk?: Prisma.knowledge_chunkOmit
+  knowledge_document?: Prisma.knowledge_documentOmit
 }
 
 /* Types for Logging */

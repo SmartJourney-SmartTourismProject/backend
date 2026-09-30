@@ -4,3 +4,4 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;      -- fuzzy place-name matching (geo_tool.py)
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS vector;       -- RAG knowledge_chunk.embedding (db/Dockerfile, migration 0013)

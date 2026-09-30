@@ -70,6 +70,18 @@ export interface AiTripPlanResponse {
    */
   start_location: AiStartLocation | null;
   final_response: string | null;
+  /**
+   * RAG Q&A citations (ai-backend's app/rag/) - what a "question" or "both"
+   * intent turn's answer actually cited. Empty on a plain plan turn.
+   */
+  sources: AiSource[];
   errors: string[];
   trace: Record<string, unknown>;
+}
+
+export interface AiSource {
+  title: string;
+  url: string | null;
+  section: string | null;
+  license: string;
 }

@@ -3,7 +3,13 @@ services:
     # PostGIS, not plain postgres - the schema uses geography(Point,4326)
     # columns (travel_listing.location, traveler_profile.home_location), which
     # a stock postgres image cannot create. See docs/BACKEND_PLAN.md §3.1.
-    image: postgis/postgis:16-3.4
+    #
+    # Built, not pulled, as of the RAG knowledge base (db/migrations/0013):
+    # db/Dockerfile adds pgvector (knowledge_chunk.embedding) on top of this
+    # same image via one apt package - no source build. Same Postgres 16
+    # major version, so an existing db_data volume is unaffected; run
+    # `docker compose up -d --build db` once to pick this up.
+    build: ./db
     container_name: smartjourney_postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}

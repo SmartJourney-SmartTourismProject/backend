@@ -6,9 +6,15 @@ import type { AiBackendService } from './ai-backend.service.js';
 function makePrisma() {
   return {
     chat_session: { create: vi.fn(), findMany: vi.fn(), findFirst: vi.fn(), update: vi.fn(), delete: vi.fn() },
-    // count backs the "only title from the FIRST plan" rule; 1 means this
-    // turn's own plan is the only one so far.
-    chat_message: { create: vi.fn(), findMany: vi.fn(), count: vi.fn().mockResolvedValue(1) },
+    // findMany here backs the "only title from the FIRST plan" rule -
+    // ChatService counts, in JS, how many of these have a non-empty
+    // itinerary (a real plan, not a question turn's sources-only `plan`
+    // row). Default: one prior row with a real plan, i.e. "this turn's
+    // own plan is the only one so far".
+    chat_message: {
+      create: vi.fn(),
+      findMany: vi.fn().mockResolvedValue([{ plan: { itinerary: [{ day: 1, items: [] }] } }]),
+    },
     itinerary: { findMany: vi.fn(), deleteMany: vi.fn() },
   };
 }
@@ -143,7 +149,11 @@ describe('ChatService.sendMessage session titles', () => {
     const aiBackend = makeAiBackend();
     prisma.chat_session.findFirst.mockResolvedValue({ id: 'session-1', ai_session_id: 'ai-session-1' });
     prisma.chat_message.create.mockResolvedValue({ id: 'assistant-msg-1' });
-    prisma.chat_message.count.mockResolvedValue(priorPlans);
+    // `priorPlans` real-plan rows (a non-empty itinerary each) - what
+    // ChatService's JS filter counts, not a raw row count.
+    prisma.chat_message.findMany.mockResolvedValue(
+      Array.from({ length: priorPlans }, () => ({ plan: { itinerary: [{ day: 1, items: [] }] } })),
+    );
     aiBackend.planTrip.mockResolvedValue(aiPlan);
     const service = new ChatService(prisma as unknown as PrismaService, aiBackend as unknown as AiBackendService);
 
@@ -184,5 +194,61 @@ describe('ChatService.sendMessage session titles', () => {
 
   it('only titles from the first plan, so a follow-up cannot rename the chat', async () => {
     expect(await titleFrom(planResponse(), 3)).toBeUndefined();
+  });
+
+  it('a prior sources-only (question) turn does not count against the naming budget', async () => {
+    // Regression: `plan` is now also stored for a pure-question turn (for
+    // its citations), which used to make it count as a "prior plan" too -
+    // a visa question asked before the first real itinerary would then
+    // block that itinerary from ever naming the session.
+    const prisma = makePrisma();
+    const aiBackend = makeAiBackend();
+    prisma.chat_session.findFirst.mockResolvedValue({ id: 'session-1', ai_session_id: 'ai-session-1' });
+    prisma.chat_message.create.mockResolvedValue({ id: 'assistant-msg-1' });
+    // One prior row exists, but its itinerary is empty (a question turn) -
+    // must not be counted as a real plan.
+    prisma.chat_message.findMany.mockResolvedValue([{ plan: { itinerary: [] } }]);
+    aiBackend.planTrip.mockResolvedValue(planResponse());
+    const service = new ChatService(prisma as unknown as PrismaService, aiBackend as unknown as AiBackendService);
+
+    await service.sendMessage('user-1', 'session-1', { message: 'plan a trip to Kandy' });
+
+    expect(prisma.chat_session.update.mock.calls[0][0].data.title).toBe('Kandy · 1 day');
+  });
+});
+
+describe('ChatService.sendMessage persists sources-only responses', () => {
+  it('stores `plan` for a question turn with sources but no itinerary, so citations survive a reload', async () => {
+    const prisma = makePrisma();
+    const aiBackend = makeAiBackend();
+    prisma.chat_session.findFirst.mockResolvedValue({ id: 'session-1', ai_session_id: 'ai-session-1' });
+    prisma.chat_message.create.mockResolvedValue({ id: 'assistant-msg-1' });
+    aiBackend.planTrip.mockResolvedValue({
+      final_response: 'Cover your shoulders and knees [1].',
+      itinerary: [],
+      session_id: 'ai-session-1',
+      sources: [{ title: 'Temple dress code', url: 'https://x', section: 'General rule', license: 'internal' }],
+    });
+    const service = new ChatService(prisma as unknown as PrismaService, aiBackend as unknown as AiBackendService);
+
+    await service.sendMessage('user-1', 'session-1', { message: 'what should I wear at a temple?' });
+
+    const assistantCreateCall = prisma.chat_message.create.mock.calls[1][0];
+    expect(assistantCreateCall.data.plan).toBeDefined();
+    expect((assistantCreateCall.data.plan as { sources: unknown[] }).sources).toHaveLength(1);
+  });
+
+  it('still omits `plan` when there is neither an itinerary nor sources (a bare clarification)', async () => {
+    const prisma = makePrisma();
+    const aiBackend = makeAiBackend();
+    prisma.chat_session.findFirst.mockResolvedValue({ id: 'session-1', ai_session_id: 'ai-session-1' });
+    prisma.chat_message.create.mockResolvedValue({ id: 'assistant-msg-1' });
+    aiBackend.planTrip.mockResolvedValue({ final_response: 'which city?', itinerary: [], session_id: 'ai-session-1' });
+    const service = new ChatService(prisma as unknown as PrismaService, aiBackend as unknown as AiBackendService);
+
+    await service.sendMessage('user-1', 'session-1', { message: 'plan a trip' });
+
+    const assistantCreateCall = prisma.chat_message.create.mock.calls[1][0];
+    expect(assistantCreateCall.data.plan).toBeUndefined();
   });
 });

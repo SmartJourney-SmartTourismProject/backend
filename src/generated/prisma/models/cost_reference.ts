@@ -15,6 +15,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 /**
  * Model cost_reference
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
  */
 export type cost_referenceModel = runtime.Types.Result.DefaultSelection<Prisma.$cost_referencePayload>
 
@@ -46,6 +47,7 @@ export type Cost_referenceMinAggregateOutputType = {
   currency: string | null
   source_note: string | null
   updated_at: Date | null
+  is_assumed_default: boolean | null
 }
 
 export type Cost_referenceMaxAggregateOutputType = {
@@ -58,6 +60,7 @@ export type Cost_referenceMaxAggregateOutputType = {
   currency: string | null
   source_note: string | null
   updated_at: Date | null
+  is_assumed_default: boolean | null
 }
 
 export type Cost_referenceCountAggregateOutputType = {
@@ -70,6 +73,7 @@ export type Cost_referenceCountAggregateOutputType = {
   currency: number
   source_note: number
   updated_at: number
+  is_assumed_default: number
   _all: number
 }
 
@@ -94,6 +98,7 @@ export type Cost_referenceMinAggregateInputType = {
   currency?: true
   source_note?: true
   updated_at?: true
+  is_assumed_default?: true
 }
 
 export type Cost_referenceMaxAggregateInputType = {
@@ -106,6 +111,7 @@ export type Cost_referenceMaxAggregateInputType = {
   currency?: true
   source_note?: true
   updated_at?: true
+  is_assumed_default?: true
 }
 
 export type Cost_referenceCountAggregateInputType = {
@@ -118,6 +124,7 @@ export type Cost_referenceCountAggregateInputType = {
   currency?: true
   source_note?: true
   updated_at?: true
+  is_assumed_default?: true
   _all?: true
 }
 
@@ -217,6 +224,7 @@ export type Cost_referenceGroupByOutputType = {
   currency: string
   source_note: string | null
   updated_at: Date
+  is_assumed_default: boolean
   _count: Cost_referenceCountAggregateOutputType | null
   _avg: Cost_referenceAvgAggregateOutputType | null
   _sum: Cost_referenceSumAggregateOutputType | null
@@ -252,6 +260,7 @@ export type cost_referenceWhereInput = {
   currency?: Prisma.StringFilter<"cost_reference"> | string
   source_note?: Prisma.StringNullableFilter<"cost_reference"> | string | null
   updated_at?: Prisma.DateTimeFilter<"cost_reference"> | Date | string
+  is_assumed_default?: Prisma.BoolFilter<"cost_reference"> | boolean
   district?: Prisma.XOR<Prisma.DistrictNullableScalarRelationFilter, Prisma.districtWhereInput> | null
 }
 
@@ -265,6 +274,7 @@ export type cost_referenceOrderByWithRelationInput = {
   currency?: Prisma.SortOrder
   source_note?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  is_assumed_default?: Prisma.SortOrder
   district?: Prisma.districtOrderByWithRelationInput
 }
 
@@ -282,6 +292,7 @@ export type cost_referenceWhereUniqueInput = Prisma.AtLeast<{
   currency?: Prisma.StringFilter<"cost_reference"> | string
   source_note?: Prisma.StringNullableFilter<"cost_reference"> | string | null
   updated_at?: Prisma.DateTimeFilter<"cost_reference"> | Date | string
+  is_assumed_default?: Prisma.BoolFilter<"cost_reference"> | boolean
   district?: Prisma.XOR<Prisma.DistrictNullableScalarRelationFilter, Prisma.districtWhereInput> | null
 }, "id" | "district_id_category_price_level_unit">
 
@@ -295,6 +306,7 @@ export type cost_referenceOrderByWithAggregationInput = {
   currency?: Prisma.SortOrder
   source_note?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  is_assumed_default?: Prisma.SortOrder
   _count?: Prisma.cost_referenceCountOrderByAggregateInput
   _avg?: Prisma.cost_referenceAvgOrderByAggregateInput
   _max?: Prisma.cost_referenceMaxOrderByAggregateInput
@@ -315,6 +327,7 @@ export type cost_referenceScalarWhereWithAggregatesInput = {
   currency?: Prisma.StringWithAggregatesFilter<"cost_reference"> | string
   source_note?: Prisma.StringNullableWithAggregatesFilter<"cost_reference"> | string | null
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"cost_reference"> | Date | string
+  is_assumed_default?: Prisma.BoolWithAggregatesFilter<"cost_reference"> | boolean
 }
 
 export type cost_referenceCreateInput = {
@@ -326,6 +339,7 @@ export type cost_referenceCreateInput = {
   currency?: string
   source_note?: string | null
   updated_at?: Date | string
+  is_assumed_default?: boolean
   district?: Prisma.districtCreateNestedOneWithoutCost_referenceInput
 }
 
@@ -339,6 +353,7 @@ export type cost_referenceUncheckedCreateInput = {
   currency?: string
   source_note?: string | null
   updated_at?: Date | string
+  is_assumed_default?: boolean
 }
 
 export type cost_referenceUpdateInput = {
@@ -350,6 +365,7 @@ export type cost_referenceUpdateInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   source_note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_assumed_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
   district?: Prisma.districtUpdateOneWithoutCost_referenceNestedInput
 }
 
@@ -363,6 +379,7 @@ export type cost_referenceUncheckedUpdateInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   source_note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_assumed_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type cost_referenceCreateManyInput = {
@@ -375,6 +392,7 @@ export type cost_referenceCreateManyInput = {
   currency?: string
   source_note?: string | null
   updated_at?: Date | string
+  is_assumed_default?: boolean
 }
 
 export type cost_referenceUpdateManyMutationInput = {
@@ -386,6 +404,7 @@ export type cost_referenceUpdateManyMutationInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   source_note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_assumed_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type cost_referenceUncheckedUpdateManyInput = {
@@ -398,6 +417,7 @@ export type cost_referenceUncheckedUpdateManyInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   source_note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_assumed_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type cost_referenceDistrict_idCategoryPrice_levelUnitCompoundUniqueInput = {
@@ -417,6 +437,7 @@ export type cost_referenceCountOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   source_note?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  is_assumed_default?: Prisma.SortOrder
 }
 
 export type cost_referenceAvgOrderByAggregateInput = {
@@ -434,6 +455,7 @@ export type cost_referenceMaxOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   source_note?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  is_assumed_default?: Prisma.SortOrder
 }
 
 export type cost_referenceMinOrderByAggregateInput = {
@@ -446,6 +468,7 @@ export type cost_referenceMinOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   source_note?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  is_assumed_default?: Prisma.SortOrder
 }
 
 export type cost_referenceSumOrderByAggregateInput = {
@@ -508,6 +531,7 @@ export type cost_referenceCreateWithoutDistrictInput = {
   currency?: string
   source_note?: string | null
   updated_at?: Date | string
+  is_assumed_default?: boolean
 }
 
 export type cost_referenceUncheckedCreateWithoutDistrictInput = {
@@ -519,6 +543,7 @@ export type cost_referenceUncheckedCreateWithoutDistrictInput = {
   currency?: string
   source_note?: string | null
   updated_at?: Date | string
+  is_assumed_default?: boolean
 }
 
 export type cost_referenceCreateOrConnectWithoutDistrictInput = {
@@ -560,6 +585,7 @@ export type cost_referenceScalarWhereInput = {
   currency?: Prisma.StringFilter<"cost_reference"> | string
   source_note?: Prisma.StringNullableFilter<"cost_reference"> | string | null
   updated_at?: Prisma.DateTimeFilter<"cost_reference"> | Date | string
+  is_assumed_default?: Prisma.BoolFilter<"cost_reference"> | boolean
 }
 
 export type cost_referenceUpdateWithoutDistrictInput = {
@@ -571,6 +597,7 @@ export type cost_referenceUpdateWithoutDistrictInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   source_note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_assumed_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type cost_referenceUncheckedUpdateWithoutDistrictInput = {
@@ -582,6 +609,7 @@ export type cost_referenceUncheckedUpdateWithoutDistrictInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   source_note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_assumed_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type cost_referenceCreateManyDistrictInput = {
@@ -593,6 +621,7 @@ export type cost_referenceCreateManyDistrictInput = {
   currency?: string
   source_note?: string | null
   updated_at?: Date | string
+  is_assumed_default?: boolean
 }
 
 export type cost_referenceUncheckedUpdateManyWithoutDistrictInput = {
@@ -604,6 +633,7 @@ export type cost_referenceUncheckedUpdateManyWithoutDistrictInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   source_note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_assumed_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -618,6 +648,7 @@ export type cost_referenceSelect<ExtArgs extends runtime.Types.Extensions.Intern
   currency?: boolean
   source_note?: boolean
   updated_at?: boolean
+  is_assumed_default?: boolean
   district?: boolean | Prisma.cost_reference$districtArgs<ExtArgs>
 }, ExtArgs["result"]["cost_reference"]>
 
@@ -631,6 +662,7 @@ export type cost_referenceSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   currency?: boolean
   source_note?: boolean
   updated_at?: boolean
+  is_assumed_default?: boolean
   district?: boolean | Prisma.cost_reference$districtArgs<ExtArgs>
 }, ExtArgs["result"]["cost_reference"]>
 
@@ -644,6 +676,7 @@ export type cost_referenceSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   currency?: boolean
   source_note?: boolean
   updated_at?: boolean
+  is_assumed_default?: boolean
   district?: boolean | Prisma.cost_reference$districtArgs<ExtArgs>
 }, ExtArgs["result"]["cost_reference"]>
 
@@ -657,9 +690,10 @@ export type cost_referenceSelectScalar = {
   currency?: boolean
   source_note?: boolean
   updated_at?: boolean
+  is_assumed_default?: boolean
 }
 
-export type cost_referenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "district_id" | "category" | "price_level" | "unit" | "typical_cost" | "currency" | "source_note" | "updated_at", ExtArgs["result"]["cost_reference"]>
+export type cost_referenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "district_id" | "category" | "price_level" | "unit" | "typical_cost" | "currency" | "source_note" | "updated_at" | "is_assumed_default", ExtArgs["result"]["cost_reference"]>
 export type cost_referenceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   district?: boolean | Prisma.cost_reference$districtArgs<ExtArgs>
 }
@@ -685,6 +719,7 @@ export type $cost_referencePayload<ExtArgs extends runtime.Types.Extensions.Inte
     currency: string
     source_note: string | null
     updated_at: Date
+    is_assumed_default: boolean
   }, ExtArgs["result"]["cost_reference"]>
   composites: {}
 }
@@ -1118,6 +1153,7 @@ export interface cost_referenceFieldRefs {
   readonly currency: Prisma.FieldRef<"cost_reference", 'String'>
   readonly source_note: Prisma.FieldRef<"cost_reference", 'String'>
   readonly updated_at: Prisma.FieldRef<"cost_reference", 'DateTime'>
+  readonly is_assumed_default: Prisma.FieldRef<"cost_reference", 'Boolean'>
 }
     
 

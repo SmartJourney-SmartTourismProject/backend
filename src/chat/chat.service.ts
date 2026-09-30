@@ -159,9 +159,16 @@ export class ChatService {
         content: aiResponse.final_response ?? '',
         // Without this, reloading a session (refresh, or switching chats
         // and back) only had the rendered text to go on - the itinerary
-        // summary card had nothing to rebuild itself from. Only stored
-        // when there's an actual plan, not on a bare clarification reply.
-        plan: aiResponse.itinerary.length > 0 ? (aiResponse as unknown as Prisma.InputJsonValue) : undefined,
+        // summary card, or a RAG answer's source links, had nothing to
+        // rebuild itself from. Only stored when there's a real plan OR
+        // real sources, not on a bare clarification reply - `sources` is
+        // checked too (not just `itinerary`), or a pure-question turn's
+        // citations would vanish on reload even though the plan check
+        // alone looked like the right guard for "was anything produced".
+        plan:
+          aiResponse.itinerary.length > 0 || (aiResponse.sources?.length ?? 0) > 0
+            ? (aiResponse as unknown as Prisma.InputJsonValue)
+            : undefined,
       },
     });
 
@@ -169,9 +176,24 @@ export class ChatService {
     // follow-up ("make it cheaper") rewrite the name of a conversation the
     // user may since have renamed by hand, and a session's identity in the
     // sidebar should not keep moving underneath them.
-    const priorPlans = await this.prisma.chat_message.count({
+    //
+    // Counts real plans specifically (a non-empty itinerary), not every row
+    // with `plan` set - since the RAG fix above, a pure-question turn ("do
+    // I need a visa?") also stores `plan` (for its source citations) with
+    // an EMPTY itinerary. Counting those too would make a question asked
+    // before the first real plan turn eat this session's one naming
+    // chance, leaving an actual Kandy itinerary unnamed. Fetched and
+    // filtered in JS rather than a JSON-path DB query - a session's
+    // message count is small, and this avoids a Postgres-specific jsonb
+    // array-length filter.
+    const priorPlanMessages = await this.prisma.chat_message.findMany({
       where: { session_id: sessionId, role: 'assistant', plan: { not: Prisma.DbNull } },
+      select: { plan: true },
     });
+    const priorPlans = priorPlanMessages.filter((m) => {
+      const itinerary = (m.plan as { itinerary?: unknown[] } | null)?.itinerary;
+      return Array.isArray(itinerary) && itinerary.length > 0;
+    }).length;
     const derivedTitle = priorPlans <= 1 ? this.planTitle(aiResponse) : null;
 
     await this.prisma.chat_session.update({
