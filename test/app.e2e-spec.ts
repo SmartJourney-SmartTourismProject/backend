@@ -49,6 +49,8 @@ function makeFakePrisma(itineraries: unknown[] = []) {
       findFirst: vi.fn(),
       create: vi.fn(),
     },
+    // The trip list's cover-photo lookup (trips.service coverPhotos).
+    itinerary_item: { findMany: vi.fn().mockResolvedValue([]) },
     expense: { groupBy: vi.fn().mockResolvedValue([]) },
   };
 }
@@ -109,7 +111,7 @@ describe('App (e2e)', () => {
       .get('/trips')
       .set('Authorization', bearerFor({ id: 'user-1', roles: ['traveler'] }))
       .expect(200);
-    expect(res.body).toEqual([{ id: 'trip-owned-by-caller', user_id: 'user-1' }]);
+    expect(res.body).toEqual([{ id: 'trip-owned-by-caller', user_id: 'user-1', cover_photo_url: null }]);
     await app.close();
   });
 

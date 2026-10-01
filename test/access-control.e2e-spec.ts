@@ -77,11 +77,16 @@ function makeFakePrisma() {
       update: vi.fn(),
       delete: vi.fn(),
     },
+    // The trip list looks up a cover photo from its stops (trips.service
+    // coverPhotos): no stops here, so every trip gets cover_photo_url: null.
+    itinerary_item: { findMany: vi.fn().mockResolvedValue([]) },
     expense: { groupBy: vi.fn().mockResolvedValue([]) },
     app_user: { count: vi.fn().mockResolvedValue(0) },
     chat_session: { count: vi.fn().mockResolvedValue(0) },
-    travel_listing: { count: vi.fn().mockResolvedValue(0) },
+    travel_listing: { count: vi.fn().mockResolvedValue(0), findMany: vi.fn().mockResolvedValue([]) },
     local_event: { count: vi.fn().mockResolvedValue(0) },
+    // /admin/stats also counts entry fees awaiting review.
+    listing_entry_fee: { count: vi.fn().mockResolvedValue(0) },
   };
 }
 
@@ -142,7 +147,7 @@ describe('Access control testing — authorization (application-level)', () => {
       .get('/trips')
       .set('Authorization', bearerFor(TRAVELER_A))
       .expect(200);
-    expect(asA.body).toEqual([TRIP_OF_A]);
+    expect(asA.body).toEqual([{ ...TRIP_OF_A, cover_photo_url: null }]);
 
     const asB = await request(app.getHttpServer())
       .get('/trips')
