@@ -52,6 +52,8 @@ function makeFakePrisma(itineraries: unknown[] = []) {
     // The trip list's cover-photo lookup (trips.service coverPhotos).
     itinerary_item: { findMany: vi.fn().mockResolvedValue([]) },
     expense: { groupBy: vi.fn().mockResolvedValue([]) },
+    // GET /health's database probe.
+    $queryRaw: vi.fn().mockResolvedValue([{ '?column?': 1 }]),
   };
 }
 
@@ -77,6 +79,12 @@ describe('App (e2e)', () => {
   it('GET / is public and needs no identity', async () => {
     const app = await buildApp();
     await request(app.getHttpServer()).get('/').expect(200).expect('Hello World!');
+    await app.close();
+  });
+
+  it('GET /health is public and reports ok when the database answers', async () => {
+    const app = await buildApp();
+    await request(app.getHttpServer()).get('/health').expect(200).expect({ status: 'ok' });
     await app.close();
   });
 

@@ -1,0 +1,196 @@
+# Production stack for the single Lightsail server (deploy/MANUAL_SETUP.md).
+# Lives in /opt/smartjourney next to .env. CD copies this folder there and
+# updates image tags with deploy.sh - never `docker compose build` on the box.
+#
+# Only Caddy publishes ports (80/443). Everything else is reachable solely on
+# the internal Docker network, in particular Postgres, Redis and the AI
+# backend, which is unauthenticated by design and callable only by NestJS.
+name: smartjourney
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      IP_DASHED: ${IP_DASHED:?set IP_DASHED in .env (the server IP with dashes, e.g. 13-233-10-20)}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env (Let's Encrypt expiry notices)}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      default:
+        # Containers call the public hostnames (the backend fetches Keycloak's
+        # keys from KEYCLOAK_ISSUER) - resolve them to Caddy on the internal
+        # network instead of looping out through the internet.
+        aliases:
+          - api.${IP_DASHED}.sslip.io
+          - auth.${IP_DASHED}.sslip.io
+    depends_on:
+      - backend
+      - keycloak
+    logging: *logging
+
+  backend:
+    image: ${REGISTRY:-ghcr.io/smartjourney-smarttourismproject}/backend:${BACKEND_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      PORT: "3001"
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      KEYCLOAK_ISSUER: https://auth.${IP_DASHED}.sslip.io/realms/smartjourney
+      KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-account}
+      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-smartjourney-backend}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:?set KEYCLOAK_ADMIN_CLIENT_SECRET in .env}
+      FRONTEND_URL: ${FRONTEND_URL:?set FRONTEND_URL in .env (the Vercel production URL)}
+      AI_BACKEND_URL: http://ai-backend:8000
+      AI_BACKEND_TIMEOUT_MS: ${AI_BACKEND_TIMEOUT_MS:-120000}
+      SETTINGS_ENCRYPTION_KEY: ${SETTINGS_ENCRYPTION_KEY:?set SETTINGS_ENCRYPTION_KEY in .env}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:?set INTERNAL_API_TOKEN in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    logging: *logging
+
+  ai-backend:
+    image: ${REGISTRY:-ghcr.io/smartjourney-smarttourismproject}/ai-backend:${AI_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379/0
+      SETTINGS_ENCRYPTION_KEY: ${SETTINGS_ENCRYPTION_KEY}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+      LLM_PROVIDER_CHAIN: ${LLM_PROVIDER_CHAIN:-gemini:gemini-3.5-flash-lite,gemini:gemini-3.6-flash,groq:openai/gpt-oss-120b}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-}
+      ORS_API_KEY: ${ORS_API_KEY:-}
+      BOOKING_RAPIDAPI_KEY: ${BOOKING_RAPIDAPI_KEY:-}
+      BOOKING_RAPIDAPI_HOST: ${BOOKING_RAPIDAPI_HOST:-booking-com15.p.rapidapi.com}
+      TICKETMASTER_API_KEY: ${TICKETMASTER_API_KEY:-}
+      USD_LKR_RATE: ${USD_LKR_RATE:-310}
+      ENABLE_RAG: ${ENABLE_RAG:-false}
+      DEBUG: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    logging: *logging
+
+  keycloak:
+    image: ${REGISTRY:-ghcr.io/smartjourney-smarttourismproject}/keycloak:${KEYCLOAK_TAG:-latest}
+    restart: unless-stopped
+    command: ["start", "--optimized", "--import-realm"]
+    environment:
+      KC_HOSTNAME: https://auth.${IP_DASHED}.sslip.io
+      KC_HTTP_ENABLED: "true" # TLS ends at Caddy
+      KC_PROXY_HEADERS: xforwarded
+      KC_DB_URL: jdbc:postgresql://keycloak_db:5432/${KEYCLOAK_DB_NAME}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME:?set the Keycloak admin username in .env}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD:?set the Keycloak admin password in .env}
+      JAVA_OPTS_APPEND: -Xms256m -Xmx512m
+      # Substituted into realm-export.json on first import (${NAME} placeholders)
+      FRONTEND_URL: ${FRONTEND_URL}
+      KEYCLOAK_WEB_CLIENT_SECRET: ${KEYCLOAK_WEB_CLIENT_SECRET:?set KEYCLOAK_WEB_CLIENT_SECRET in .env}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+      GOOGLE_SIGNIN_CLIENT_ID: ${GOOGLE_SIGNIN_CLIENT_ID:-}
+      GOOGLE_SIGNIN_CLIENT_SECRET: ${GOOGLE_SIGNIN_CLIENT_SECRET:-}
+      KC_SMTP_HOST: ${KC_SMTP_HOST:-smtp.gmail.com}
+      KC_SMTP_PORT: ${KC_SMTP_PORT:-587}
+      KC_SMTP_FROM: ${KC_SMTP_FROM:-noreply@smartjourney.local}
+      KC_SMTP_FROM_DISPLAY_NAME: ${KC_SMTP_FROM_DISPLAY_NAME:-SmartJourney}
+      KC_SMTP_AUTH: ${KC_SMTP_AUTH:-true}
+      KC_SMTP_USER: ${KC_SMTP_USER:-}
+      KC_SMTP_PASSWORD: ${KC_SMTP_PASSWORD:-}
+      KC_SMTP_STARTTLS: ${KC_SMTP_STARTTLS:-true}
+      KC_SMTP_SSL: ${KC_SMTP_SSL:-false}
+    depends_on:
+      keycloak_db:
+        condition: service_healthy
+    healthcheck:
+      # Keycloak 26 serves /health on the management port (9000). The image
+      # has no curl, so speak HTTP over bash's /dev/tcp.
+      test:
+        - CMD-SHELL
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/9000 &&
+          printf 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
+          grep -q UP <&3
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+    logging: *logging
+
+  db:
+    image: ${REGISTRY:-ghcr.io/smartjourney-smarttourismproject}/db:${DB_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    logging: *logging
+
+  keycloak_db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${KEYCLOAK_DB_USER}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      POSTGRES_DB: ${KEYCLOAK_DB_NAME}
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${KEYCLOAK_DB_USER} -d ${KEYCLOAK_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    logging: *logging
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    logging: *logging
+
+  # One-shot: applies pending SQL migrations (backend/db/migrate.py).
+  #   docker compose -f compose.prod.yml run --rm migrate
+  migrate:
+    image: ${REGISTRY:-ghcr.io/smartjourney-smarttourismproject}/migrate:${BACKEND_TAG:-latest}
+    profiles: ["tools"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
+  keycloak_db_data:
+  caddy_data:
+  caddy_config:

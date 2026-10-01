@@ -9,6 +9,7 @@ import { ChatModule } from './chat/chat.module.js';
 import { TripsModule } from './trips/trips.module.js';
 import { BudgetModule } from './budget/budget.module.js';
 import { AdminModule } from './admin/admin.module.js';
+import { HealthController } from './health/health.controller.js';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { AdminModule } from './admin/admin.module.js';
     BudgetModule,
     AdminModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AppService],
 })
 export class AppModule {}

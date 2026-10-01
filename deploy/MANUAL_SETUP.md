@@ -11,7 +11,7 @@ Everything the CD pipelines **can't** do for you: account setup, clicking throug
 | HTTPS hostnames | `sslip.io` (free, no domain to buy) + Let's Encrypt via Caddy | $0 |
 | Docker images | GitHub Container Registry (GHCR) | $0 |
 
-> This guide refers to files in this `deploy/` folder: `compose.prod.yml`, `Caddyfile`, `deploy.sh`, `backup.sh`, `.env.prod.example`, and the `keycloak.Dockerfile` / `migrate.Dockerfile` images. The CD pipelines in `.github/workflows/ci.yml` of `backend`, `ai-backend` and `frontend-web` build and deploy them automatically on every push to `main`.
+> This guide refers to files in this `deploy/` folder: `compose.prod.yml`, `compose.sh`, `Caddyfile`, `deploy.sh`, `backup.sh`, `.env.prod.example`, and the `keycloak.Dockerfile` / `migrate.Dockerfile` images. The CD pipelines in `.github/workflows/ci.yml` of `backend`, `ai-backend` and `frontend-web` build and deploy them automatically on every push to `main`.
 
 ---
 
@@ -25,7 +25,7 @@ Keep these in a password manager, **not** in git. You'll fill them in as you go.
 | `IP_DASHED` | Same IP with dashes, e.g. `13-233-10-20` |
 | API URL | `https://api.<IP_DASHED>.sslip.io` |
 | Auth URL | `https://auth.<IP_DASHED>.sslip.io` |
-| Vercel URL | `https://<project-name>.vercel.app` (section 1.3) |
+| Vercel URL | `https://aismartjourney.vercel.app` (already created) |
 | Deploy SSH key pair | `smartjourney_deploy` / `smartjourney_deploy.pub` (section 3.3) |
 | Generated secrets | DB passwords, Keycloak admin password, client secrets, `NEXTAUTH_SECRET`, `SETTINGS_ENCRYPTION_KEY`, `INTERNAL_API_TOKEN` (section 4) |
 
@@ -49,7 +49,7 @@ The frontend URL is needed by the backend (CORS) and by Keycloak (allowed redire
 
 1. Sign in at <https://vercel.com> with GitHub.
 2. **Add New → Project → Import** `frontend-web` from the org. (If the org isn't listed: **Adjust GitHub App Permissions** → give Vercel access to that repo.)
-3. Set the **Project Name**, e.g. `smartjourney`. Your production URL becomes `https://smartjourney.vercel.app`. If the name is taken, Vercel shows the URL it will actually use, so write that one down.
+3. Set the **Project Name**. Yours is already created: production URL **`https://aismartjourney.vercel.app`**.
 4. Framework preset **Next.js** (auto-detected). Root directory: leave as the repo root.
 5. **Don't deploy yet.** If it auto-deploys, that's fine: it will fail or show a broken login until section 7, and nothing is harmed.
 
@@ -124,28 +124,25 @@ Test from your computer: `ssh -i smartjourney_deploy deploy@<STATIC_IP> docker p
    openssl rand -base64 32 | tr -d '/+=' | cut -c1-32   # passwords / client secrets / tokens
    openssl rand -base64 32                              # SETTINGS_ENCRYPTION_KEY (keep the trailing =)
    ```
-2. As `deploy` on the server, create `/opt/smartjourney/.env` from `deploy/.env.prod.example` (copy its contents into `nano /opt/smartjourney/.env`) and fill it in:
+2. As `deploy` on the server, create `/opt/smartjourney/.env` from `deploy/.env.prod.example` (copy its contents into `nano /opt/smartjourney/.env`) and fill it in. `DATABASE_URL`, `KEYCLOAK_ISSUER` and the other derived URLs are built by `compose.prod.yml`, so you don't set them:
 
 | Group | Variables | Value |
 |---|---|---|
 | Hostnames | `IP_DASHED` | e.g. `13-233-10-20` |
-| | `FRONTEND_URL` | `https://<project>.vercel.app` (section 1.3) |
+| | `FRONTEND_URL` | `https://aismartjourney.vercel.app` |
 | App database | `POSTGRES_USER`, `POSTGRES_DB` | `smartjourney`, `smartjourney` |
 | | `POSTGRES_PASSWORD` | generated |
-| | `DATABASE_URL` | `postgresql://smartjourney:<POSTGRES_PASSWORD>@db:5432/smartjourney` (host is `db`, the container name) |
 | Keycloak database | `KEYCLOAK_DB_USER`, `KEYCLOAK_DB_NAME` | `keycloak`, `keycloak` |
 | | `KEYCLOAK_DB_PASSWORD` | generated |
 | Keycloak | `KC_BOOTSTRAP_ADMIN_USERNAME`, `KC_BOOTSTRAP_ADMIN_PASSWORD` | e.g. `sjadmin` + generated, for the Keycloak admin console |
 | | `KEYCLOAK_WEB_CLIENT_SECRET` | generated (Vercel needs the **same** value, section 7) |
-| | `KEYCLOAK_ISSUER` | `https://auth.<IP_DASHED>.sslip.io/realms/smartjourney` |
-| | `KEYCLOAK_AUDIENCE`, `KEYCLOAK_ADMIN_CLIENT_ID` | same values as your local `backend/.env` |
-| | `KEYCLOAK_ADMIN_CLIENT_SECRET` | leave empty for now (section 8.3 prints it) |
+| | `KEYCLOAK_AUDIENCE`, `KEYCLOAK_ADMIN_CLIENT_ID` | same values as your local `backend/.env` (defaults `account` / `smartjourney-backend`) |
+| Caddy | `ACME_EMAIL` | your email (Let's Encrypt expiry notices) |
+| | `KEYCLOAK_ADMIN_CLIENT_SECRET` | **generated now.** Keycloak creates the `smartjourney-backend` client with this secret on first start, and NestJS uses the same value |
 | Google sign-in | `GOOGLE_SIGNIN_CLIENT_ID`, `GOOGLE_SIGNIN_CLIENT_SECRET` | same as local (section 5 updates the redirect URI) |
 | Email (password reset) | `KC_SMTP_HOST=smtp.gmail.com`, `KC_SMTP_PORT=587`, `KC_SMTP_AUTH=true`, `KC_SMTP_STARTTLS=true`, `KC_SMTP_SSL=false`, `KC_SMTP_USER`, `KC_SMTP_FROM`, `KC_SMTP_FROM_DISPLAY_NAME=SmartJourney` | a Gmail address |
 | | `KC_SMTP_PASSWORD` | a **Gmail app password** (Google Account → Security → 2-Step Verification → App passwords), not the account password |
-| Service-to-service | `AI_BACKEND_URL` | `http://ai-backend:8000` |
-| | `REDIS_URL` | `redis://redis:6379/0` |
-| | `SETTINGS_ENCRYPTION_KEY` | generated (base64, 32 bytes) |
+| Shared secrets | `SETTINGS_ENCRYPTION_KEY` | generated (base64, 32 bytes) |
 | | `INTERNAL_API_TOKEN` | generated |
 | AI providers | `GEMINI_API_KEY`, `GROQ_API_KEY`, `ANTHROPIC_API_KEY`, `OPENWEATHER_API_KEY`, `ORS_API_KEY`, `BOOKING_RAPIDAPI_KEY`, `BOOKING_RAPIDAPI_HOST`, `TICKETMASTER_API_KEY`, `LLM_PROVIDER_CHAIN`, `USD_LKR_RATE` | same as your local `ai-backend/.env` |
 
@@ -179,7 +176,7 @@ Google Calendar sync isn't deployed (the AI backend isn't public), so its client
 | `LIGHTSAIL_USER` | `deploy` |
 | `LIGHTSAIL_SSH_KEY` | the **private** key file `smartjourney_deploy`, whole contents including the BEGIN/END lines |
 | `VERCEL_TOKEN` | Vercel → avatar → **Account Settings → Tokens → Create** (scope: your team or account; expiry: 30–60 days) |
-| `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` | run `npx vercel link` in `frontend-web`, pick the project, then copy `orgId` and `projectId` from `.vercel/project.json`. **Don't commit `.vercel/`** (it's gitignored). |
+| `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` | run `npx vercel link` in `frontend-web`, pick the project, then copy `orgId` (starts with `team_`) and the project `id` (starts with `prj_`) from `.vercel/repo.json` (older Vercel CLI versions wrote `.vercel/project.json` instead). **Don't commit `.vercel/`** (it's gitignored). |
 
 ---
 
@@ -187,13 +184,13 @@ Google Calendar sync isn't deployed (the AI backend isn't public), so its client
 
 **Project → Settings:**
 
-1. **Git → Production Branch:** `main`. Pushes to `main` deploy through the GitHub Actions pipeline after tests pass. `vercel.json` turns off Vercel's own automatic production deploys, while PR preview deployments still happen.
+1. **Git → Production Branch:** `new-main` (the `frontend-web` default branch). Pushes to `new-main` deploy through the GitHub Actions pipeline after lint and tests pass. `vercel.json` turns off Vercel's own automatic production deploys from that branch, while PR preview deployments still happen. (`backend` and `ai-backend` deploy from their default branch, `main`.)
 2. **Functions → Function Region:** **Mumbai, India (`bom1`)**. Login token calls go from Vercel to Keycloak in Mumbai, and the default US region adds a round trip to every login.
 3. **Environment Variables:** add these for **Production**:
    | Name | Value |
    |---|---|
    | `NEXT_PUBLIC_API_URL` | `https://api.<IP_DASHED>.sslip.io` |
-   | `NEXTAUTH_URL` | `https://<project>.vercel.app` |
+   | `NEXTAUTH_URL` | `https://aismartjourney.vercel.app` |
    | `NEXTAUTH_SECRET` | generated (section 4 command) |
    | `KEYCLOAK_ISSUER` | `https://auth.<IP_DASHED>.sslip.io/realms/smartjourney` |
    | `NEXT_PUBLIC_KEYCLOAK_ISSUER` | same as above |
@@ -201,17 +198,19 @@ Google Calendar sync isn't deployed (the AI backend isn't public), so its client
    | `NEXT_PUBLIC_KEYCLOAK_CLIENT_ID` | `smartjourney-web` |
    | `KEYCLOAK_CLIENT_SECRET` | **the same value** as `KEYCLOAK_WEB_CLIENT_SECRET` on the server |
 
-   `NEXT_PUBLIC_*` values are baked in at build time. After changing one, redeploy (push to `main` or re-run the workflow).
+   `NEXT_PUBLIC_*` values are baked in at build time. After changing one, redeploy (push to `new-main` or re-run the workflow from the Actions tab).
 
 ---
 
 ## 8. First deploy and data load
 
 ### 8.1 Deploy order
-Push (or re-run the workflow on) `main` in this order, waiting for each to go green:
-1. **backend**: builds the images, copies `deploy/` to `/opt/smartjourney`, runs migrations, and starts `db`, `keycloak_db`, `keycloak`, `redis`, `backend` and `caddy`. Caddy gets the HTTPS certificates on its first request, which can take up to a minute.
-2. **ai-backend**: starts the AI service.
-3. **frontend-web**: deploys to Vercel.
+Each pipeline skips its deploy job, with a notice, until its secrets exist. Once they do, deploy in this order, waiting for each run to go green:
+1. **backend** repo → **Actions → CI → Run workflow** on `main`, with **"Rebuild and redeploy the db and keycloak images too" ticked**. The box has no images yet, so this one manual run builds all five. It copies `deploy/` to `/opt/smartjourney`, starts `db`, `keycloak_db` and `redis`, runs the migrations, starts Keycloak (about 1–2 minutes: it imports the realm) and the backend, then Caddy. Caddy gets the HTTPS certificates on its first request, which can take up to a minute. Later pushes to `main` deploy by themselves, and only rebuild db or keycloak when their files change.
+2. **ai-backend** repo: push to `main` (or **Run workflow**). It builds its image and `deploy.sh` starts it.
+3. **frontend-web** repo: push to `new-main` (or **Run workflow**). It builds and deploys to Vercel.
+
+Every deploy health-checks the new container and **rolls back to the previous image automatically** if it doesn't become healthy.
 
 Check from your computer: `curl https://api.<IP_DASHED>.sslip.io/health` should return `{"status":"ok"}`, and `https://auth.<IP_DASHED>.sslip.io` should show Keycloak.
 
@@ -228,12 +227,13 @@ scp -i smartjourney_deploy sj.dump deploy@<STATIC_IP>:/opt/smartjourney/backups/
 ```
 On the **server** as `deploy`, in `/opt/smartjourney`:
 ```bash
-docker compose -f compose.prod.yml stop backend ai-backend
-docker compose -f compose.prod.yml exec -T db dropdb -U smartjourney --force smartjourney
-docker compose -f compose.prod.yml exec -T db createdb -U smartjourney smartjourney
-docker compose -f compose.prod.yml exec -T db pg_restore -U smartjourney -d smartjourney --no-owner --no-privileges < backups/sj.dump
-docker compose -f compose.prod.yml start backend ai-backend
+./compose.sh stop backend ai-backend
+./compose.sh exec -T db dropdb -U smartjourney --force smartjourney
+./compose.sh exec -T db createdb -U smartjourney smartjourney
+./compose.sh exec -T db pg_restore -U smartjourney -d smartjourney --no-owner --no-privileges < backups/sj.dump
+./compose.sh start backend ai-backend
 ```
+(`compose.sh` is a wrapper for `docker compose` that always loads `.env` and the image-tag file. Use it for every compose command on the server.)
 The dump includes the `schema_migration` table, so later deploys apply only newer migrations. **Don't re-run the data connectors** in production; they'd spend API quota re-fetching data you already have.
 
 ### 8.3 Keycloak after the first start
@@ -241,12 +241,12 @@ Production Keycloak starts from `realm-export.json`, so **local user accounts ar
 
 1. Open `https://auth.<IP_DASHED>.sslip.io/admin` and sign in with `KC_BOOTSTRAP_ADMIN_USERNAME` / `KC_BOOTSTRAP_ADMIN_PASSWORD`.
 2. **Realm `smartjourney` → Clients → `smartjourney-web` → Settings:** check that Valid redirect URIs and Web origins include your Vercel URL. They come from `FRONTEND_URL`; add them by hand if missing.
-3. Grant the backend's service account its admin roles. From **your computer**, in `backend/`:
+3. Grant the backend's service account its admin roles (a realm import doesn't restore them). From **your computer**, in the `backend` repo:
    ```bash
    KC_URL=https://auth.<IP_DASHED>.sslip.io KC_ADMIN_USER=<bootstrap user> KC_ADMIN_PASSWORD=<bootstrap password> \
      sh keycloak/grant-service-account-roles.sh
    ```
-   It prints the client secret. Put that in the server `.env` as `KEYCLOAK_ADMIN_CLIENT_SECRET`, then run `docker compose -f compose.prod.yml up -d backend`.
+   It should print three `HTTP 204` lines and the roles granted. The client secret it prints must equal `KEYCLOAK_ADMIN_CLIENT_SECRET` in the server `.env`; Keycloak took it from there on first import, so nothing needs copying. (Admin pages can take about 5 minutes to pick up the new roles, because the backend caches its token.)
 4. Sign up in the app with your own account. Then, in the Keycloak admin console, **Users →** your user **→ Role mapping → Assign role →** realm role **`admin`**. Sign out and in again to see the Admin menu.
 5. **Realm settings → Email → Test connection** to confirm Gmail SMTP works.
 
@@ -254,7 +254,7 @@ Production Keycloak starts from `realm-export.json`, so **local user accounts ar
 1. **Admin → AI models → API keys:** keys in the server `.env` already work. Re-enter any key you want managed from the panel; the production encryption key is new, so local DB-saved keys don't carry over.
 2. **Models order:** `gemini-3.5-flash-lite` → `gemini-3.6-flash` → `claude-haiku-4-5` → `openai/gpt-oss-120b`. **Save order**, then **Test models**.
 3. If Explore shows no places, listings aren't verified. On the server:
-   `docker compose -f compose.prod.yml exec ai-backend python -m app.data.verify_all_for_demo`
+   `./compose.sh exec ai-backend python -m app.data.verify_all_for_demo`
 
 ### 8.5 Backups
 On the server as `deploy`:
@@ -277,12 +277,12 @@ Then, in **Lightsail → Snapshots → Create snapshot**, take your known-good r
   - [ ] Plan a trip in chat (the card says `llm`, not `fallback`), save it, then open Saved itineraries.
   - [ ] Explore, then add a budget expense.
   - [ ] Admin → AI models → Test.
-- [ ] Each repo's Actions tab shows the last `main` run green, through deploy.
+- [ ] Each repo's Actions tab shows its last run green through deploy (`main` for backend and ai-backend, `new-main` for frontend-web).
 - [ ] AWS Billing shows the Budget and no unexpected services.
 
 ## 10. Evaluation day
 
-- **Freeze:** no pushes to `main` for 24 h before.
+- **Freeze:** no pushes to `main` (backend, ai-backend) or `new-main` (frontend-web) for 24 h before.
 - **The day before:** take a Lightsail snapshot, and do a full dress rehearsal of the demo path on the real URLs.
 - **15 minutes before:** open the site, sign in and plan one trip to warm up Keycloak and the AI backend.
 - Check **Admin → AI models → Test** before the demo. If Gemini is out of quota, Claude Haiku takes over automatically.

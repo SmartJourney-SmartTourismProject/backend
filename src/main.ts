@@ -5,12 +5,16 @@ import { AppModule } from './app.module.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // The Next.js frontend runs on a different port (3000 vs this app's
-  // 3001) even in local dev, so every request is cross-origin. Tighten
-  // FRONTEND_URL before any real deployment - this is permissive for local
-  // dev, same caution as ai-backend's own wide-open CORS (see
-  // docs/AI_BACKEND_ENDPOINTS.md).
-  app.enableCors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' });
+  // The Next.js frontend is a different origin from this API (local dev:
+  // :3000 vs :3001; production: <project>.vercel.app vs api.<ip>.sslip.io),
+  // so every request is cross-origin. FRONTEND_URL is the one allowed origin
+  // (or a comma-separated list); never a wildcard - this API takes Bearer
+  // tokens from the browser.
+  const origins = (process.env.FRONTEND_URL || 'http://localhost:3000')
+    .split(',')
+    .map((o) => o.trim().replace(/\/$/, ''))
+    .filter(Boolean);
+  app.enableCors({ origin: origins });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

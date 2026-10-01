@@ -22,6 +22,14 @@ realm.pop("users", None)
 for c in realm.get("clients", []):
     if c.get("clientId") == "smartjourney-web":
         c["secret"] = "${KEYCLOAK_WEB_CLIENT_SECRET}"
+        # The web app's origin differs per environment (production: the Vercel
+        # URL, passed to Keycloak as FRONTEND_URL; local default below).
+        fe = "${FRONTEND_URL:http://localhost:3000}"
+        c["redirectUris"] = [u.replace("http://localhost:3000", fe) for u in c.get("redirectUris", [])]
+        c["webOrigins"] = [o.replace("http://localhost:3000", fe) for o in c.get("webOrigins", [])]
+        attrs = c.get("attributes", {})
+        if "post.logout.redirect.uris" in attrs:
+            attrs["post.logout.redirect.uris"] = attrs["post.logout.redirect.uris"].replace("http://localhost:3000", fe)
     if c.get("clientId") == "smartjourney-backend":
         c["secret"] = "${KEYCLOAK_ADMIN_CLIENT_SECRET}"
 realm["smtpServer"] = {

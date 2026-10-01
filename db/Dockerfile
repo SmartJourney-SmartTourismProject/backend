@@ -16,3 +16,8 @@ FROM postgis/postgis:16-3.4
 RUN apt-get update \
     && apt-get install -y --no-install-recommends postgresql-16-pgvector \
     && rm -rf /var/lib/apt/lists/*
+
+# Extensions (postgis, pg_trgm, uuid-ossp, vector) are created on first init of
+# an EMPTY data volume. Locally docker-compose.yml bind-mounts ./db/init over
+# this folder; in production there is no mount, so the script is baked in.
+COPY init/ /docker-entrypoint-initdb.d/

@@ -909,14 +909,14 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "${KEYCLOAK_WEB_CLIENT_SECRET}",
       "redirectUris": [
-        "http://localhost:3000/api/auth/callback/keycloak",
+        "${FRONTEND_URL:http://localhost:3000}/api/auth/callback/keycloak",
         "http://localhost:3001/api/auth/callback/keycloak",
         "http://localhost:3001/api/auth/callback/keycloak-register",
-        "http://localhost:3000/api/auth/callback/keycloak-register"
+        "${FRONTEND_URL:http://localhost:3000}/api/auth/callback/keycloak-register"
       ],
       "webOrigins": [
         "http://localhost:3001",
-        "http://localhost:3000"
+        "${FRONTEND_URL:http://localhost:3000}"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -933,7 +933,7 @@
         "oidc.ciba.grant.enabled": "false",
         "client.secret.creation.time": "1789910345",
         "backchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "http://localhost:3000/*##http://localhost:3001/*",
+        "post.logout.redirect.uris": "${FRONTEND_URL:http://localhost:3000}/*##http://localhost:3001/*",
         "display.on.consent.screen": "false",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false"

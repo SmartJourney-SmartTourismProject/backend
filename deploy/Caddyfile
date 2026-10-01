@@ -1,0 +1,17 @@
+# TLS + routing for the single server. sslip.io resolves
+# api.<dashed-ip>.sslip.io to <ip>, so Caddy gets real Let's Encrypt
+# certificates with no domain purchase. IP_DASHED and ACME_EMAIL come from the
+# server's .env (passed through compose).
+{
+	email {$ACME_EMAIL}
+}
+
+api.{$IP_DASHED}.sslip.io {
+	encode zstd gzip
+	reverse_proxy backend:3001
+}
+
+auth.{$IP_DASHED}.sslip.io {
+	encode zstd gzip
+	reverse_proxy keycloak:8080
+}
