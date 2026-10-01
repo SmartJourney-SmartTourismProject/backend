@@ -51,7 +51,8 @@ model app_user {
   email_verified                                   Boolean              @default(false)
   role                                             String               @default("traveler")
   is_active                                        Boolean              @default(true)
-  location_enabled                                 Boolean              @default(false)
+  location_enabled                                 Boolean              @default(true)
+  avatar_url                                       String?
   created_at                                       DateTime             @default(now()) @db.Timestamptz(6)
   updated_at                                       DateTime             @default(now()) @db.Timestamptz(6)
   keycloak_id                                      String?              @unique @db.Uuid
@@ -64,6 +65,8 @@ model app_user {
   itinerary                                        itinerary[]
   listing_entry_fee                                listing_entry_fee[]
   traveler_profile                                 traveler_profile?
+  app_setting                                      app_setting[]
+  llm_provider_key                                 llm_provider_key[]
 }
 
 model category {
@@ -413,6 +416,27 @@ model travel_time {
   fetched_at DateTime @default(now()) @db.Timestamptz(6)
 
   @@id([origin_key, dest_key, mode])
+}
+
+/// Admin-changeable runtime settings (0017_llm_settings.sql). 'llm_provider_chain'
+/// = JSON array of "<provider>:<model>" read by the AI backend.
+model app_setting {
+  key        String    @id
+  value      Json
+  updated_at DateTime  @default(now()) @db.Timestamptz(6)
+  updated_by String?   @db.Uuid
+  app_user   app_user? @relation(fields: [updated_by], references: [id], onUpdate: NoAction)
+}
+
+/// Provider API keys saved in Admin > AI models, AES-256-GCM encrypted under
+/// SETTINGS_ENCRYPTION_KEY. The plaintext never leaves the server.
+model llm_provider_key {
+  provider      String    @id
+  encrypted_key String
+  last4         String
+  updated_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_by    String?   @db.Uuid
+  app_user      app_user? @relation(fields: [updated_by], references: [id], onUpdate: NoAction)
 }
 
 model traveler_profile {

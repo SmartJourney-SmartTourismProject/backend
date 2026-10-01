@@ -77,6 +77,8 @@ export const ModelName = {
   tag_vocabulary: 'tag_vocabulary',
   travel_listing: 'travel_listing',
   travel_time: 'travel_time',
+  app_setting: 'app_setting',
+  llm_provider_key: 'llm_provider_key',
   traveler_profile: 'traveler_profile',
   knowledge_chunk: 'knowledge_chunk',
   knowledge_document: 'knowledge_document'
@@ -141,6 +143,7 @@ export const App_userScalarFieldEnum = {
   role: 'role',
   is_active: 'is_active',
   location_enabled: 'location_enabled',
+  avatar_url: 'avatar_url',
   created_at: 'created_at',
   updated_at: 'updated_at',
   keycloak_id: 'keycloak_id'
@@ -465,6 +468,27 @@ export const Travel_timeScalarFieldEnum = {
 } as const
 
 export type Travel_timeScalarFieldEnum = (typeof Travel_timeScalarFieldEnum)[keyof typeof Travel_timeScalarFieldEnum]
+
+
+export const App_settingScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  updated_at: 'updated_at',
+  updated_by: 'updated_by'
+} as const
+
+export type App_settingScalarFieldEnum = (typeof App_settingScalarFieldEnum)[keyof typeof App_settingScalarFieldEnum]
+
+
+export const Llm_provider_keyScalarFieldEnum = {
+  provider: 'provider',
+  encrypted_key: 'encrypted_key',
+  last4: 'last4',
+  updated_at: 'updated_at',
+  updated_by: 'updated_by'
+} as const
+
+export type Llm_provider_keyScalarFieldEnum = (typeof Llm_provider_keyScalarFieldEnum)[keyof typeof Llm_provider_keyScalarFieldEnum]
 
 
 export const Traveler_profileScalarFieldEnum = {

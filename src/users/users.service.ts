@@ -37,6 +37,7 @@ const ME_SELECT = {
   role: true,
   email_verified: true,
   location_enabled: true,
+  avatar_url: true,
   created_at: true,
 } as const;
 
@@ -131,6 +132,7 @@ export class UsersService {
       data: {
         ...(dto.phone !== undefined && { phone: dto.phone }),
         ...(dto.location_enabled !== undefined && { location_enabled: dto.location_enabled }),
+        ...(dto.avatar_url !== undefined && { avatar_url: dto.avatar_url }),
         updated_at: new Date(),
       },
       select: ME_SELECT,

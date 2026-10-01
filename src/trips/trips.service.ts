@@ -138,7 +138,48 @@ export class TripsService {
       orderBy: { updated_at: 'desc' },
       include: { district: { select: DISTRICT_SUMMARY_SELECT } },
     });
-    return trips.map((trip) => effectiveStatus(trip, today));
+    const covers = await this.coverPhotos(trips.map((t) => t.id));
+    return trips.map((trip) => ({
+      ...effectiveStatus(trip, today),
+      cover_photo_url: covers.get(trip.id) ?? null,
+    }));
+  }
+
+  /**
+   * A photo per trip for the Saved Itineraries card: the first stop (in trip
+   * order) whose place has one. Saved items don't keep their listing id, so
+   * stops are matched to listings by name. Decoration only - a failed lookup
+   * is swallowed and the card falls back to its gradient.
+   */
+  private async coverPhotos(tripIds: string[]): Promise<Map<string, string>> {
+    const covers = new Map<string, string>();
+    if (tripIds.length === 0) return covers;
+    try {
+      const items = await this.prisma.itinerary_item.findMany({
+        where: { itinerary_day: { itinerary_id: { in: tripIds } } },
+        select: { name: true, itinerary_day: { select: { itinerary_id: true } } },
+        orderBy: [{ itinerary_day: { day_number: 'asc' } }, { order_index: 'asc' }],
+      });
+      const names = [...new Set(items.map((i) => i.name))];
+      if (names.length === 0) return covers;
+      const listings = await this.prisma.travel_listing.findMany({
+        where: { name: { in: names } },
+        select: { name: true, photo_url: true, listing_image: { select: { url: true }, take: 1 } },
+      });
+      const photoByName = new Map<string, string>();
+      for (const l of listings) {
+        const url = l.photo_url ?? l.listing_image[0]?.url;
+        if (url && !photoByName.has(l.name)) photoByName.set(l.name, url);
+      }
+      for (const item of items) {
+        const tripId = item.itinerary_day.itinerary_id;
+        const url = photoByName.get(item.name);
+        if (url && !covers.has(tripId)) covers.set(tripId, url);
+      }
+    } catch {
+      // photos are optional
+    }
+    return covers;
   }
 
   async getTripById(userId: string, id: string) {

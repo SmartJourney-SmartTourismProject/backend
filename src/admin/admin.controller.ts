@@ -1,12 +1,14 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Put, Query } from '@nestjs/common';
 import { CurrentUser, Roles } from '../auth/index.js';
 import { AdminAnalyticsService } from './admin-analytics.service.js';
 import { AdminContentService } from './admin-content.service.js';
 import { AdminEntryFeesService } from './admin-entry-fees.service.js';
+import { AdminLlmService } from './admin-llm.service.js';
 import { AdminUsersService } from './admin-users.service.js';
 import { CreateEventDto } from './dto/create-event.dto.js';
 import { CreateListingDto } from './dto/create-listing.dto.js';
 import { EntryFeeQueryDto, RelinkEntryFeeDto } from './dto/entry-fee-query.dto.js';
+import { SetLlmChainDto, SetLlmKeyDto } from './dto/llm.dto.js';
 import { ModerationQueryDto } from './dto/moderation-query.dto.js';
 import { RejectDto } from './dto/reject.dto.js';
 import { BulkVerifyDto } from './dto/bulk-verify.dto.js';
@@ -31,6 +33,7 @@ export class AdminController {
     private readonly users: AdminUsersService,
     private readonly analytics: AdminAnalyticsService,
     private readonly entryFees: AdminEntryFeesService,
+    private readonly llm: AdminLlmService,
   ) {}
 
   @Get('stats')
@@ -204,5 +207,32 @@ export class AdminController {
     @Body() dto: AdminUpdateUserDto,
   ) {
     return this.users.update(adminId, id, dto);
+  }
+
+  // ---- AI models (provider chain + API keys) ----------------------------
+
+  @Get('llm')
+  getLlmConfig() {
+    return this.llm.getConfig();
+  }
+
+  @Put('llm/chain')
+  setLlmChain(@CurrentUser('id') adminId: string, @Body() dto: SetLlmChainDto) {
+    return this.llm.setChain(adminId, dto.chain);
+  }
+
+  @Put('llm/keys/:provider')
+  setLlmKey(@CurrentUser('id') adminId: string, @Param('provider') provider: string, @Body() dto: SetLlmKeyDto) {
+    return this.llm.setKey(adminId, provider, dto.key);
+  }
+
+  @Delete('llm/keys/:provider')
+  clearLlmKey(@CurrentUser('id') adminId: string, @Param('provider') provider: string) {
+    return this.llm.clearKey(adminId, provider);
+  }
+
+  @Post('llm/test')
+  testLlm() {
+    return this.llm.test();
   }
 }

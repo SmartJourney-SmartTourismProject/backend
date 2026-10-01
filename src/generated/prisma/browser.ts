@@ -151,6 +151,18 @@ export type travel_listing = Prisma.travel_listingModel
  */
 export type travel_time = Prisma.travel_timeModel
 /**
+ * Model app_setting
+ * Admin-changeable runtime settings (0017_llm_settings.sql). 'llm_provider_chain'
+ * = JSON array of "<provider>:<model>" read by the AI backend.
+ */
+export type app_setting = Prisma.app_settingModel
+/**
+ * Model llm_provider_key
+ * Provider API keys saved in Admin > AI models, AES-256-GCM encrypted under
+ * SETTINGS_ENCRYPTION_KEY. The plaintext never leaves the server.
+ */
+export type llm_provider_key = Prisma.llm_provider_keyModel
+/**
  * Model traveler_profile
  * 
  */

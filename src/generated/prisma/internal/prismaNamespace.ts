@@ -423,6 +423,8 @@ export const ModelName = {
   tag_vocabulary: 'tag_vocabulary',
   travel_listing: 'travel_listing',
   travel_time: 'travel_time',
+  app_setting: 'app_setting',
+  llm_provider_key: 'llm_provider_key',
   traveler_profile: 'traveler_profile',
   knowledge_chunk: 'knowledge_chunk',
   knowledge_document: 'knowledge_document'
@@ -441,7 +443,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "activity_log" | "admin_profile" | "ai_session" | "app_user" | "category" | "chat_message" | "chat_session" | "cost_reference" | "data_source" | "data_source_run" | "district" | "expense" | "geo_resolution" | "google_oauth_tokens" | "itinerary" | "itinerary_day" | "itinerary_item" | "listing_image" | "listing_entry_fee" | "local_event" | "schema_migration" | "spatial_ref_sys" | "tag_mapping" | "tag_vocabulary" | "travel_listing" | "travel_time" | "traveler_profile" | "knowledge_chunk" | "knowledge_document"
+    modelProps: "activity_log" | "admin_profile" | "ai_session" | "app_user" | "category" | "chat_message" | "chat_session" | "cost_reference" | "data_source" | "data_source_run" | "district" | "expense" | "geo_resolution" | "google_oauth_tokens" | "itinerary" | "itinerary_day" | "itinerary_item" | "listing_image" | "listing_entry_fee" | "local_event" | "schema_migration" | "spatial_ref_sys" | "tag_mapping" | "tag_vocabulary" | "travel_listing" | "travel_time" | "app_setting" | "llm_provider_key" | "traveler_profile" | "knowledge_chunk" | "knowledge_document"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2321,6 +2323,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    app_setting: {
+      payload: Prisma.$app_settingPayload<ExtArgs>
+      fields: Prisma.app_settingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.app_settingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$app_settingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.app_settingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$app_settingPayload>
+        }
+        findFirst: {
+          args: Prisma.app_settingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$app_settingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.app_settingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$app_settingPayload>
+        }
+        findMany: {
+          args: Prisma.app_settingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$app_settingPayload>[]
+        }
+        create: {
+          args: Prisma.app_settingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$app_settingPayload>
+        }
+        createMany: {
+          args: Prisma.app_settingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.app_settingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$app_settingPayload>[]
+        }
+        delete: {
+          args: Prisma.app_settingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$app_settingPayload>
+        }
+        update: {
+          args: Prisma.app_settingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$app_settingPayload>
+        }
+        deleteMany: {
+          args: Prisma.app_settingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.app_settingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.app_settingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$app_settingPayload>[]
+        }
+        upsert: {
+          args: Prisma.app_settingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$app_settingPayload>
+        }
+        aggregate: {
+          args: Prisma.App_settingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateApp_setting>
+        }
+        groupBy: {
+          args: Prisma.app_settingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.App_settingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.app_settingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.App_settingCountAggregateOutputType> | number
+        }
+      }
+    }
+    llm_provider_key: {
+      payload: Prisma.$llm_provider_keyPayload<ExtArgs>
+      fields: Prisma.llm_provider_keyFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.llm_provider_keyFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$llm_provider_keyPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.llm_provider_keyFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$llm_provider_keyPayload>
+        }
+        findFirst: {
+          args: Prisma.llm_provider_keyFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$llm_provider_keyPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.llm_provider_keyFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$llm_provider_keyPayload>
+        }
+        findMany: {
+          args: Prisma.llm_provider_keyFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$llm_provider_keyPayload>[]
+        }
+        create: {
+          args: Prisma.llm_provider_keyCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$llm_provider_keyPayload>
+        }
+        createMany: {
+          args: Prisma.llm_provider_keyCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.llm_provider_keyCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$llm_provider_keyPayload>[]
+        }
+        delete: {
+          args: Prisma.llm_provider_keyDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$llm_provider_keyPayload>
+        }
+        update: {
+          args: Prisma.llm_provider_keyUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$llm_provider_keyPayload>
+        }
+        deleteMany: {
+          args: Prisma.llm_provider_keyDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.llm_provider_keyUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.llm_provider_keyUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$llm_provider_keyPayload>[]
+        }
+        upsert: {
+          args: Prisma.llm_provider_keyUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$llm_provider_keyPayload>
+        }
+        aggregate: {
+          args: Prisma.Llm_provider_keyAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLlm_provider_key>
+        }
+        groupBy: {
+          args: Prisma.llm_provider_keyGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Llm_provider_keyGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.llm_provider_keyCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Llm_provider_keyCountAggregateOutputType> | number
+        }
+      }
+    }
     traveler_profile: {
       payload: Prisma.$traveler_profilePayload<ExtArgs>
       fields: Prisma.traveler_profileFieldRefs
@@ -2625,6 +2775,7 @@ export const App_userScalarFieldEnum = {
   role: 'role',
   is_active: 'is_active',
   location_enabled: 'location_enabled',
+  avatar_url: 'avatar_url',
   created_at: 'created_at',
   updated_at: 'updated_at',
   keycloak_id: 'keycloak_id'
@@ -2949,6 +3100,27 @@ export const Travel_timeScalarFieldEnum = {
 } as const
 
 export type Travel_timeScalarFieldEnum = (typeof Travel_timeScalarFieldEnum)[keyof typeof Travel_timeScalarFieldEnum]
+
+
+export const App_settingScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  updated_at: 'updated_at',
+  updated_by: 'updated_by'
+} as const
+
+export type App_settingScalarFieldEnum = (typeof App_settingScalarFieldEnum)[keyof typeof App_settingScalarFieldEnum]
+
+
+export const Llm_provider_keyScalarFieldEnum = {
+  provider: 'provider',
+  encrypted_key: 'encrypted_key',
+  last4: 'last4',
+  updated_at: 'updated_at',
+  updated_by: 'updated_by'
+} as const
+
+export type Llm_provider_keyScalarFieldEnum = (typeof Llm_provider_keyScalarFieldEnum)[keyof typeof Llm_provider_keyScalarFieldEnum]
 
 
 export const Traveler_profileScalarFieldEnum = {
@@ -3328,6 +3500,8 @@ export type GlobalOmitConfig = {
   tag_vocabulary?: Prisma.tag_vocabularyOmit
   travel_listing?: Prisma.travel_listingOmit
   travel_time?: Prisma.travel_timeOmit
+  app_setting?: Prisma.app_settingOmit
+  llm_provider_key?: Prisma.llm_provider_keyOmit
   traveler_profile?: Prisma.traveler_profileOmit
   knowledge_chunk?: Prisma.knowledge_chunkOmit
   knowledge_document?: Prisma.knowledge_documentOmit

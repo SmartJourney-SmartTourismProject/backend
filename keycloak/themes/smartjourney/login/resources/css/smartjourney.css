@@ -401,3 +401,153 @@ body#keycloak-bg::before {
     font-size: 1.5rem;
   }
 }
+
+/* ---- Motion --------------------------------------------------------------
+ * Mirrors the app's auth card (AuthCard.tsx): drifting mist behind a glass
+ * card that rises in with a soft glow, a light sweep on the primary button,
+ * and a shake when something goes wrong. All of it is switched off for
+ * visitors who ask for reduced motion (last block).
+ */
+
+/* Background: the mountain photo, blurred. No white mist layer on top. */
+body#keycloak-bg::before {
+  z-index: 1;
+}
+
+body#keycloak-bg::after {
+  content: '';
+  position: fixed;
+  inset: -2%;
+  z-index: 0;
+  pointer-events: none;
+  background: url('../img/hero-mountains.png') no-repeat center center;
+  background-size: cover;
+  filter: blur(8px);
+}
+
+.pf-v5-c-login {
+  z-index: 1;
+}
+
+/* Card: heavier blur, a 1px light edge, a soft brand-pink glow, and a rise-in. */
+.pf-v5-c-login__container {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 40px rgba(213, 82, 163, 0.25);
+  animation: sj-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Inputs: the focus ring fades in instead of snapping on. */
+.pf-v5-c-form-control {
+  transition: box-shadow 0.2s ease;
+}
+
+.pf-v5-c-form-control:focus-within {
+  box-shadow:
+    0 0 0 3px rgba(201, 179, 226, 0.6),
+    0 0 18px rgba(213, 82, 163, 0.25);
+}
+
+/* Primary button: lift on hover + a periodic light sweep. PatternFly already
+   uses ::after for the button border, so the sweep lives on ::before. */
+.pf-v5-c-button.pf-m-primary {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.15s ease;
+}
+
+.pf-v5-c-button.pf-m-primary:hover,
+.pf-v5-c-button.pf-m-primary:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 0 24px rgba(213, 82, 163, 0.45);
+}
+
+.pf-v5-c-button.pf-m-primary:active {
+  transform: scale(0.98);
+}
+
+.pf-v5-c-button.pf-m-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.35) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: sj-sheen 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Social button and alerts. */
+#kc-social-providers .pf-v5-c-login__main-footer-links-item-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+#kc-social-providers .pf-v5-c-login__main-footer-links-item-link {
+  transition:
+    background 0.15s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.pf-v5-c-alert.pf-m-danger,
+.pf-v5-c-helper-text__item.pf-m-error {
+  animation: sj-shake 0.5s ease-in-out 1;
+}
+
+@keyframes sj-rise {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sj-sheen {
+  0%,
+  55% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes sj-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body#keycloak-bg::after,
+  .pf-v5-c-login__container,
+  .pf-v5-c-button.pf-m-primary::before,
+  .pf-v5-c-alert.pf-m-danger,
+  .pf-v5-c-helper-text__item.pf-m-error {
+    animation: none;
+  }
+
+  .pf-v5-c-button.pf-m-primary,
+  .pf-v5-c-form-control,
+  #kc-social-providers .pf-v5-c-login__main-footer-links-item-link {
+    transition: none;
+  }
+}

@@ -19,6 +19,7 @@ function makePrisma() {
       findMany: vi.fn().mockResolvedValue([{ plan: { itinerary: [{ day: 1, items: [STOP] }] } }]),
     },
     itinerary: { findMany: vi.fn(), deleteMany: vi.fn() },
+    app_user: { findUnique: vi.fn().mockResolvedValue({ location_enabled: true }) },
   };
 }
 
@@ -126,6 +127,23 @@ describe('ChatService.sendMessage', () => {
 
     const assistantCreateCall = prisma.chat_message.create.mock.calls[1][0];
     expect(assistantCreateCall.data.plan).toBeUndefined();
+  });
+
+  it.each([
+    [true, { lat: 6.9, lon: 79.8 }],
+    [false, null],
+  ])('with location access %s, forwards client_gps as %j', async (enabled, expected) => {
+    const prisma = makePrisma();
+    const aiBackend = makeAiBackend();
+    prisma.app_user.findUnique.mockResolvedValue({ location_enabled: enabled });
+    prisma.chat_session.findFirst.mockResolvedValue({ id: 'session-1', ai_session_id: null });
+    prisma.chat_message.create.mockResolvedValue({ id: 'assistant-msg-1' });
+    aiBackend.planTrip.mockResolvedValue({ final_response: 'plan', itinerary: [], session_id: 'ai-session-1' });
+    const service = new ChatService(prisma as unknown as PrismaService, aiBackend as unknown as AiBackendService);
+
+    await service.sendMessage('user-1', 'session-1', { message: 'plan a trip', client_gps: { lat: 6.9, lon: 79.8 } });
+
+    expect(aiBackend.planTrip).toHaveBeenCalledWith(expect.objectContaining({ client_gps: expected }));
   });
 });
 

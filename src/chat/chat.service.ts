@@ -183,10 +183,18 @@ export class ChatService {
       data: { session_id: sessionId, role: 'user', content: dto.message },
     });
 
+    // "Enable location access" (Settings) is enforced here too, not only in
+    // the web app: with it off, a GPS fix is dropped whatever the client sent.
+    const user = await this.prisma.app_user.findUnique({
+      where: { id: userId },
+      select: { location_enabled: true },
+    });
+    const locationAllowed = user?.location_enabled ?? true;
+
     const aiResponse = await this.aiBackend.planTrip({
       message: dto.message,
       user_id: userId,
-      client_gps: dto.client_gps ?? null,
+      client_gps: locationAllowed ? (dto.client_gps ?? null) : null,
       // Omit on the first turn so the AI backend starts a fresh
       // conversation rather than treating an unset id as a real one.
       session_id: session.ai_session_id ?? undefined,
