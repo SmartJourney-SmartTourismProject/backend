@@ -136,7 +136,7 @@ Test from your computer: `ssh -i smartjourney_deploy deploy@<STATIC_IP> docker p
 | | `KEYCLOAK_DB_PASSWORD` | generated |
 | Keycloak | `KC_BOOTSTRAP_ADMIN_USERNAME`, `KC_BOOTSTRAP_ADMIN_PASSWORD` | e.g. `sjadmin` + generated, for the Keycloak admin console |
 | | `KEYCLOAK_WEB_CLIENT_SECRET` | generated (Vercel needs the **same** value, section 7) |
-| | `KEYCLOAK_AUDIENCE`, `KEYCLOAK_ADMIN_CLIENT_ID` | same values as your local `backend/.env` (defaults `account` / `smartjourney-backend`) |
+| | `KEYCLOAK_AUDIENCE`, `KEYCLOAK_ADMIN_CLIENT_ID` | same values as your local `backend/.env` (defaults `smartjourney-api` / `smartjourney-backend`) |
 | Caddy | `ACME_EMAIL` | your email (Let's Encrypt expiry notices) |
 | | `KEYCLOAK_ADMIN_CLIENT_SECRET` | **generated now.** Keycloak creates the `smartjourney-backend` client with this secret on first start, and NestJS uses the same value |
 | Google sign-in | `GOOGLE_SIGNIN_CLIENT_ID`, `GOOGLE_SIGNIN_CLIENT_SECRET` | same as local (section 5 updates the redirect URI) |
@@ -172,9 +172,9 @@ Google Calendar sync isn't deployed (the AI backend isn't public), so its client
 
 | Secret | Value |
 |---|---|
-| `LIGHTSAIL_HOST` | `STATIC_IP` |
-| `LIGHTSAIL_USER` | `deploy` |
-| `LIGHTSAIL_SSH_KEY` | the **private** key file `smartjourney_deploy`, whole contents including the BEGIN/END lines |
+| `SERVER_HOST` | `STATIC_IP` |
+| `SERVER_USER` | `deploy` |
+| `SERVER_SSH_KEY` | the **private** key file `smartjourney_deploy`, whole contents including the BEGIN/END lines |
 | `VERCEL_TOKEN` | Vercel → avatar → **Account Settings → Tokens → Create** (scope: your team or account; expiry: 30–60 days) |
 | `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` | run `npx vercel link` in `frontend-web`, pick the project, then copy `orgId` (starts with `team_`) and the project `id` (starts with `prj_`) from `.vercel/repo.json` (older Vercel CLI versions wrote `.vercel/project.json` instead). **Don't commit `.vercel/`** (it's gitignored). |
 
@@ -293,7 +293,7 @@ Put a calendar reminder for the day after evaluation.
 
 1. Download the final backup: `scp -i smartjourney_deploy deploy@<STATIC_IP>:/opt/smartjourney/backups/<latest>.dump .`
 2. **Lightsail:** delete the instance, then **release the static IP** (an unattached static IP is billed), then delete snapshots.
-3. **GitHub:** delete or disable the `LIGHTSAIL_*` secrets, and remove the deploy jobs or disable the workflows so pushes don't fail.
+3. **GitHub:** delete or disable the `SERVER_*` secrets, and remove the deploy jobs or disable the workflows so pushes don't fail.
 4. **Vercel:** keep the project as a portfolio piece (free) or delete it. Revoke the `VERCEL_TOKEN`.
 5. **Google Cloud:** remove the production redirect URI.
 6. **Anthropic / other paid keys:** revoke the production keys, or lower the spend limit to $0.
