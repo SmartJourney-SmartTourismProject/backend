@@ -157,29 +157,10 @@ jobs:
         if: steps.gate.outputs.enabled == 'true'
         run: |
           scp -i ~/.ssh/deploy_key \
-            deploy/compose.prod.yml deploy/Caddyfile deploy/compose.sh deploy/deploy.sh deploy/backup.sh \
+            deploy/compose.prod.yml deploy/Caddyfile deploy/compose.sh deploy/deploy.sh deploy/release.sh deploy/backup.sh \
             "$SERVER_USER@$SERVER_HOST:/opt/smartjourney/"
           ssh -i ~/.ssh/deploy_key "$SERVER_USER@$SERVER_HOST" 'chmod +x /opt/smartjourney/*.sh'
       - name: Migrate and deploy
         if: steps.gate.outputs.enabled == 'true'
         run: |
-          ssh -i ~/.ssh/deploy_key "$SERVER_USER@$SERVER_HOST" bash -se <<EOF
-          set -euo pipefail
-          cd /opt/smartjourney
-          SHA=${{ github.sha }}
-
-          # Infrastructure (no-ops when already running).
-          ./compose.sh up -d db keycloak_db redis
-
-          # New SQL migrations first: they are additive, so the old backend
-          # keeps working until the new one replaces it.
-          BACKEND_TAG=\$SHA ./compose.sh run --rm migrate
-
-          if [ "${{ needs.build.outputs.db_changed }}" = true ]; then ./deploy.sh db \$SHA; fi
-          if [ "${{ needs.build.outputs.keycloak_changed }}" = true ]; then ./deploy.sh keycloak \$SHA; fi
-          ./deploy.sh backend \$SHA
-
-          # First deploy only: bring up whatever is not running yet.
-          ./compose.sh up -d keycloak caddy
-          ./compose.sh ps
-          EOF
+          ssh -i ~/.ssh/deploy_key "$SERVER_USER@$SERVER_HOST"             "/opt/smartjourney/release.sh ${{ github.sha }} ${{ needs.build.outputs.db_changed }} ${{ needs.build.outputs.keycloak_changed }}"
