@@ -2775,10 +2775,10 @@ export const App_userScalarFieldEnum = {
   role: 'role',
   is_active: 'is_active',
   location_enabled: 'location_enabled',
-  avatar_url: 'avatar_url',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  keycloak_id: 'keycloak_id'
+  keycloak_id: 'keycloak_id',
+  avatar_url: 'avatar_url'
 } as const
 
 export type App_userScalarFieldEnum = (typeof App_userScalarFieldEnum)[keyof typeof App_userScalarFieldEnum]

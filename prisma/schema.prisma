@@ -52,21 +52,21 @@ model app_user {
   role                                             String               @default("traveler")
   is_active                                        Boolean              @default(true)
   location_enabled                                 Boolean              @default(true)
-  avatar_url                                       String?
   created_at                                       DateTime             @default(now()) @db.Timestamptz(6)
   updated_at                                       DateTime             @default(now()) @db.Timestamptz(6)
   keycloak_id                                      String?              @unique @db.Uuid
+  avatar_url                                       String?
   activity_log                                     activity_log[]
   admin_profile_admin_profile_granted_byToapp_user admin_profile[]      @relation("admin_profile_granted_byToapp_user")
   admin_profile_admin_profile_user_idToapp_user    admin_profile?       @relation("admin_profile_user_idToapp_user")
   ai_session                                       ai_session[]
+  app_setting                                      app_setting[]
   chat_session                                     chat_session[]
   google_oauth_tokens                              google_oauth_tokens?
   itinerary                                        itinerary[]
   listing_entry_fee                                listing_entry_fee[]
-  traveler_profile                                 traveler_profile?
-  app_setting                                      app_setting[]
   llm_provider_key                                 llm_provider_key[]
+  traveler_profile                                 traveler_profile?
 }
 
 model category {
