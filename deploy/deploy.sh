@@ -29,6 +29,7 @@ esac
 
 touch .tags
 COMPOSE=(./compose.sh)
+PULL_RETRIES="${PULL_RETRIES:-3}"
 
 current_tag() { grep -E "^${VAR}=" .tags | tail -n1 | cut -d= -f2- || true; }
 set_tag() {
@@ -67,7 +68,15 @@ echo ">> $SERVICE: ${PREVIOUS:-<none>} -> $TAG"
 try_deploy() {
   set_tag "$TAG"
   if [ "${DEPLOY_SKIP_PULL:-0}" != 1 ]; then
-    "${COMPOSE[@]}" pull "$SERVICE" || return 1
+    local attempt
+    for attempt in $(seq 1 "$PULL_RETRIES"); do
+      if "${COMPOSE[@]}" pull "$SERVICE"; then
+        break
+      fi
+      [ "$attempt" -lt "$PULL_RETRIES" ] || return 1
+      echo "!! pull failed for $SERVICE (attempt $attempt/$PULL_RETRIES), retrying..." >&2
+      sleep 3
+    done
   fi
   "${COMPOSE[@]}" up -d --no-deps "$SERVICE" || return 1
   wait_healthy
