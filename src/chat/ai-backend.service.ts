@@ -32,6 +32,8 @@ export class AiBackendService {
       this.http
         .post<AiTripPlanResponse>(`${this.baseUrl}/trip-plan`, request, {
           timeout: this.timeoutMs,
+          // Shared secret the AI backend requires on /trip-plan (it has no auth of its own).
+          headers: { 'X-Internal-Token': this.config.get<string>('INTERNAL_API_TOKEN', '') },
         })
         .pipe(
           catchError((error: AxiosError) => {
