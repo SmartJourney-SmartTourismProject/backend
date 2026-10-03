@@ -1,4 +1,4 @@
-# Production stack for the single Lightsail server (deploy/MANUAL_SETUP.md).
+# Production stack for the single EC2 server (deploy/MANUAL_SETUP.md).
 # Lives in /opt/smartjourney next to .env. CD copies this folder there and
 # updates image tags with deploy.sh - never `docker compose build` on the box.
 #

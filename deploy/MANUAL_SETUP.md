@@ -7,7 +7,7 @@ Everything the CD pipelines **can't** do for you: account setup, clicking throug
 | Part | Where | Cost |
 |---|---|---|
 | Next.js frontend | Vercel Hobby | $0 |
-| NestJS API, AI backend, Keycloak, Redis, Postgres (PostGIS + pgvector), Keycloak's Postgres, Caddy (HTTPS) | One AWS Lightsail 4 GB instance, Mumbai | ~$24 for the month |
+| NestJS API, AI backend, Keycloak, Redis, Postgres (PostGIS + pgvector), Keycloak's Postgres, Caddy (HTTPS) | One AWS EC2 instance (2 vCPU / 4 GB, e.g. `t3.medium`), Mumbai | pay-as-you-go; check AWS Billing |
 | HTTPS hostnames | `sslip.io` (free, no domain to buy) + Let's Encrypt via Caddy | $0 |
 | Docker images | GitHub Container Registry (GHCR) | $0 |
 
@@ -21,7 +21,7 @@ Keep these in a password manager, **not** in git. You'll fill them in as you go.
 
 | Name | Example / where it comes from |
 |---|---|
-| `STATIC_IP` | Lightsail static IP, e.g. `13.233.10.20` (section 2) |
+| `STATIC_IP` | EC2 Elastic IP, e.g. `13.233.10.20` (section 2) |
 | `IP_DASHED` | Same IP with dashes, e.g. `13-233-10-20` |
 | API URL | `https://api.<IP_DASHED>.sslip.io` |
 | Auth URL | `https://auth.<IP_DASHED>.sslip.io` |
@@ -55,32 +55,34 @@ The frontend URL is needed by the backend (CORS) and by Keycloak (allowed redire
 
 ---
 
-## 2. Lightsail instance
+## 2. EC2 instance
 
-1. Open <https://lightsail.aws.amazon.com>, **Create instance**:
-   - **Region:** Mumbai (`ap-south-1`), any zone.
-   - **Platform:** Linux/Unix. **Blueprint:** OS Only → **Ubuntu 24.04 LTS**.
-   - **SSH key:** use the default key, or upload your own public key.
-   - **Plan:** the **4 GB RAM / 2 vCPU** plan (~$24/month).
-   - **Name:** `smartjourney-prod`. Click **Create**.
-2. **Networking tab → Create static IP**, attach it to `smartjourney-prod`. Write down `STATIC_IP` and `IP_DASHED`.
-3. **Networking tab → IPv4 Firewall**, so that **exactly** these rules exist:
-   | Application | Protocol | Port | Source |
+1. Open **EC2 → Instances → Launch instances**:
+   - **Region:** Mumbai (`ap-south-1`).
+   - **Name:** `smartjourney-prod`.
+   - **AMI:** **Ubuntu Server 24.04 LTS**.
+   - **Instance type:** 2 vCPU / 4 GB RAM, e.g. **`t3.medium`**.
+   - **Key pair:** create or choose one (`.pem`), and keep it safe.
+   - **Storage:** at least **30 GB gp3**.
+   - **Network settings:** create a security group `smartjourney-prod-sg` (rules in step 3).
+2. **EC2 → Elastic IPs → Allocate Elastic IP address**, then **Associate** it with `smartjourney-prod`. Write down `STATIC_IP` and `IP_DASHED`.
+3. **Security group inbound rules**, so that **exactly** these exist:
+   | Type | Protocol | Port | Source |
    |---|---|---|---|
-   | SSH | TCP | 22 | **Your IP only** (tick "Restrict to IP address") |
-   | HTTP | TCP | 80 | Any (Let's Encrypt needs this) |
-   | HTTPS | TCP | 443 | Any |
+   | SSH | TCP | 22 | see note below |
+   | HTTP | TCP | 80 | 0.0.0.0/0 (Let's Encrypt needs this) |
+   | HTTPS | TCP | 443 | 0.0.0.0/0 |
 
    Delete anything else. **Never** open 5432, 6379, 3001, 8000 or 8080.
 
-   Because SSH is restricted to your IP, GitHub Actions also needs SSH access. Either allow port 22 from anywhere **and** rely on key-only login (the Ubuntu default), or keep it restricted and add GitHub's IP ranges. For a one-month project, **allow 22 from anywhere with key-only auth**. That's simpler, and password login is disabled by default on Lightsail.
-4. **Snapshots:** nothing yet. You'll take one after section 8.
+   GitHub Actions deploys over SSH, so it needs port 22 too. Either allow 22 from anywhere **and** rely on key-only login (the Ubuntu AMI default; password login is disabled), or keep it restricted to your IP and add GitHub's IP ranges. For a one-month project, **allow 22 from anywhere with key-only auth**.
+4. **Snapshots:** nothing yet. You'll take an EBS snapshot after section 8.
 
 ---
 
 ## 3. Server preparation (one time, over SSH)
 
-Connect with the browser SSH button in Lightsail, or `ssh -i <lightsail-key>.pem ubuntu@<STATIC_IP>`.
+Connect with **EC2 Instance Connect** in the console, or `ssh -i <your-key>.pem ubuntu@<STATIC_IP>`.
 
 ### 3.1 Updates, Docker, automatic security patches
 ```bash
@@ -265,7 +267,7 @@ crontab -e
 ```
 Next day: check that `ls /opt/smartjourney/backups` shows a dated `.dump`. Once, test-restore it into a scratch database. A backup you've never restored isn't a backup.
 
-Then, in **Lightsail → Snapshots → Create snapshot**, take your known-good rollback point.
+Then, in **EC2 → Volumes → (the instance's volume) → Actions → Create snapshot**, take your known-good rollback point.
 
 ---
 
@@ -283,7 +285,7 @@ Then, in **Lightsail → Snapshots → Create snapshot**, take your known-good r
 ## 10. Evaluation day
 
 - **Freeze:** no pushes to `main` (backend, ai-backend) or `new-main` (frontend-web) for 24 h before.
-- **The day before:** take a Lightsail snapshot, and do a full dress rehearsal of the demo path on the real URLs.
+- **The day before:** take an EBS snapshot, and do a full dress rehearsal of the demo path on the real URLs.
 - **15 minutes before:** open the site, sign in and plan one trip to warm up Keycloak and the AI backend.
 - Check **Admin → AI models → Test** before the demo. If Gemini is out of quota, Claude Haiku takes over automatically.
 
@@ -292,9 +294,9 @@ Then, in **Lightsail → Snapshots → Create snapshot**, take your known-good r
 Put a calendar reminder for the day after evaluation.
 
 1. Download the final backup: `scp -i smartjourney_deploy deploy@<STATIC_IP>:/opt/smartjourney/backups/<latest>.dump .`
-2. **Lightsail:** delete the instance, then **release the static IP** (an unattached static IP is billed), then delete snapshots.
+2. **EC2:** terminate the instance, then **release the Elastic IP** (an unattached Elastic IP is billed), then delete the EBS snapshots and any leftover volumes.
 3. **GitHub:** delete or disable the `SERVER_*` secrets, and remove the deploy jobs or disable the workflows so pushes don't fail.
 4. **Vercel:** keep the project as a portfolio piece (free) or delete it. Revoke the `VERCEL_TOKEN`.
 5. **Google Cloud:** remove the production redirect URI.
 6. **Anthropic / other paid keys:** revoke the production keys, or lower the spend limit to $0.
-7. **AWS Billing:** check the next bill shows **$0** for Lightsail. Delete the Budget last.
+7. **AWS Billing:** check the next bill shows **$0** for EC2. Delete the Budget last.
