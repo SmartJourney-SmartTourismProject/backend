@@ -144,6 +144,7 @@ Test from your computer: `ssh -i smartjourney_deploy deploy@<STATIC_IP> docker p
 | Google sign-in | `GOOGLE_SIGNIN_CLIENT_ID`, `GOOGLE_SIGNIN_CLIENT_SECRET` | same as local (section 5 updates the redirect URI) |
 | Email (password reset) | `KC_SMTP_HOST=smtp.gmail.com`, `KC_SMTP_PORT=587`, `KC_SMTP_AUTH=true`, `KC_SMTP_STARTTLS=true`, `KC_SMTP_SSL=false`, `KC_SMTP_USER`, `KC_SMTP_FROM`, `KC_SMTP_FROM_DISPLAY_NAME=SmartJourney` | a Gmail address |
 | | `KC_SMTP_PASSWORD` | a **Gmail app password** (Google Account → Security → 2-Step Verification → App passwords), not the account password |
+| Email (notifications) | `MAIL_HOST`, `MAIL_PORT`, `MAIL_SECURE`, `MAIL_USER`, `MAIL_PASSWORD`, `MAIL_FROM` | **optional, leave empty** to send trip reminders and weather/budget alerts through the `KC_SMTP_*` account above. Fill them only to use a different sender. Weather alerts also need `OPENWEATHER_API_KEY` |
 | Shared secrets | `SETTINGS_ENCRYPTION_KEY` | generated (base64, 32 bytes) |
 | | `INTERNAL_API_TOKEN` | generated |
 | AI providers | `GEMINI_API_KEY`, `GROQ_API_KEY`, `ANTHROPIC_API_KEY`, `OPENWEATHER_API_KEY`, `ORS_API_KEY`, `BOOKING_RAPIDAPI_KEY`, `BOOKING_RAPIDAPI_HOST`, `TICKETMASTER_API_KEY`, `LLM_PROVIDER_CHAIN`, `USD_LKR_RATE` | same as your local `ai-backend/.env` |
@@ -278,6 +279,7 @@ Then, in **EC2 → Volumes → (the instance's volume) → Actions → Create sn
   - [ ] Sign up and sign in, plus Google sign-in and a password reset email.
   - [ ] Plan a trip in chat (the card says `llm`, not `fallback`), save it, then open Saved itineraries.
   - [ ] Explore, then add a budget expense.
+  - [ ] Settings → Notifications → turn on **Email notifications** → **Send test email**, and check it arrives (look in Spam the first time).
   - [ ] Admin → AI models → Test.
 - [ ] Each repo's Actions tab shows its last run green through deploy (`main` for backend and ai-backend, `new-main` for frontend-web).
 - [ ] AWS Billing shows the Budget and no unexpected services.
