@@ -1,6 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
 import { BudgetService } from './budget.service.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
+import type { NotificationsService } from '../notifications/notifications.service.js';
+
+const NOTIFICATIONS = { budgetChanged: vi.fn().mockResolvedValue(false) } as unknown as NotificationsService;
 
 function makePrisma() {
   return {
@@ -17,7 +20,7 @@ describe('BudgetService ownership', () => {
     const prisma = makePrisma();
     prisma.itinerary.findFirst.mockResolvedValue(null);
     prisma.expense.findFirst.mockResolvedValue(null);
-    const service = new BudgetService(prisma as unknown as PrismaService);
+    const service = new BudgetService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     await expect(service.listExpenses('user-1', 'foreign-trip')).rejects.toThrow(NotFoundException);
     await expect(service.getTripBudget('user-1', 'foreign-trip')).rejects.toThrow(NotFoundException);
@@ -31,7 +34,7 @@ describe('BudgetService.addExpense', () => {
     const prisma = makePrisma();
     prisma.itinerary.findFirst.mockResolvedValue(OWNED_TRIP);
     prisma.expense.create.mockResolvedValue({ id: 'exp-1' });
-    const service = new BudgetService(prisma as unknown as PrismaService);
+    const service = new BudgetService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     await service.addExpense('user-1', 'trip-1', { category: 'food', amount: 500 });
 
@@ -46,7 +49,7 @@ describe('BudgetService.updateExpense', () => {
     const prisma = makePrisma();
     prisma.expense.findFirst.mockResolvedValue({ id: 'exp-1' });
     prisma.expense.update.mockResolvedValue({ id: 'exp-1' });
-    const service = new BudgetService(prisma as unknown as PrismaService);
+    const service = new BudgetService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     await service.updateExpense('user-1', 'exp-1', { amount: 750 });
 
@@ -71,7 +74,7 @@ describe('BudgetService.getTripBudget', () => {
 
   it('reports no_budget when neither budget nor estimated_cost is set', async () => {
     const prisma = setup({ spent: 100 });
-    const service = new BudgetService(prisma as unknown as PrismaService);
+    const service = new BudgetService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     const result = await service.getTripBudget('user-1', 'trip-1');
 
@@ -81,7 +84,7 @@ describe('BudgetService.getTripBudget', () => {
 
   it('falls back to estimated_cost when budget is not set', async () => {
     const prisma = setup({ estimated_cost: 1000, spent: 100 });
-    const service = new BudgetService(prisma as unknown as PrismaService);
+    const service = new BudgetService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     const result = await service.getTripBudget('user-1', 'trip-1');
 
@@ -90,19 +93,19 @@ describe('BudgetService.getTripBudget', () => {
   });
 
   it('reports on_track, watch, and over_budget at the right thresholds', async () => {
-    const service = new BudgetService(setup({ budget: 1000, spent: 500 }) as unknown as PrismaService);
+    const service = new BudgetService(setup({ budget: 1000, spent: 500 }) as unknown as PrismaService, NOTIFICATIONS);
     expect((await service.getTripBudget('user-1', 'trip-1')).status).toBe('on_track');
 
-    const watchService = new BudgetService(setup({ budget: 1000, spent: 850 }) as unknown as PrismaService);
+    const watchService = new BudgetService(setup({ budget: 1000, spent: 850 }) as unknown as PrismaService, NOTIFICATIONS);
     expect((await watchService.getTripBudget('user-1', 'trip-1')).status).toBe('watch');
 
-    const overService = new BudgetService(setup({ budget: 1000, spent: 1000 }) as unknown as PrismaService);
+    const overService = new BudgetService(setup({ budget: 1000, spent: 1000 }) as unknown as PrismaService, NOTIFICATIONS);
     expect((await overService.getTripBudget('user-1', 'trip-1')).status).toBe('over_budget');
   });
 
   it('uses total spend (not per-day) as the daily average when no days are planned', async () => {
     const prisma = setup({ budget: 1000, spent: 300, plannedDays: 0 });
-    const service = new BudgetService(prisma as unknown as PrismaService);
+    const service = new BudgetService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     const result = await service.getTripBudget('user-1', 'trip-1');
 
@@ -111,7 +114,7 @@ describe('BudgetService.getTripBudget', () => {
 
   it('divides spend across planned days when there are any', async () => {
     const prisma = setup({ budget: 1000, spent: 300, plannedDays: 3 });
-    const service = new BudgetService(prisma as unknown as PrismaService);
+    const service = new BudgetService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     const result = await service.getTripBudget('user-1', 'trip-1');
 
@@ -121,7 +124,7 @@ describe('BudgetService.getTripBudget', () => {
   it('computes by_category percentages against total spend, and 0% when nothing was spent', async () => {
     const prisma = setup({ budget: 1000, spent: 0 });
     prisma.expense.groupBy.mockResolvedValue([{ category: 'food', _sum: { amount: 0 } }]);
-    const service = new BudgetService(prisma as unknown as PrismaService);
+    const service = new BudgetService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     const result = await service.getTripBudget('user-1', 'trip-1');
 
@@ -133,7 +136,7 @@ describe('BudgetService.getAllTripsSummary', () => {
   it('returns [] without querying expenses when the user has no trips', async () => {
     const prisma = makePrisma();
     prisma.itinerary.findMany.mockResolvedValue([]);
-    const service = new BudgetService(prisma as unknown as PrismaService);
+    const service = new BudgetService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     const result = await service.getAllTripsSummary('user-1');
 
@@ -148,7 +151,7 @@ describe('BudgetService.getAllTripsSummary', () => {
       { id: 'trip-2', title: 'B', budget: null, estimated_cost: null, currency: 'LKR', district: null },
     ]);
     prisma.expense.groupBy.mockResolvedValue([{ itinerary_id: 'trip-1', _sum: { amount: 200 } }]);
-    const service = new BudgetService(prisma as unknown as PrismaService);
+    const service = new BudgetService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     const result = await service.getAllTripsSummary('user-1');
 

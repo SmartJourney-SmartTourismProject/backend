@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 import { SaveTripDto } from './dto/save-trip.dto.js';
 import { TripsQueryDto } from './dto/trips-query.dto.js';
 import { UpdateTripDto } from './dto/update-trip.dto.js';
@@ -51,7 +52,10 @@ export function effectiveStatus<T extends { status: string; end_date: Date | nul
 
 @Injectable()
 export class TripsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+  ) {}
 
   private async resolveDistrictId(destination?: string): Promise<string | null> {
     if (!destination) return null;
@@ -118,6 +122,14 @@ export class TripsService {
         },
       },
       include: { itinerary_day: { include: { itinerary_item: true } } },
+    });
+    // Confirmation email (if the user opted in) - not awaited, the save
+    // doesn't depend on it.
+    void this.notifications.tripSaved(userId, {
+      id: created.id,
+      title: created.title,
+      start_date: created.start_date,
+      days: dto.itinerary.length,
     });
     return effectiveStatus(created);
   }

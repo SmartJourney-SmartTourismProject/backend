@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -9,11 +10,14 @@ import { ChatModule } from './chat/chat.module.js';
 import { TripsModule } from './trips/trips.module.js';
 import { BudgetModule } from './budget/budget.module.js';
 import { AdminModule } from './admin/admin.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
 import { HealthController } from './health/health.controller.js';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    // Cron jobs - the daily trip-reminder / weather-alert emails.
+    ScheduleModule.forRoot(),
     PrismaModule,
     // Registers the global JwtAuthGuard + RolesGuard - every route needs a
     // Keycloak token unless marked @Public().
@@ -23,6 +27,7 @@ import { HealthController } from './health/health.controller.js';
     TripsModule,
     BudgetModule,
     AdminModule,
+    NotificationsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

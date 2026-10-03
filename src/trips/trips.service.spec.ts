@@ -1,6 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
 import { TripsService, effectiveStatus, todayInSriLanka } from './trips.service.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
+import type { NotificationsService } from '../notifications/notifications.service.js';
+
+const NOTIFICATIONS = { tripSaved: vi.fn().mockResolvedValue(false) } as unknown as NotificationsService;
 
 function makePrisma() {
   return {
@@ -23,7 +26,7 @@ describe('TripsService.saveTrip', () => {
     prisma.itinerary.findFirst.mockResolvedValue(null); // no chat_message_id dedupe hit
     prisma.district.findFirst.mockResolvedValue({ id: 'district-1' });
     prisma.itinerary.create.mockResolvedValue({ id: 'trip-1' });
-    const service = new TripsService(prisma as unknown as PrismaService);
+    const service = new TripsService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     const dto = {
       destination: 'Kandy',
@@ -71,7 +74,7 @@ describe('TripsService.saveTrip', () => {
   it('returns the existing trip instead of creating a duplicate when chat_message_id already saved', async () => {
     const prisma = makePrisma();
     prisma.itinerary.findFirst.mockResolvedValue({ id: 'existing-trip' });
-    const service = new TripsService(prisma as unknown as PrismaService);
+    const service = new TripsService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     const result = await service.saveTrip('user-1', {
       chat_message_id: 'msg-1',
@@ -85,7 +88,7 @@ describe('TripsService.saveTrip', () => {
   it('leaves district_id null when no destination is given, without querying district', async () => {
     const prisma = makePrisma();
     prisma.itinerary.create.mockResolvedValue({ id: 'trip-2' });
-    const service = new TripsService(prisma as unknown as PrismaService);
+    const service = new TripsService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     await service.saveTrip('user-1', { itinerary: [{ day: 1, items: [] }] } as Parameters<
       TripsService['saveTrip']
@@ -105,7 +108,7 @@ describe('TripsService.listTrips', () => {
   it('scopes Drafts/Upcoming to the caller and to trips that have not ended', async () => {
     const prisma = makePrisma();
     prisma.itinerary.findMany.mockResolvedValue([]);
-    const service = new TripsService(prisma as unknown as PrismaService);
+    const service = new TripsService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     await service.listTrips('user-1', { status: 'upcoming' });
 
@@ -123,7 +126,7 @@ describe('TripsService.listTrips', () => {
   it('Past includes trips whose last day is over, whatever their stored status', async () => {
     const prisma = makePrisma();
     prisma.itinerary.findMany.mockResolvedValue([{ id: 't1', status: 'upcoming', end_date: YESTERDAY }]);
-    const service = new TripsService(prisma as unknown as PrismaService);
+    const service = new TripsService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     const trips = await service.listTrips('user-1', { status: 'past' });
 
@@ -148,7 +151,7 @@ describe('TripsService dates', () => {
     prisma.itinerary.findFirst.mockResolvedValue(null);
     prisma.district.findFirst.mockResolvedValue(null);
     prisma.itinerary.create.mockResolvedValue({ id: 'trip-1', status: 'draft', end_date: null });
-    const service = new TripsService(prisma as unknown as PrismaService);
+    const service = new TripsService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     await service.saveTrip('user-1', {
       destination: 'Kandy',
@@ -181,7 +184,7 @@ describe('TripsService dates', () => {
     prisma.itinerary.update.mockReturnValue('trip-update');
     prisma.itinerary_day.update.mockImplementation((args) => args);
     prisma.$transaction.mockResolvedValue([{ id: 'trip-1', status: 'upcoming', end_date: null }]);
-    const service = new TripsService(prisma as unknown as PrismaService);
+    const service = new TripsService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     await service.updateTrip('user-1', 'trip-1', { start_date: '2026-12-10' });
 
@@ -198,7 +201,7 @@ describe('TripsService dates', () => {
     prisma.itinerary.findFirst.mockResolvedValue(tripWithDays('draft'));
     prisma.itinerary_day.update.mockImplementation((args) => args);
     prisma.$transaction.mockResolvedValue([{ id: 'trip-1', status: 'draft', end_date: null }]);
-    const service = new TripsService(prisma as unknown as PrismaService);
+    const service = new TripsService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     await service.updateTrip('user-1', 'trip-1', { start_date: '2026-12-10', status: 'draft' });
 
@@ -210,7 +213,7 @@ describe('TripsService dates', () => {
     prisma.itinerary.findFirst.mockResolvedValue(tripWithDays('upcoming'));
     prisma.itinerary_day.update.mockImplementation((args) => args);
     prisma.$transaction.mockResolvedValue([{ id: 'trip-1', status: 'upcoming', end_date: null }]);
-    const service = new TripsService(prisma as unknown as PrismaService);
+    const service = new TripsService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     await service.updateTrip('user-1', 'trip-1', { start_date: '2026-12-10' });
 
@@ -222,7 +225,7 @@ describe('TripsService ownership', () => {
   it('getTripById throws NotFound for a trip that belongs to someone else', async () => {
     const prisma = makePrisma();
     prisma.itinerary.findFirst.mockResolvedValue(null);
-    const service = new TripsService(prisma as unknown as PrismaService);
+    const service = new TripsService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     await expect(service.getTripById('user-1', 'someone-elses-trip')).rejects.toThrow(NotFoundException);
   });
@@ -230,7 +233,7 @@ describe('TripsService ownership', () => {
   it('updateTrip and deleteTrip both reject a foreign trip before touching it', async () => {
     const prisma = makePrisma();
     prisma.itinerary.findFirst.mockResolvedValue(null);
-    const service = new TripsService(prisma as unknown as PrismaService);
+    const service = new TripsService(prisma as unknown as PrismaService, NOTIFICATIONS);
 
     await expect(service.updateTrip('user-1', 'foreign-trip', { title: 'x' })).rejects.toThrow(NotFoundException);
     await expect(service.deleteTrip('user-1', 'foreign-trip')).rejects.toThrow(NotFoundException);

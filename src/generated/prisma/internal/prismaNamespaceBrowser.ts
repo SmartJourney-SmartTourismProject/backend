@@ -81,7 +81,9 @@ export const ModelName = {
   llm_provider_key: 'llm_provider_key',
   traveler_profile: 'traveler_profile',
   knowledge_chunk: 'knowledge_chunk',
-  knowledge_document: 'knowledge_document'
+  knowledge_document: 'knowledge_document',
+  notification_settings: 'notification_settings',
+  notification: 'notification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -531,6 +533,34 @@ export const Knowledge_documentScalarFieldEnum = {
 } as const
 
 export type Knowledge_documentScalarFieldEnum = (typeof Knowledge_documentScalarFieldEnum)[keyof typeof Knowledge_documentScalarFieldEnum]
+
+
+export const Notification_settingsScalarFieldEnum = {
+  user_id: 'user_id',
+  trip_reminders: 'trip_reminders',
+  weather_alerts: 'weather_alerts',
+  budget_alerts: 'budget_alerts',
+  push_enabled: 'push_enabled',
+  email_enabled: 'email_enabled',
+  sound_enabled: 'sound_enabled',
+  sound_volume: 'sound_volume',
+  updated_at: 'updated_at'
+} as const
+
+export type Notification_settingsScalarFieldEnum = (typeof Notification_settingsScalarFieldEnum)[keyof typeof Notification_settingsScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  type: 'type',
+  channel: 'channel',
+  dedupe_key: 'dedupe_key',
+  subject: 'subject',
+  created_at: 'created_at'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const SortOrder = {
