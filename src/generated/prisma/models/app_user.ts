@@ -248,6 +248,8 @@ export type app_userWhereInput = {
   itinerary?: Prisma.ItineraryListRelationFilter
   listing_entry_fee?: Prisma.Listing_entry_feeListRelationFilter
   llm_provider_key?: Prisma.Llm_provider_keyListRelationFilter
+  notification?: Prisma.NotificationListRelationFilter
+  notification_settings?: Prisma.XOR<Prisma.Notification_settingsNullableScalarRelationFilter, Prisma.notification_settingsWhereInput> | null
   traveler_profile?: Prisma.XOR<Prisma.Traveler_profileNullableScalarRelationFilter, Prisma.traveler_profileWhereInput> | null
 }
 
@@ -274,6 +276,8 @@ export type app_userOrderByWithRelationInput = {
   itinerary?: Prisma.itineraryOrderByRelationAggregateInput
   listing_entry_fee?: Prisma.listing_entry_feeOrderByRelationAggregateInput
   llm_provider_key?: Prisma.llm_provider_keyOrderByRelationAggregateInput
+  notification?: Prisma.notificationOrderByRelationAggregateInput
+  notification_settings?: Prisma.notification_settingsOrderByWithRelationInput
   traveler_profile?: Prisma.traveler_profileOrderByWithRelationInput
 }
 
@@ -303,6 +307,8 @@ export type app_userWhereUniqueInput = Prisma.AtLeast<{
   itinerary?: Prisma.ItineraryListRelationFilter
   listing_entry_fee?: Prisma.Listing_entry_feeListRelationFilter
   llm_provider_key?: Prisma.Llm_provider_keyListRelationFilter
+  notification?: Prisma.NotificationListRelationFilter
+  notification_settings?: Prisma.XOR<Prisma.Notification_settingsNullableScalarRelationFilter, Prisma.notification_settingsWhereInput> | null
   traveler_profile?: Prisma.XOR<Prisma.Traveler_profileNullableScalarRelationFilter, Prisma.traveler_profileWhereInput> | null
 }, "id" | "email" | "keycloak_id">
 
@@ -365,6 +371,8 @@ export type app_userCreateInput = {
   itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
 }
 
@@ -391,6 +399,8 @@ export type app_userUncheckedCreateInput = {
   itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
 }
 
@@ -417,6 +427,8 @@ export type app_userUpdateInput = {
   itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
 }
 
@@ -443,6 +455,8 @@ export type app_userUncheckedUpdateInput = {
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
@@ -716,6 +730,34 @@ export type app_userUpdateOneRequiredWithoutTraveler_profileNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.app_userUpdateToOneWithWhereWithoutTraveler_profileInput, Prisma.app_userUpdateWithoutTraveler_profileInput>, Prisma.app_userUncheckedUpdateWithoutTraveler_profileInput>
 }
 
+export type app_userCreateNestedOneWithoutNotification_settingsInput = {
+  create?: Prisma.XOR<Prisma.app_userCreateWithoutNotification_settingsInput, Prisma.app_userUncheckedCreateWithoutNotification_settingsInput>
+  connectOrCreate?: Prisma.app_userCreateOrConnectWithoutNotification_settingsInput
+  connect?: Prisma.app_userWhereUniqueInput
+}
+
+export type app_userUpdateOneRequiredWithoutNotification_settingsNestedInput = {
+  create?: Prisma.XOR<Prisma.app_userCreateWithoutNotification_settingsInput, Prisma.app_userUncheckedCreateWithoutNotification_settingsInput>
+  connectOrCreate?: Prisma.app_userCreateOrConnectWithoutNotification_settingsInput
+  upsert?: Prisma.app_userUpsertWithoutNotification_settingsInput
+  connect?: Prisma.app_userWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.app_userUpdateToOneWithWhereWithoutNotification_settingsInput, Prisma.app_userUpdateWithoutNotification_settingsInput>, Prisma.app_userUncheckedUpdateWithoutNotification_settingsInput>
+}
+
+export type app_userCreateNestedOneWithoutNotificationInput = {
+  create?: Prisma.XOR<Prisma.app_userCreateWithoutNotificationInput, Prisma.app_userUncheckedCreateWithoutNotificationInput>
+  connectOrCreate?: Prisma.app_userCreateOrConnectWithoutNotificationInput
+  connect?: Prisma.app_userWhereUniqueInput
+}
+
+export type app_userUpdateOneRequiredWithoutNotificationNestedInput = {
+  create?: Prisma.XOR<Prisma.app_userCreateWithoutNotificationInput, Prisma.app_userUncheckedCreateWithoutNotificationInput>
+  connectOrCreate?: Prisma.app_userCreateOrConnectWithoutNotificationInput
+  upsert?: Prisma.app_userUpsertWithoutNotificationInput
+  connect?: Prisma.app_userWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.app_userUpdateToOneWithWhereWithoutNotificationInput, Prisma.app_userUpdateWithoutNotificationInput>, Prisma.app_userUncheckedUpdateWithoutNotificationInput>
+}
+
 export type app_userCreateWithoutActivity_logInput = {
   id?: string
   email: string
@@ -738,6 +780,8 @@ export type app_userCreateWithoutActivity_logInput = {
   itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
 }
 
@@ -763,6 +807,8 @@ export type app_userUncheckedCreateWithoutActivity_logInput = {
   itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
 }
 
@@ -804,6 +850,8 @@ export type app_userUpdateWithoutActivity_logInput = {
   itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
 }
 
@@ -829,6 +877,8 @@ export type app_userUncheckedUpdateWithoutActivity_logInput = {
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
@@ -854,6 +904,8 @@ export type app_userCreateWithoutAdmin_profile_admin_profile_granted_byToapp_use
   itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
 }
 
@@ -879,6 +931,8 @@ export type app_userUncheckedCreateWithoutAdmin_profile_admin_profile_granted_by
   itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
 }
 
@@ -909,6 +963,8 @@ export type app_userCreateWithoutAdmin_profile_admin_profile_user_idToapp_userIn
   itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
 }
 
@@ -934,6 +990,8 @@ export type app_userUncheckedCreateWithoutAdmin_profile_admin_profile_user_idToa
   itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
 }
 
@@ -975,6 +1033,8 @@ export type app_userUpdateWithoutAdmin_profile_admin_profile_granted_byToapp_use
   itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1000,6 +1060,8 @@ export type app_userUncheckedUpdateWithoutAdmin_profile_admin_profile_granted_by
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1036,6 +1098,8 @@ export type app_userUpdateWithoutAdmin_profile_admin_profile_user_idToapp_userIn
   itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1061,6 +1125,8 @@ export type app_userUncheckedUpdateWithoutAdmin_profile_admin_profile_user_idToa
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1086,6 +1152,8 @@ export type app_userCreateWithoutAi_sessionInput = {
   itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
 }
 
@@ -1111,6 +1179,8 @@ export type app_userUncheckedCreateWithoutAi_sessionInput = {
   itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
 }
 
@@ -1152,6 +1222,8 @@ export type app_userUpdateWithoutAi_sessionInput = {
   itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1177,6 +1249,8 @@ export type app_userUncheckedUpdateWithoutAi_sessionInput = {
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1202,6 +1276,8 @@ export type app_userCreateWithoutChat_sessionInput = {
   itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
 }
 
@@ -1227,6 +1303,8 @@ export type app_userUncheckedCreateWithoutChat_sessionInput = {
   itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
 }
 
@@ -1268,6 +1346,8 @@ export type app_userUpdateWithoutChat_sessionInput = {
   itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1293,6 +1373,8 @@ export type app_userUncheckedUpdateWithoutChat_sessionInput = {
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1318,6 +1400,8 @@ export type app_userCreateWithoutGoogle_oauth_tokensInput = {
   itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
 }
 
@@ -1343,6 +1427,8 @@ export type app_userUncheckedCreateWithoutGoogle_oauth_tokensInput = {
   itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
 }
 
@@ -1384,6 +1470,8 @@ export type app_userUpdateWithoutGoogle_oauth_tokensInput = {
   itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1409,6 +1497,8 @@ export type app_userUncheckedUpdateWithoutGoogle_oauth_tokensInput = {
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1434,6 +1524,8 @@ export type app_userCreateWithoutItineraryInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensCreateNestedOneWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
 }
 
@@ -1459,6 +1551,8 @@ export type app_userUncheckedCreateWithoutItineraryInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensUncheckedCreateNestedOneWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
 }
 
@@ -1500,6 +1594,8 @@ export type app_userUpdateWithoutItineraryInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensUpdateOneWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1525,6 +1621,8 @@ export type app_userUncheckedUpdateWithoutItineraryInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensUncheckedUpdateOneWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1550,6 +1648,8 @@ export type app_userCreateWithoutListing_entry_feeInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensCreateNestedOneWithoutApp_userInput
   itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
 }
 
@@ -1575,6 +1675,8 @@ export type app_userUncheckedCreateWithoutListing_entry_feeInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensUncheckedCreateNestedOneWithoutApp_userInput
   itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
 }
 
@@ -1616,6 +1718,8 @@ export type app_userUpdateWithoutListing_entry_feeInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensUpdateOneWithoutApp_userNestedInput
   itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1641,6 +1745,8 @@ export type app_userUncheckedUpdateWithoutListing_entry_feeInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensUncheckedUpdateOneWithoutApp_userNestedInput
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1666,6 +1772,8 @@ export type app_userCreateWithoutApp_settingInput = {
   itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
 }
 
@@ -1691,6 +1799,8 @@ export type app_userUncheckedCreateWithoutApp_settingInput = {
   itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
 }
 
@@ -1732,6 +1842,8 @@ export type app_userUpdateWithoutApp_settingInput = {
   itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1757,6 +1869,8 @@ export type app_userUncheckedUpdateWithoutApp_settingInput = {
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1782,6 +1896,8 @@ export type app_userCreateWithoutLlm_provider_keyInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensCreateNestedOneWithoutApp_userInput
   itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
 }
 
@@ -1807,6 +1923,8 @@ export type app_userUncheckedCreateWithoutLlm_provider_keyInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensUncheckedCreateNestedOneWithoutApp_userInput
   itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
   traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
 }
 
@@ -1848,6 +1966,8 @@ export type app_userUpdateWithoutLlm_provider_keyInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensUpdateOneWithoutApp_userNestedInput
   itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1873,6 +1993,8 @@ export type app_userUncheckedUpdateWithoutLlm_provider_keyInput = {
   google_oauth_tokens?: Prisma.google_oauth_tokensUncheckedUpdateOneWithoutApp_userNestedInput
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
   traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
@@ -1899,6 +2021,8 @@ export type app_userCreateWithoutTraveler_profileInput = {
   itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
 }
 
 export type app_userUncheckedCreateWithoutTraveler_profileInput = {
@@ -1924,6 +2048,8 @@ export type app_userUncheckedCreateWithoutTraveler_profileInput = {
   itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
 }
 
 export type app_userCreateOrConnectWithoutTraveler_profileInput = {
@@ -1965,6 +2091,8 @@ export type app_userUpdateWithoutTraveler_profileInput = {
   itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
 }
 
 export type app_userUncheckedUpdateWithoutTraveler_profileInput = {
@@ -1990,6 +2118,256 @@ export type app_userUncheckedUpdateWithoutTraveler_profileInput = {
   itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
   listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
   llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
+}
+
+export type app_userCreateWithoutNotification_settingsInput = {
+  id?: string
+  email: string
+  name?: string | null
+  phone?: string | null
+  email_verified?: boolean
+  role?: string
+  is_active?: boolean
+  location_enabled?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  keycloak_id?: string | null
+  avatar_url?: string | null
+  activity_log?: Prisma.activity_logCreateNestedManyWithoutApp_userInput
+  admin_profile_admin_profile_granted_byToapp_user?: Prisma.admin_profileCreateNestedManyWithoutApp_user_admin_profile_granted_byToapp_userInput
+  admin_profile_admin_profile_user_idToapp_user?: Prisma.admin_profileCreateNestedOneWithoutApp_user_admin_profile_user_idToapp_userInput
+  ai_session?: Prisma.ai_sessionCreateNestedManyWithoutApp_userInput
+  app_setting?: Prisma.app_settingCreateNestedManyWithoutApp_userInput
+  chat_session?: Prisma.chat_sessionCreateNestedManyWithoutApp_userInput
+  google_oauth_tokens?: Prisma.google_oauth_tokensCreateNestedOneWithoutApp_userInput
+  itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
+  listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
+  llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationCreateNestedManyWithoutApp_userInput
+  traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
+}
+
+export type app_userUncheckedCreateWithoutNotification_settingsInput = {
+  id?: string
+  email: string
+  name?: string | null
+  phone?: string | null
+  email_verified?: boolean
+  role?: string
+  is_active?: boolean
+  location_enabled?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  keycloak_id?: string | null
+  avatar_url?: string | null
+  activity_log?: Prisma.activity_logUncheckedCreateNestedManyWithoutApp_userInput
+  admin_profile_admin_profile_granted_byToapp_user?: Prisma.admin_profileUncheckedCreateNestedManyWithoutApp_user_admin_profile_granted_byToapp_userInput
+  admin_profile_admin_profile_user_idToapp_user?: Prisma.admin_profileUncheckedCreateNestedOneWithoutApp_user_admin_profile_user_idToapp_userInput
+  ai_session?: Prisma.ai_sessionUncheckedCreateNestedManyWithoutApp_userInput
+  app_setting?: Prisma.app_settingUncheckedCreateNestedManyWithoutApp_userInput
+  chat_session?: Prisma.chat_sessionUncheckedCreateNestedManyWithoutApp_userInput
+  google_oauth_tokens?: Prisma.google_oauth_tokensUncheckedCreateNestedOneWithoutApp_userInput
+  itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
+  listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
+  llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification?: Prisma.notificationUncheckedCreateNestedManyWithoutApp_userInput
+  traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
+}
+
+export type app_userCreateOrConnectWithoutNotification_settingsInput = {
+  where: Prisma.app_userWhereUniqueInput
+  create: Prisma.XOR<Prisma.app_userCreateWithoutNotification_settingsInput, Prisma.app_userUncheckedCreateWithoutNotification_settingsInput>
+}
+
+export type app_userUpsertWithoutNotification_settingsInput = {
+  update: Prisma.XOR<Prisma.app_userUpdateWithoutNotification_settingsInput, Prisma.app_userUncheckedUpdateWithoutNotification_settingsInput>
+  create: Prisma.XOR<Prisma.app_userCreateWithoutNotification_settingsInput, Prisma.app_userUncheckedCreateWithoutNotification_settingsInput>
+  where?: Prisma.app_userWhereInput
+}
+
+export type app_userUpdateToOneWithWhereWithoutNotification_settingsInput = {
+  where?: Prisma.app_userWhereInput
+  data: Prisma.XOR<Prisma.app_userUpdateWithoutNotification_settingsInput, Prisma.app_userUncheckedUpdateWithoutNotification_settingsInput>
+}
+
+export type app_userUpdateWithoutNotification_settingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  location_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keycloak_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activity_log?: Prisma.activity_logUpdateManyWithoutApp_userNestedInput
+  admin_profile_admin_profile_granted_byToapp_user?: Prisma.admin_profileUpdateManyWithoutApp_user_admin_profile_granted_byToapp_userNestedInput
+  admin_profile_admin_profile_user_idToapp_user?: Prisma.admin_profileUpdateOneWithoutApp_user_admin_profile_user_idToapp_userNestedInput
+  ai_session?: Prisma.ai_sessionUpdateManyWithoutApp_userNestedInput
+  app_setting?: Prisma.app_settingUpdateManyWithoutApp_userNestedInput
+  chat_session?: Prisma.chat_sessionUpdateManyWithoutApp_userNestedInput
+  google_oauth_tokens?: Prisma.google_oauth_tokensUpdateOneWithoutApp_userNestedInput
+  itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
+  llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUpdateManyWithoutApp_userNestedInput
+  traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
+}
+
+export type app_userUncheckedUpdateWithoutNotification_settingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  location_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keycloak_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activity_log?: Prisma.activity_logUncheckedUpdateManyWithoutApp_userNestedInput
+  admin_profile_admin_profile_granted_byToapp_user?: Prisma.admin_profileUncheckedUpdateManyWithoutApp_user_admin_profile_granted_byToapp_userNestedInput
+  admin_profile_admin_profile_user_idToapp_user?: Prisma.admin_profileUncheckedUpdateOneWithoutApp_user_admin_profile_user_idToapp_userNestedInput
+  ai_session?: Prisma.ai_sessionUncheckedUpdateManyWithoutApp_userNestedInput
+  app_setting?: Prisma.app_settingUncheckedUpdateManyWithoutApp_userNestedInput
+  chat_session?: Prisma.chat_sessionUncheckedUpdateManyWithoutApp_userNestedInput
+  google_oauth_tokens?: Prisma.google_oauth_tokensUncheckedUpdateOneWithoutApp_userNestedInput
+  itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
+  llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification?: Prisma.notificationUncheckedUpdateManyWithoutApp_userNestedInput
+  traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
+}
+
+export type app_userCreateWithoutNotificationInput = {
+  id?: string
+  email: string
+  name?: string | null
+  phone?: string | null
+  email_verified?: boolean
+  role?: string
+  is_active?: boolean
+  location_enabled?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  keycloak_id?: string | null
+  avatar_url?: string | null
+  activity_log?: Prisma.activity_logCreateNestedManyWithoutApp_userInput
+  admin_profile_admin_profile_granted_byToapp_user?: Prisma.admin_profileCreateNestedManyWithoutApp_user_admin_profile_granted_byToapp_userInput
+  admin_profile_admin_profile_user_idToapp_user?: Prisma.admin_profileCreateNestedOneWithoutApp_user_admin_profile_user_idToapp_userInput
+  ai_session?: Prisma.ai_sessionCreateNestedManyWithoutApp_userInput
+  app_setting?: Prisma.app_settingCreateNestedManyWithoutApp_userInput
+  chat_session?: Prisma.chat_sessionCreateNestedManyWithoutApp_userInput
+  google_oauth_tokens?: Prisma.google_oauth_tokensCreateNestedOneWithoutApp_userInput
+  itinerary?: Prisma.itineraryCreateNestedManyWithoutApp_userInput
+  listing_entry_fee?: Prisma.listing_entry_feeCreateNestedManyWithoutApp_userInput
+  llm_provider_key?: Prisma.llm_provider_keyCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsCreateNestedOneWithoutApp_userInput
+  traveler_profile?: Prisma.traveler_profileCreateNestedOneWithoutApp_userInput
+}
+
+export type app_userUncheckedCreateWithoutNotificationInput = {
+  id?: string
+  email: string
+  name?: string | null
+  phone?: string | null
+  email_verified?: boolean
+  role?: string
+  is_active?: boolean
+  location_enabled?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  keycloak_id?: string | null
+  avatar_url?: string | null
+  activity_log?: Prisma.activity_logUncheckedCreateNestedManyWithoutApp_userInput
+  admin_profile_admin_profile_granted_byToapp_user?: Prisma.admin_profileUncheckedCreateNestedManyWithoutApp_user_admin_profile_granted_byToapp_userInput
+  admin_profile_admin_profile_user_idToapp_user?: Prisma.admin_profileUncheckedCreateNestedOneWithoutApp_user_admin_profile_user_idToapp_userInput
+  ai_session?: Prisma.ai_sessionUncheckedCreateNestedManyWithoutApp_userInput
+  app_setting?: Prisma.app_settingUncheckedCreateNestedManyWithoutApp_userInput
+  chat_session?: Prisma.chat_sessionUncheckedCreateNestedManyWithoutApp_userInput
+  google_oauth_tokens?: Prisma.google_oauth_tokensUncheckedCreateNestedOneWithoutApp_userInput
+  itinerary?: Prisma.itineraryUncheckedCreateNestedManyWithoutApp_userInput
+  listing_entry_fee?: Prisma.listing_entry_feeUncheckedCreateNestedManyWithoutApp_userInput
+  llm_provider_key?: Prisma.llm_provider_keyUncheckedCreateNestedManyWithoutApp_userInput
+  notification_settings?: Prisma.notification_settingsUncheckedCreateNestedOneWithoutApp_userInput
+  traveler_profile?: Prisma.traveler_profileUncheckedCreateNestedOneWithoutApp_userInput
+}
+
+export type app_userCreateOrConnectWithoutNotificationInput = {
+  where: Prisma.app_userWhereUniqueInput
+  create: Prisma.XOR<Prisma.app_userCreateWithoutNotificationInput, Prisma.app_userUncheckedCreateWithoutNotificationInput>
+}
+
+export type app_userUpsertWithoutNotificationInput = {
+  update: Prisma.XOR<Prisma.app_userUpdateWithoutNotificationInput, Prisma.app_userUncheckedUpdateWithoutNotificationInput>
+  create: Prisma.XOR<Prisma.app_userCreateWithoutNotificationInput, Prisma.app_userUncheckedCreateWithoutNotificationInput>
+  where?: Prisma.app_userWhereInput
+}
+
+export type app_userUpdateToOneWithWhereWithoutNotificationInput = {
+  where?: Prisma.app_userWhereInput
+  data: Prisma.XOR<Prisma.app_userUpdateWithoutNotificationInput, Prisma.app_userUncheckedUpdateWithoutNotificationInput>
+}
+
+export type app_userUpdateWithoutNotificationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  location_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keycloak_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activity_log?: Prisma.activity_logUpdateManyWithoutApp_userNestedInput
+  admin_profile_admin_profile_granted_byToapp_user?: Prisma.admin_profileUpdateManyWithoutApp_user_admin_profile_granted_byToapp_userNestedInput
+  admin_profile_admin_profile_user_idToapp_user?: Prisma.admin_profileUpdateOneWithoutApp_user_admin_profile_user_idToapp_userNestedInput
+  ai_session?: Prisma.ai_sessionUpdateManyWithoutApp_userNestedInput
+  app_setting?: Prisma.app_settingUpdateManyWithoutApp_userNestedInput
+  chat_session?: Prisma.chat_sessionUpdateManyWithoutApp_userNestedInput
+  google_oauth_tokens?: Prisma.google_oauth_tokensUpdateOneWithoutApp_userNestedInput
+  itinerary?: Prisma.itineraryUpdateManyWithoutApp_userNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUpdateManyWithoutApp_userNestedInput
+  llm_provider_key?: Prisma.llm_provider_keyUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUpdateOneWithoutApp_userNestedInput
+  traveler_profile?: Prisma.traveler_profileUpdateOneWithoutApp_userNestedInput
+}
+
+export type app_userUncheckedUpdateWithoutNotificationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  location_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keycloak_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activity_log?: Prisma.activity_logUncheckedUpdateManyWithoutApp_userNestedInput
+  admin_profile_admin_profile_granted_byToapp_user?: Prisma.admin_profileUncheckedUpdateManyWithoutApp_user_admin_profile_granted_byToapp_userNestedInput
+  admin_profile_admin_profile_user_idToapp_user?: Prisma.admin_profileUncheckedUpdateOneWithoutApp_user_admin_profile_user_idToapp_userNestedInput
+  ai_session?: Prisma.ai_sessionUncheckedUpdateManyWithoutApp_userNestedInput
+  app_setting?: Prisma.app_settingUncheckedUpdateManyWithoutApp_userNestedInput
+  chat_session?: Prisma.chat_sessionUncheckedUpdateManyWithoutApp_userNestedInput
+  google_oauth_tokens?: Prisma.google_oauth_tokensUncheckedUpdateOneWithoutApp_userNestedInput
+  itinerary?: Prisma.itineraryUncheckedUpdateManyWithoutApp_userNestedInput
+  listing_entry_fee?: Prisma.listing_entry_feeUncheckedUpdateManyWithoutApp_userNestedInput
+  llm_provider_key?: Prisma.llm_provider_keyUncheckedUpdateManyWithoutApp_userNestedInput
+  notification_settings?: Prisma.notification_settingsUncheckedUpdateOneWithoutApp_userNestedInput
+  traveler_profile?: Prisma.traveler_profileUncheckedUpdateOneWithoutApp_userNestedInput
 }
 
 
@@ -2006,6 +2384,7 @@ export type App_userCountOutputType = {
   itinerary: number
   listing_entry_fee: number
   llm_provider_key: number
+  notification: number
 }
 
 export type App_userCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2017,6 +2396,7 @@ export type App_userCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   itinerary?: boolean | App_userCountOutputTypeCountItineraryArgs
   listing_entry_fee?: boolean | App_userCountOutputTypeCountListing_entry_feeArgs
   llm_provider_key?: boolean | App_userCountOutputTypeCountLlm_provider_keyArgs
+  notification?: boolean | App_userCountOutputTypeCountNotificationArgs
 }
 
 /**
@@ -2085,6 +2465,13 @@ export type App_userCountOutputTypeCountLlm_provider_keyArgs<ExtArgs extends run
   where?: Prisma.llm_provider_keyWhereInput
 }
 
+/**
+ * App_userCountOutputType without action
+ */
+export type App_userCountOutputTypeCountNotificationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.notificationWhereInput
+}
+
 
 export type app_userSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2109,6 +2496,8 @@ export type app_userSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   itinerary?: boolean | Prisma.app_user$itineraryArgs<ExtArgs>
   listing_entry_fee?: boolean | Prisma.app_user$listing_entry_feeArgs<ExtArgs>
   llm_provider_key?: boolean | Prisma.app_user$llm_provider_keyArgs<ExtArgs>
+  notification?: boolean | Prisma.app_user$notificationArgs<ExtArgs>
+  notification_settings?: boolean | Prisma.app_user$notification_settingsArgs<ExtArgs>
   traveler_profile?: boolean | Prisma.app_user$traveler_profileArgs<ExtArgs>
   _count?: boolean | Prisma.App_userCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["app_user"]>
@@ -2170,6 +2559,8 @@ export type app_userInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   itinerary?: boolean | Prisma.app_user$itineraryArgs<ExtArgs>
   listing_entry_fee?: boolean | Prisma.app_user$listing_entry_feeArgs<ExtArgs>
   llm_provider_key?: boolean | Prisma.app_user$llm_provider_keyArgs<ExtArgs>
+  notification?: boolean | Prisma.app_user$notificationArgs<ExtArgs>
+  notification_settings?: boolean | Prisma.app_user$notification_settingsArgs<ExtArgs>
   traveler_profile?: boolean | Prisma.app_user$traveler_profileArgs<ExtArgs>
   _count?: boolean | Prisma.App_userCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2189,6 +2580,8 @@ export type $app_userPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     itinerary: Prisma.$itineraryPayload<ExtArgs>[]
     listing_entry_fee: Prisma.$listing_entry_feePayload<ExtArgs>[]
     llm_provider_key: Prisma.$llm_provider_keyPayload<ExtArgs>[]
+    notification: Prisma.$notificationPayload<ExtArgs>[]
+    notification_settings: Prisma.$notification_settingsPayload<ExtArgs> | null
     traveler_profile: Prisma.$traveler_profilePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2608,6 +3001,8 @@ export interface Prisma__app_userClient<T, Null = never, ExtArgs extends runtime
   itinerary<T extends Prisma.app_user$itineraryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.app_user$itineraryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$itineraryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   listing_entry_fee<T extends Prisma.app_user$listing_entry_feeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.app_user$listing_entry_feeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$listing_entry_feePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   llm_provider_key<T extends Prisma.app_user$llm_provider_keyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.app_user$llm_provider_keyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$llm_provider_keyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notification<T extends Prisma.app_user$notificationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.app_user$notificationArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$notificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notification_settings<T extends Prisma.app_user$notification_settingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.app_user$notification_settingsArgs<ExtArgs>>): Prisma.Prisma__notification_settingsClient<runtime.Types.Result.GetResult<Prisma.$notification_settingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   traveler_profile<T extends Prisma.app_user$traveler_profileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.app_user$traveler_profileArgs<ExtArgs>>): Prisma.Prisma__traveler_profileClient<runtime.Types.Result.GetResult<Prisma.$traveler_profilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3270,6 +3665,49 @@ export type app_user$llm_provider_keyArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.Llm_provider_keyScalarFieldEnum | Prisma.Llm_provider_keyScalarFieldEnum[]
+}
+
+/**
+ * app_user.notification
+ */
+export type app_user$notificationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the notification
+   */
+  select?: Prisma.notificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the notification
+   */
+  omit?: Prisma.notificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.notificationInclude<ExtArgs> | null
+  where?: Prisma.notificationWhereInput
+  orderBy?: Prisma.notificationOrderByWithRelationInput | Prisma.notificationOrderByWithRelationInput[]
+  cursor?: Prisma.notificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * app_user.notification_settings
+ */
+export type app_user$notification_settingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the notification_settings
+   */
+  select?: Prisma.notification_settingsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the notification_settings
+   */
+  omit?: Prisma.notification_settingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.notification_settingsInclude<ExtArgs> | null
+  where?: Prisma.notification_settingsWhereInput
 }
 
 /**

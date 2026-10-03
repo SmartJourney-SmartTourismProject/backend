@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 import { CreateExpenseDto } from './dto/create-expense.dto.js';
 import { UpdateExpenseDto } from './dto/update-expense.dto.js';
 
@@ -23,7 +24,27 @@ function computeStatus(budget: number | null, spent: number): BudgetStatus {
 
 @Injectable()
 export class BudgetService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+  ) {}
+
+  /** Budget alert email if this change pushed the trip to WATCH or OVER
+   * BUDGET. Not awaited by the caller - the expense is saved either way. */
+  private checkBudgetAlert(userId: string, tripId: string) {
+    void this.getTripBudget(userId, tripId)
+      .then((budget) =>
+        this.notifications.budgetChanged(userId, {
+          id: tripId,
+          title: budget.trip.title ?? 'Your trip',
+          status: budget.status,
+          spent: budget.spent,
+          budget: budget.total,
+          currency: budget.trip.currency,
+        }),
+      )
+      .catch(() => undefined);
+  }
 
   /** Ownership check shared by every route here - a user may only touch
    * expenses on their own itineraries. NotFoundException (not Forbidden),
@@ -66,7 +87,7 @@ export class BudgetService {
 
   async addExpense(userId: string, tripId: string, dto: CreateExpenseDto) {
     await this.getOwnedItinerary(userId, tripId);
-    return this.prisma.expense.create({
+    const expense = await this.prisma.expense.create({
       data: {
         itinerary_id: tripId,
         category: dto.category,
@@ -76,11 +97,13 @@ export class BudgetService {
         ...(dto.occurred_at && { occurred_at: new Date(dto.occurred_at) }),
       },
     });
+    this.checkBudgetAlert(userId, tripId);
+    return expense;
   }
 
   async updateExpense(userId: string, expenseId: string, dto: UpdateExpenseDto) {
-    await this.getOwnedExpense(userId, expenseId);
-    return this.prisma.expense.update({
+    const existing = await this.getOwnedExpense(userId, expenseId);
+    const expense = await this.prisma.expense.update({
       where: { id: expenseId },
       data: {
         ...(dto.category !== undefined && { category: dto.category }),
@@ -90,6 +113,8 @@ export class BudgetService {
         ...(dto.occurred_at !== undefined && { occurred_at: new Date(dto.occurred_at) }),
       },
     });
+    if (dto.amount !== undefined) this.checkBudgetAlert(userId, existing.itinerary_id);
+    return expense;
   }
 
   async deleteExpense(userId: string, expenseId: string) {

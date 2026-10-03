@@ -55,6 +55,14 @@ services:
       AI_BACKEND_TIMEOUT_MS: ${AI_BACKEND_TIMEOUT_MS:-120000}
       SETTINGS_ENCRYPTION_KEY: ${SETTINGS_ENCRYPTION_KEY:?set SETTINGS_ENCRYPTION_KEY in .env}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:?set INTERNAL_API_TOKEN in .env}
+      # Notification emails reuse Keycloak's SMTP account unless overridden.
+      MAIL_HOST: ${MAIL_HOST:-${KC_SMTP_HOST:-smtp.gmail.com}}
+      MAIL_PORT: ${MAIL_PORT:-${KC_SMTP_PORT:-587}}
+      MAIL_SECURE: ${MAIL_SECURE:-${KC_SMTP_SSL:-false}}
+      MAIL_USER: ${MAIL_USER:-${KC_SMTP_USER:-}}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-${KC_SMTP_PASSWORD:-}}
+      MAIL_FROM: ${MAIL_FROM:-SmartJourney <${KC_SMTP_FROM:-noreply@smartjourney.local}>}
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-}
     depends_on:
       db:
         condition: service_healthy

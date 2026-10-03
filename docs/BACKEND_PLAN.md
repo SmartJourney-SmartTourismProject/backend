@@ -16,7 +16,7 @@ silently re-litigated later.
 |---|---|---|
 | **AI backend ↔ database** | Direct connection | AI backend's `db_tool.py` / `calendar_tool.py` get rewritten from the Supabase SDK to `asyncpg` against the same `DATABASE_URL`. No network hop inside trip-planning; AI backend stays independently runnable. **Two services share one database** — see §2 for who owns what. |
 | **PostGIS** | Keep it | `postgis/postgis:16-3.4` image, `geography(Point,4326)` columns as SRS/SAD specify. Costs some Prisma friction — mitigated in §4.2. |
-| **Endpoint scope** | Core + admin | Auth, profile, chat/trip planning, saved itineraries, explore, budget tracker, admin (listings CRUD + verification, user management). **Deferred:** subscriptions/payments, FCM + email notifications, analytics dashboard. |
+| **Endpoint scope** | Core + admin | Auth, profile, chat/trip planning, saved itineraries, explore, budget tracker, admin (listings CRUD + verification, user management). **Deferred:** subscriptions/payments, FCM push notifications, analytics dashboard. ~~Email notifications~~ **done 2026-10-03** (see §1 deviations). |
 | **Auth depth** | ~~JWT + Google sign-in~~ **Keycloak (decided 2026-09-20)** | Keycloak 26 in Docker (`backend/keycloak/`) owns accounts, passwords, the SRS §3.1.1 password policy, Google sign-in (as an identity provider) and realm roles `traveler`/`admin`. NestJS issues **no tokens**: it verifies Keycloak's RS256 access tokens against the realm JWKS (`src/auth/`) and mirrors each user into `app_user` on first request (`src/users/`). Web uses next-auth; mobile will use a PKCE public client. **Email flows are on** (decided 2026-09-20): realm SMTP is configured from `KC_SMTP_*` env vars — locally the `mailpit` compose service (inbox at http://localhost:8025), in production a real provider — so Keycloak's forgot-password and verify-email screens work. |
 
 ### Deliberate deviations from SRS/SAD, to note in the report
@@ -26,6 +26,12 @@ silently re-litigated later.
   `resetPasswordAllowed` are on in the realm, mail goes out through the realm's SMTP settings
   (`KC_SMTP_*` in `.env`; Mailpit locally). Google sign-ins skip verification (`trustEmail`).
   One nuance vs. the SRS wording: Keycloak sends a verification *link*, not a numeric *code*.
+- **Email notifications added 2026-10-03** (`src/notifications/`, migration `0018_notifications.sql`).
+  Opt-in per user (Settings > Notifications > Email, off by default) with per-type switches. Sends:
+  trip-saved confirmation, "trip starts tomorrow" reminder and rain-forecast alerts (daily cron,
+  07:00 Asia/Colombo, OpenWeather), budget WATCH / OVER BUDGET alerts on expense changes. Each is
+  deduped through `notification (user_id, dedupe_key)`. SMTP via `MAIL_*` (Mailpit locally; prod
+  falls back to the `KC_SMTP_*` account). Push (FCM) is still deferred - its toggle is stored only.
 - **Subscriptions, notifications, analytics deferred.** SRS §3.1.9/§3.1.10/§3.1.14. Their tables
   are omitted from the first migration rather than created-and-unused; adding them later is
   additive, not a breaking change.

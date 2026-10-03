@@ -201,3 +201,14 @@ export type knowledge_chunk = Prisma.knowledge_chunkModel
  * 
  */
 export type knowledge_document = Prisma.knowledge_documentModel
+/**
+ * Model notification_settings
+ * Per-user notification preferences (0018_notifications.sql). No row = the
+ * column defaults; email stays off until the user opts in.
+ */
+export type notification_settings = Prisma.notification_settingsModel
+/**
+ * Model notification
+ * Sent-notification log + dedupe guard: UNIQUE (user_id, dedupe_key).
+ */
+export type notification = Prisma.notificationModel

@@ -427,7 +427,9 @@ export const ModelName = {
   llm_provider_key: 'llm_provider_key',
   traveler_profile: 'traveler_profile',
   knowledge_chunk: 'knowledge_chunk',
-  knowledge_document: 'knowledge_document'
+  knowledge_document: 'knowledge_document',
+  notification_settings: 'notification_settings',
+  notification: 'notification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -443,7 +445,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "activity_log" | "admin_profile" | "ai_session" | "app_user" | "category" | "chat_message" | "chat_session" | "cost_reference" | "data_source" | "data_source_run" | "district" | "expense" | "geo_resolution" | "google_oauth_tokens" | "itinerary" | "itinerary_day" | "itinerary_item" | "listing_image" | "listing_entry_fee" | "local_event" | "schema_migration" | "spatial_ref_sys" | "tag_mapping" | "tag_vocabulary" | "travel_listing" | "travel_time" | "app_setting" | "llm_provider_key" | "traveler_profile" | "knowledge_chunk" | "knowledge_document"
+    modelProps: "activity_log" | "admin_profile" | "ai_session" | "app_user" | "category" | "chat_message" | "chat_session" | "cost_reference" | "data_source" | "data_source_run" | "district" | "expense" | "geo_resolution" | "google_oauth_tokens" | "itinerary" | "itinerary_day" | "itinerary_item" | "listing_image" | "listing_entry_fee" | "local_event" | "schema_migration" | "spatial_ref_sys" | "tag_mapping" | "tag_vocabulary" | "travel_listing" | "travel_time" | "app_setting" | "llm_provider_key" | "traveler_profile" | "knowledge_chunk" | "knowledge_document" | "notification_settings" | "notification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2693,6 +2695,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    notification_settings: {
+      payload: Prisma.$notification_settingsPayload<ExtArgs>
+      fields: Prisma.notification_settingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.notification_settingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notification_settingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.notification_settingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notification_settingsPayload>
+        }
+        findFirst: {
+          args: Prisma.notification_settingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notification_settingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.notification_settingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notification_settingsPayload>
+        }
+        findMany: {
+          args: Prisma.notification_settingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notification_settingsPayload>[]
+        }
+        create: {
+          args: Prisma.notification_settingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notification_settingsPayload>
+        }
+        createMany: {
+          args: Prisma.notification_settingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.notification_settingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notification_settingsPayload>[]
+        }
+        delete: {
+          args: Prisma.notification_settingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notification_settingsPayload>
+        }
+        update: {
+          args: Prisma.notification_settingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notification_settingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.notification_settingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.notification_settingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.notification_settingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notification_settingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.notification_settingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notification_settingsPayload>
+        }
+        aggregate: {
+          args: Prisma.Notification_settingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotification_settings>
+        }
+        groupBy: {
+          args: Prisma.notification_settingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Notification_settingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.notification_settingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Notification_settingsCountAggregateOutputType> | number
+        }
+      }
+    }
+    notification: {
+      payload: Prisma.$notificationPayload<ExtArgs>
+      fields: Prisma.notificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.notificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.notificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        findFirst: {
+          args: Prisma.notificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.notificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        findMany: {
+          args: Prisma.notificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>[]
+        }
+        create: {
+          args: Prisma.notificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        createMany: {
+          args: Prisma.notificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.notificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>[]
+        }
+        delete: {
+          args: Prisma.notificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        update: {
+          args: Prisma.notificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.notificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.notificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.notificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.notificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationPayload>
+        }
+        aggregate: {
+          args: Prisma.NotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotification>
+        }
+        groupBy: {
+          args: Prisma.notificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.notificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3165,6 +3315,34 @@ export const Knowledge_documentScalarFieldEnum = {
 export type Knowledge_documentScalarFieldEnum = (typeof Knowledge_documentScalarFieldEnum)[keyof typeof Knowledge_documentScalarFieldEnum]
 
 
+export const Notification_settingsScalarFieldEnum = {
+  user_id: 'user_id',
+  trip_reminders: 'trip_reminders',
+  weather_alerts: 'weather_alerts',
+  budget_alerts: 'budget_alerts',
+  push_enabled: 'push_enabled',
+  email_enabled: 'email_enabled',
+  sound_enabled: 'sound_enabled',
+  sound_volume: 'sound_volume',
+  updated_at: 'updated_at'
+} as const
+
+export type Notification_settingsScalarFieldEnum = (typeof Notification_settingsScalarFieldEnum)[keyof typeof Notification_settingsScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  type: 'type',
+  channel: 'channel',
+  dedupe_key: 'dedupe_key',
+  subject: 'subject',
+  created_at: 'created_at'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3505,6 +3683,8 @@ export type GlobalOmitConfig = {
   traveler_profile?: Prisma.traveler_profileOmit
   knowledge_chunk?: Prisma.knowledge_chunkOmit
   knowledge_document?: Prisma.knowledge_documentOmit
+  notification_settings?: Prisma.notification_settingsOmit
+  notification?: Prisma.notificationOmit
 }
 
 /* Types for Logging */
